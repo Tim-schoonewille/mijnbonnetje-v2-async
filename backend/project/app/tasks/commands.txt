@@ -1,0 +1,2 @@
+$ celery -A app.tasks beat
+$ celery -A app.tasks worker -l INFO

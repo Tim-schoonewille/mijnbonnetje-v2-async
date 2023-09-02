@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  web-db:
+    container_name: postgresql_fastapi_template
+    build:
+      context: ./project/db
+      dockerfile: Dockerfile
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  mongodb:
+    container_name: mongodb_fastapi_template
+    image: mongo:6-jammy
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=super-secret-password
+    ports:
+      - '27017:27017'
+    volumes:
+      - dbdata6:/data/db
+  
+  redis-cache:
+    image: redis:alpine
+    hostname: redis-cache
+    container_name: redis_cache_fastapi_template
+    ports:
+      - '6379:6379'
+    command: /bin/sh -c "redis-server --requirepass REDIS_PASSWORD"
+    volumes:
+      - cache:/data
+  
+  rabbitmq:
+    container_name: rabbitmq_fastapi_template
+    image: 'rabbitmq:management'
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+  
+
+volumes:
+  db_data:
+  dbdata6:
+  cache:
