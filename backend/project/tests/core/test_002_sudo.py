@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime, date
+from datetime import datetime
 from app.config import settings
 from app.crud.mongodb.mongo_crud import delete_api_call_logs
 
@@ -8,7 +8,9 @@ def compare_date_from_string_to_today(date_str: str) -> bool:
     datetime_object = datetime.strptime(
         date_str, '%Y-%m-%dT%H:%M:%S.%f'
     )
-    today = date.today()
+    today = datetime.utcnow().date()
+    print(today)
+    print(datetime_object.date())
     return today == datetime_object.date()
 
 

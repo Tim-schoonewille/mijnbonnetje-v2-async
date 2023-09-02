@@ -1,7 +1,7 @@
 from typing import Any
 from pathlib import Path
 
-import emails  # type:ignore
+import emails  # type: ignore
 from emails.template import JinjaTemplate as T  # type: ignore
 from fastapi import BackgroundTasks
 

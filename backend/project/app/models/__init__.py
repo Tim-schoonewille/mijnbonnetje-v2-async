@@ -60,6 +60,13 @@ from .mongo.traffic_log import (
     TrafficLogwithMetaData
 )
 
+from .categories import Categories
+from .receipt_entry import (
+    ReceiptEntryDB,
+    ReceiptEntry,
+    ReceiptEntryCreate,
+    ReceiptEntryUpdate,
+)
 
 SubscriptionWithTier.model_rebuild()
 ItemWithUser.model_rebuild()

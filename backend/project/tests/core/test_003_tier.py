@@ -1,6 +1,7 @@
 from datetime import date, datetime
 
 from app import models
+from app.db import create_test_tables
 
 tier = models.TierCreate(
     name='TestTier',
@@ -16,6 +17,7 @@ subscription_create_schema = models.SubscriptionCreateSchema(  # type: ignore
 
 
 def test_create_tier(client):
+    create_test_tables(drop=True)
     response = client.post('/sub/tier', json={**tier.model_dump()})
     data = response.json()
     assert response.status_code == 201
@@ -23,7 +25,7 @@ def test_create_tier(client):
     assert data_from_db == tier
     assert data['id']
     created_at_date_obj = datetime.fromisoformat(data['createdAt']).date()
-    assert created_at_date_obj == date.today()
+    assert created_at_date_obj == datetime.utcnow().date()
 
 
 def test_read_tiers(client):

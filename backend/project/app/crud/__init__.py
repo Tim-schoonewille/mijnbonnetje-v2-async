@@ -14,3 +14,5 @@ from .core.subscription import subscription  # noqa
 from .core.tier import tier  # noqa
 from .core.user import user  # noqa
 from .mongodb import mongo_crud  # noqa
+
+from .receipt_entry import receipt_entry # noqa

@@ -26,6 +26,8 @@ if TYPE_CHECKING:
     from app.models import RefreshTokenDB
     from app.models import SubscriptionDB
 
+    from app.models import ReceiptEntryDB
+
 
 class UserDB(IDFieldDBMixin, TimeStampDBMixin, Base):
     __tablename__ = "users"
@@ -50,6 +52,8 @@ class UserDB(IDFieldDBMixin, TimeStampDBMixin, Base):
     subscriptions: Mapped[List["SubscriptionDB"]] = relationship(back_populates="user")
     payments: Mapped[List["PaymentDB"]] = relationship(back_populates="user")
     items: Mapped[List["ItemDB"]] = relationship(back_populates="user")
+    
+    receipt_entries: Mapped[List["ReceiptEntryDB"]] = relationship(back_populates="user")
 
     def __repr__(self):
         return f'<User({self.id}) {self.email}>'
