@@ -1,3 +1,5 @@
+from datetime import date
+from typing import Optional
 from typing import TYPE_CHECKING
 from typing import List
 
@@ -34,6 +36,12 @@ class UserDB(IDFieldDBMixin, TimeStampDBMixin, Base):
     sudo: Mapped[bool] = mapped_column(default=False)
     two_factor: Mapped[bool] = mapped_column(default=False)
 
+    first_name: Mapped[Optional[str]]
+    last_name: Mapped[Optional[str]]
+    date_of_birth: Mapped[Optional[date]]
+    country: Mapped[Optional[str]]
+    phone_number: Mapped[Optional[str]]
+
     # login_history: Mapped[List['LoginHistoryDB']] = relationship(
     #   back_populates='user', lazy='selectin'
     # )
@@ -54,6 +62,13 @@ class User(IDFieldSchemaMixin, TimeStampSchemaMixin):
     verified: bool
     sudo: bool
     two_factor: bool
+
+    first_name: str | None = None
+    last_name: str | None = None
+    date_of_birth: date | None = None
+    country: str | None = None
+    phone_number: str | None = None
+
     model_config = ConfigDict(from_attributes=True)
 
 
@@ -75,11 +90,11 @@ class UserUpdateBase(CamelBase):
 
 
 class UserUpdate(UserUpdateBase):
-    email: EmailStr | None = None
-    password: str | None = None
-    active: bool | None = None
-    verified: bool | None = None
-    sudo: bool | None = None
+    first_name: str | None = None
+    last_name: str | None = None
+    date_of_birth: date | None = None
+    country: str | None = None
+    phone_number: str | None = None
 
 
 class UserUpdatePassword(UserUpdateBase):
