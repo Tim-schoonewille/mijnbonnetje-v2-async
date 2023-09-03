@@ -20,7 +20,16 @@ async def create_receipt_entry(
     schema: models.ReceiptEntryCreate, user: VerifiedUser, db: GetDB
 ):
     """Create new receipt entry"""
-    return await crud.receipt_entry.create(db, schema, user)
+    new_receipt_entry = await crud.receipt_entry.create(db, schema, user)
+    if schema.store_id:
+        store = await crud.store.get(db, schema.store_id)
+        if store is None:
+            raise HTTPException(status_code=404, detail="STORE_NOT_FOUND")
+        await store.awaitable_attrs.users
+        if store and user not in store.users:
+            store.users.append(user)
+            await db.commit()
+    return new_receipt_entry
 
 
 @router.get("/", response_model=list[models.ReceiptEntry])

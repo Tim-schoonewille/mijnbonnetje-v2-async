@@ -52,6 +52,7 @@ async def get_db():
 async def override_get_db():
     async with TestAsyncSessionLocal() as session:
         yield session
+    await session.close()
 
 
 async def get_db_in_pytest():

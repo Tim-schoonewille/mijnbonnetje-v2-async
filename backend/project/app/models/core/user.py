@@ -10,6 +10,7 @@ from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 
+from app.models.store import store_users_association_table
 from app.models.base import Base
 from app.models.base import CamelBase
 from app.models.base import IDFieldDBMixin
@@ -27,6 +28,7 @@ if TYPE_CHECKING:
     from app.models import SubscriptionDB
 
     from app.models import ReceiptEntryDB
+    from app.models import StoreDB
 
 
 class UserDB(IDFieldDBMixin, TimeStampDBMixin, Base):
@@ -52,8 +54,11 @@ class UserDB(IDFieldDBMixin, TimeStampDBMixin, Base):
     subscriptions: Mapped[List["SubscriptionDB"]] = relationship(back_populates="user")
     payments: Mapped[List["PaymentDB"]] = relationship(back_populates="user")
     items: Mapped[List["ItemDB"]] = relationship(back_populates="user")
-    
+
     receipt_entries: Mapped[List["ReceiptEntryDB"]] = relationship(back_populates="user")
+    stores: Mapped[list['StoreDB']] = relationship(
+        secondary=store_users_association_table, back_populates='users'
+    )
 
     def __repr__(self):
         return f'<User({self.id}) {self.email}>'

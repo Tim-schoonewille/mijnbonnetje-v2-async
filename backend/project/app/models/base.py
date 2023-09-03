@@ -20,9 +20,11 @@ from app.utilities.core.models import to_camel
 
 if settings.ID_UUID is True:
     IDFieldDB = Mapped[UUID]
+    OptionalIDFieldDB = Mapped[Optional[UUID]]
     id_field_db_default = uuid4
 else:
     IDFieldDB = Mapped[int]  # type: ignore
+    OptionalIDFieldDB = Mapped[Optional[int]]  # type: ignore
     id_field_db_default = None  # type: ignore
 
 
@@ -40,6 +42,10 @@ class UserIDFieldDBMixin:
 
 class SubscriptionIDFieldDBMixin:
     subscription_id: IDFieldDB = mapped_column(ForeignKey('subscriptions.id'))
+
+
+class StoreIDFieldDBMixin:
+    store_id: OptionalIDFieldDB = mapped_column(ForeignKey("stores.id"))
 
 
 class TierIDFieldDBMixin:

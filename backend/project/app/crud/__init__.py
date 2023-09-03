@@ -16,3 +16,4 @@ from .core.user import user  # noqa
 from .mongodb import mongo_crud  # noqa
 
 from .receipt_entry import receipt_entry # noqa
+from .store import store # noqa

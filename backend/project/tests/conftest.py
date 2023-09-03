@@ -1,27 +1,32 @@
-import pytest
 import random
-# from pydantic_settings import BaseSettings
 
+import pytest
+from app import crud
+from app import models
+from app.config import Settings
+from app.config import get_settings
+from app.db import TestAsyncSessionLocal
+from app.db import create_test_tables
+from app.db import get_db
+from app.db import override_get_db
+from app.db import test_sync_engine
+from app.main import create_application
+from app.mongodb import get_mongo_db
+from app.mongodb import get_test_mongo_db
+from app.utilities.core.auth import get_sudo
+from app.utilities.core.auth import get_user
+from app.utilities.core.auth import get_user_api_call_log
+from app.utilities.core.auth import get_verified_user
+from app.utilities.core.redis import cache
+from app.utilities.core.user_api_call_log import api_calls_exceeded
+from fastapi import Depends
+from fastapi import HTTPException
 from motor.motor_asyncio import AsyncIOMotorClient  # type: ignore
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
 from starlette.testclient import TestClient
-from fastapi import Depends, HTTPException
 
-from app.main import create_application
-from app import crud, models
-from app.config import get_settings, Settings
-from app.db import create_test_tables, override_get_db, get_db
-from app.db import TestAsyncSessionLocal, test_sync_engine
-from app.utilities.core.auth import (
-    get_verified_user,
-    get_sudo,
-    get_user,
-    get_user_api_call_log
-)
-from app.mongodb import get_test_mongo_db, get_mongo_db
-from app.utilities.core.user_api_call_log import api_calls_exceeded
-from app.utilities.core.redis import cache
+# from pydantic_settings import BaseSettings
 
 
 def get_settings_override():
@@ -30,15 +35,13 @@ def get_settings_override():
     settings.ID_UUID = False
     settings.DB_ASYNC_URL = settings.DB_TEST_ASYNC_URL
     settings.DB_SYNC_URL = settings.DB_TEST_SYNC_URL
-    settings.REDIS_LOGIN_PREFIX = 'test_login_attempts_user'
+    settings.REDIS_LOGIN_PREFIX = "test_login_attempts_user"
     settings.LOGIN_LOCKOUT_TIME = 5
     settings.MONGO_DB_DB = settings.MONGO_DB_TESTDB
     return settings
 
 
-async def get_verified_user_override(
-    db: AsyncSession = Depends(override_get_db)
-):
+async def get_verified_user_override(db: AsyncSession = Depends(override_get_db)):
     user = await crud.user.get(db, 10)
     return user
     # return models.UserDB(
@@ -47,11 +50,7 @@ async def get_verified_user_override(
 
 
 async def get_sudo_override():
-    return models.UserDB(
-        id=1,
-        email='mock@gmail.com',
-        sudo=True
-    )
+    return models.UserDB(id=1, email="mock@gmail.com", sudo=True)
 
 
 async def get_user_api_call_log_override(
@@ -61,11 +60,11 @@ async def get_user_api_call_log_override(
     collection = mongo[settings.API_CALL_LOG_COLLECTION]
     no_authorization = await api_calls_exceeded(collection, 1, 10)
     if no_authorization:
-        raise HTTPException(status_code=403, detail='request amount exceeded')
+        raise HTTPException(status_code=403, detail="request amount exceeded")
     return None
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def test_app():
     app = create_application()
     app.dependency_overrides[get_settings] = get_settings_override
@@ -73,11 +72,11 @@ def test_app():
         yield test_client
 
 
-@pytest.fixture(scope='package')
+@pytest.fixture(scope="session")
 def client():
     app = create_application()
     app.dependency_overrides[get_settings] = get_settings_override
-    app.dependency_overrides[get_db] = override_get_db
+    app.dependency_overrides[get_db] = db_session
     app.dependency_overrides[get_verified_user] = get_verified_user_override
     app.dependency_overrides[get_user] = get_verified_user_override
     app.dependency_overrides[get_sudo] = get_sudo_override
@@ -87,3 +86,9 @@ def client():
     cache().flushdb()
     with TestClient(app) as test_client:
         yield test_client
+
+
+async def db_session():
+    async with TestAsyncSessionLocal() as session:
+        yield session
+    await session.close()

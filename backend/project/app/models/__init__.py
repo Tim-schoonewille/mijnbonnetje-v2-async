@@ -68,6 +68,9 @@ from .receipt_entry import (
     ReceiptEntryUpdate,
 )
 
+from .store import StoreDB, Store, StoreCreate, StoreUpdate, StoreWithReceiptEntries
+
 SubscriptionWithTier.model_rebuild()
 ItemWithUser.model_rebuild()
 UserWithItems.model_rebuild()
+StoreWithReceiptEntries.model_rebuild()

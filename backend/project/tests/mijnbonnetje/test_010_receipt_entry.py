@@ -1,7 +1,6 @@
 from app import models
 from app.db import create_test_tables
 
-
 dummy_receipt_entry = models.ReceiptEntryCreate(
     total_amount=69,
     warranty=30,
