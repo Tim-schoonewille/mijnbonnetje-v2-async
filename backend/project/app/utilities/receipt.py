@@ -10,7 +10,7 @@ from app import models
 from app.config import settings
 
 
-async def write_receipt_file_to_disk(file: UploadFile, entry_id: int | UUID) -> str:
+async def write_receipt_file_to_disk(file: UploadFile, entry_id: int | UUID, folder: str) -> str:
     """ Take a FastAPI UploadFile object and checks for:
     - if the file has a filename and is valid
     - if the filesize is within set boundries.
@@ -30,7 +30,7 @@ async def write_receipt_file_to_disk(file: UploadFile, entry_id: int | UUID) -> 
     if not await check_file_type(file):
         raise HTTPException(status_code=400, detail="INVALID_FILE_TYPE")
 
-    FOLDER_TO_SAVE_PATH = os.path.join('.' + settings.STATIC_FOLDER, str(entry_id))
+    FOLDER_TO_SAVE_PATH = os.path.join('.' + folder, str(entry_id))
     os.makedirs(FOLDER_TO_SAVE_PATH, exist_ok=True)
     file_name_without_spaces = file.filename.replace(' ', '')  # type: ignore
     file_name_on_disk = str(uuid4()) + file_name_without_spaces
@@ -58,8 +58,9 @@ async def handle_receipt_file(
     user: models.UserDB,
     receipt_file: UploadFile,
     entry_id: int | UUID,
+    folder: str,
 ):
-    file_path_on_disk = await write_receipt_file_to_disk(receipt_file, entry_id)
+    file_path_on_disk = await write_receipt_file_to_disk(receipt_file, entry_id, folder)
     input_schema = models.ReceiptFileCreate(
         receipt_entry_id=entry_id,
         file_name=str(receipt_file.filename),

@@ -9,15 +9,17 @@ from app.utilities.receipt import handle_receipt_file
 from app.utilities.core.dependencies import GetDB
 from app.utilities.core.dependencies import ParametersDepends
 from app.utilities.core.dependencies import VerifiedUser
+from app.utilities.core.dependencies import GetSettings
 
 router = APIRouter(prefix=settings.URL_PREFIX + '/receipt-file', tags=['receipt-file'])
 
 
-@router.post('/')
+@router.post('/', response_model=models.ReceiptFile, status_code=201)
 async def create_receipt_file(
     user: VerifiedUser,
     file: UploadFile,
     entry_id: int | UUID,
+    settings: GetSettings,
     db: GetDB,
 ):
     """
@@ -34,4 +36,4 @@ async def create_receipt_file(
         raise HTTPException(status_code=404, detail="ENTRY_NOT_FOUND")
     if receipt_entry_in_db.user_id != user.id:
         raise HTTPException(status_code=403, detail="NOT_YOUR_ENTRY")
-    return await handle_receipt_file(db, user, file, entry_id)
+    return await handle_receipt_file(db, user, file, entry_id, settings.STATIC_FOLDER)
