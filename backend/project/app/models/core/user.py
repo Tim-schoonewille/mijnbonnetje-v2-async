@@ -28,6 +28,7 @@ if TYPE_CHECKING:
     from app.models import SubscriptionDB
 
     from app.models import ReceiptEntryDB
+    from app.models import ReceiptFileDB
     from app.models import StoreDB
 
 
@@ -56,6 +57,7 @@ class UserDB(IDFieldDBMixin, TimeStampDBMixin, Base):
     items: Mapped[List["ItemDB"]] = relationship(back_populates="user")
 
     receipt_entries: Mapped[List["ReceiptEntryDB"]] = relationship(back_populates="user")
+    receipt_files: Mapped[list['ReceiptFileDB']] = relationship(back_populates='user')
     stores: Mapped[list['StoreDB']] = relationship(
         secondary=store_users_association_table, back_populates='users'
     )

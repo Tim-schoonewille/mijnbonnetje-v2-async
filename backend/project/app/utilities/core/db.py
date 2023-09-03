@@ -27,17 +27,11 @@ async def fill_db(db: AsyncSession) -> None:
         description="Pro tier with unlimited access",
         api_call_limit=100,
     )
-    tier_ultimate = models.TierDB(
-        name="Ultimate",
-        price=3000,
-        duration=2,
-        description="Ultimate tier with unlimited access",
-        api_call_limit=100,
-    )
+    store = models.StoreDB(name='Aldi', city='Brunssum', country='NL')
     async with db as sess:
         sess.add(super_user)
         sess.add(tier_pro)
-        sess.add(tier_ultimate)
+        sess.add(store)
         await sess.commit()
 
     # await create_mock_users(db)

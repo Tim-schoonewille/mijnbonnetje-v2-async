@@ -5,7 +5,6 @@ from uuid import UUID
 
 from pydantic import ConfigDict
 from pydantic import Field
-from pydantic import field_validator
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
@@ -24,6 +23,7 @@ from app.models.base import UserIDFieldSchemaMixin
 
 if TYPE_CHECKING:
     from app.models import UserDB
+    from app.models import ReceiptFileDB
     from app.models import StoreDB
 
 
@@ -35,13 +35,16 @@ class ReceiptEntryDB(
     Base,
 ):
     __tablename__ = "receipt_entries"
-    purchase_date: Mapped[Optional[date]]
+    purchase_date: Mapped[Optional[str]]
     total_amount: Mapped[int] = mapped_column(default=0)
-    warranty: Mapped[int] = mapped_column(default=365 * 2)
+    warranty: Mapped[int] = mapped_column(default=0)
     category: Mapped[Categories] = mapped_column(default=Categories.OTHER)
 
     user: Mapped["UserDB"] = relationship(back_populates="receipt_entries")
     store: Mapped[list["StoreDB"]] = relationship(back_populates="receipt_entries")
+    receipt_files: Mapped[list['ReceiptFileDB']] = relationship(
+        back_populates='receipt_entry'
+    )
 
 
 class ReceiptEntry(
@@ -50,37 +53,19 @@ class ReceiptEntry(
     TimeStampSchemaMixin,
 ):
     store_id: int | UUID | None = None
-    purchase_date: date
+    purchase_date: str
     total_amount: int | None = None
     warranty: int
     category: Categories
     model_config = ConfigDict(from_attributes=True)
 
-    @field_validator("purchase_date")
-    def parse_date(cls, value):
-        if isinstance(value, date):
-            return value
-        try:
-            return date.fromisoformat(value)
-        except ValueError:
-            return ValueError("Invalid date format, expected YYY-MM-DD")
-
 
 class ReceiptEntryCreate(CamelBase):
     store_id: int | UUID | None = None
-    purchase_date: date = Field(default_factory=lambda: str(date.today()))
+    purchase_date: str = Field(default_factory=lambda: str(date.today()))
     total_amount: int = Field(default=0)
-    warranty: int = Field(default=365 * 2)
+    warranty: int = Field(default=0)
     category: Categories = Field(default=Categories.OTHER)
-
-    @field_validator("purchase_date")
-    def parse_date(cls, value):
-        if isinstance(value, date):
-            return value
-        try:
-            return date.fromisoformat(value)
-        except ValueError:
-            return ValueError("Invalid date format, expected YYY-MM-DD")
 
 
 class ReceiptEntryUpdate(CamelBase):

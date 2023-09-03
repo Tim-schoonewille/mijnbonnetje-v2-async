@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     # Database
     DB_ASYNC_URL: str
     DB_SYNC_URL: str
-    DB_SQL_ECHO: bool = True
+    DB_SQL_ECHO: bool = False
     DB_TEST_ASYNC_URL: str
     DB_TEST_SYNC_URL: str
 
@@ -68,6 +68,11 @@ class Settings(BaseSettings):
 
     # TwoFactor
     OTP_CACHE_PREFIX: str = 'OTP_'
+
+    # Static Files
+    STATIC_FOLDER: str = '/public/'
+    MAX_FILE_SIZE: int = 2
+    ALLOWED_FILE_TYPES: list = ['image/jpeg', 'image/png']
 
 
 @lru_cache()
