@@ -15,7 +15,6 @@ from app.models.base import TimeStampSchemaMixin
 
 
 if TYPE_CHECKING:
-    from app.models import UserDB
     from app.models import ReceiptFileDB
 
 
