@@ -1,3 +1,4 @@
+import os
 from uuid import UUID
 
 
@@ -37,3 +38,55 @@ async def create_receipt_file(
     if receipt_entry_in_db.user_id != user.id:
         raise HTTPException(status_code=403, detail="NOT_YOUR_ENTRY")
     return await handle_receipt_file(db, user, file, entry_id, settings.STATIC_FOLDER)
+
+
+@router.get('/', response_model=list[models.ReceiptFile])
+async def read_multiple_receipt_files(
+    user: VerifiedUser,
+    params: ParametersDepends,
+    db: GetDB,
+):
+    """ Return multiple receipt files, depending on given parameters
+    requires verified user token
+    """
+    return await crud.receipt_file.get_multi(db, user, **params)
+
+
+@router.get('/{receipt_file_id}', response_model=models.ReceiptFile)
+async def read_specific_receipt_file(
+    receipt_file_id: int | UUID,
+    user: VerifiedUser,
+    db: GetDB,
+):
+    """ Returns specific receipt file from database, requires verified user token
+
+        Raises:\n
+            403: {detail: "NOT_YOUR_RECEIPT_FILE"}
+            404: {detail: "RECEIPT_FILE_NOT_FOUND"}
+    """
+    receipt_file_in_db = await crud.receipt_file.get(db, receipt_file_id)
+    if receipt_file_in_db is None:
+        raise HTTPException(status_code=404, detail="RECEIPT_FILE_NOT_FOUND")
+    if receipt_file_in_db.user_id != user.id and not user.sudo:
+        raise HTTPException(status_code=403, detail="NOT_YOUR_RECEIPT_FILE")
+    return receipt_file_in_db
+
+
+@router.delete('/{receipt_file_id}', response_model=dict[str, str])
+async def delete_receipt_file(
+    receipt_file_id: int | UUID,
+    user: VerifiedUser,
+    settings: GetSettings,
+    db: GetDB,
+):
+    """ deeletes a specific receipt file from database, requires verified user token
+
+        Raises:\n
+            403: {detail: "NOT_YOUR_RECEIPT_FILE"}
+            404: {detail: "RECEIPT_FILE_NOT_FOUND"}
+    """
+    receipt_file_in_db = await crud.receipt_file.get(db, receipt_file_id)
+    if receipt_file_in_db is None:
+        raise HTTPException(status_code=404, detail="RECEIPT_FILE_NOT_FOUND")
+    if receipt_file_in_db.user_id != user.id and not user.sudo:
+        raise HTTPException(status_code=403, detail="NOT_YOUR_RECEIPT_FILE")
