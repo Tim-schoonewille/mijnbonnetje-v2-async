@@ -19,6 +19,7 @@ from app.models.base import UserIDFieldSchemaMixin
 if TYPE_CHECKING:
     from app.models import UserDB
     from app.models import ReceiptEntryDB
+    from app.models import ReceiptScanDB
 
 
 class ReceiptFileDB(
@@ -36,6 +37,7 @@ class ReceiptFileDB(
 
     user: Mapped['UserDB'] = relationship(back_populates='receipt_files')
     receipt_entry: Mapped['ReceiptEntryDB'] = relationship(back_populates='receipt_files')
+    receipt_scans: Mapped[list['ReceiptScanDB']] = relationship(back_populates='receipt_file')
 
 
 class ReceiptFile(

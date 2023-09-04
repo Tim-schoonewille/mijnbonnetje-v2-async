@@ -44,6 +44,10 @@ class ReceiptEntryIDFieldDBMixin:
     receipt_entry_id: IDFieldDB = mapped_column(ForeignKey('receipt_entries.id'))
 
 
+class ReceiptFileIDFieldDBMixin:
+    receipt_file_id: IDFieldDB = mapped_column(ForeignKey('receipt_files.id'))
+
+
 class SubscriptionIDFieldDBMixin:
     subscription_id: IDFieldDB = mapped_column(ForeignKey('subscriptions.id'))
 

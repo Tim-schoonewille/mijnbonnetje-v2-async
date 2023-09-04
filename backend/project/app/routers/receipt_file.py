@@ -47,7 +47,7 @@ async def read_multiple_receipt_files(
     db: GetDB,
 ):
     """ Return multiple receipt files, depending on given parameters
-    requires verified user token
+    Requires verified user token
     """
     return await crud.receipt_file.get_multi(db, user, **params)
 
@@ -61,8 +61,8 @@ async def read_specific_receipt_file(
     """ Returns specific receipt file from database, requires verified user token
 
         Raises:\n
-            403: {detail: "NOT_YOUR_RECEIPT_FILE"}
-            404: {detail: "RECEIPT_FILE_NOT_FOUND"}
+            403: {detail: "NOT_YOUR_RECEIPT_FILE"}\n
+            404: {detail: "RECEIPT_FILE_NOT_FOUND"}\n
     """
     receipt_file_in_db = await crud.receipt_file.get(db, receipt_file_id)
     if receipt_file_in_db is None:
@@ -82,11 +82,16 @@ async def delete_receipt_file(
     """ deeletes a specific receipt file from database, requires verified user token
 
         Raises:\n
-            403: {detail: "NOT_YOUR_RECEIPT_FILE"}
-            404: {detail: "RECEIPT_FILE_NOT_FOUND"}
+            403: {detail: "NOT_YOUR_RECEIPT_FILE"}\n
+            404: {detail: "RECEIPT_FILE_NOT_FOUND"}\n
+            404: {detail: "RECEIPT_IMAGE_NOT_FOUND"}\n
     """
     receipt_file_in_db = await crud.receipt_file.get(db, receipt_file_id)
     if receipt_file_in_db is None:
         raise HTTPException(status_code=404, detail="RECEIPT_FILE_NOT_FOUND")
     if receipt_file_in_db.user_id != user.id and not user.sudo:
         raise HTTPException(status_code=403, detail="NOT_YOUR_RECEIPT_FILE")
+    if not os.path.exists(receipt_file_in_db.file_path):
+        raise HTTPException(status_code=404, detail="RECEIPT_IMAGE_NOT_FOUND")
+    os.remove(receipt_file_in_db.file_path)
+    return dict(message="RECEIPT_FILE_DELETED")
