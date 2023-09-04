@@ -25,6 +25,7 @@ if TYPE_CHECKING:
     from app.models import UserDB
     from app.models import ReceiptFileDB
     from app.models import StoreDB
+    from app.models import ProductItemDB
 
 
 class ReceiptEntryDB(
@@ -43,6 +44,9 @@ class ReceiptEntryDB(
     user: Mapped["UserDB"] = relationship(back_populates="receipt_entries")
     store: Mapped[list["StoreDB"]] = relationship(back_populates="receipt_entries")
     receipt_files: Mapped[list['ReceiptFileDB']] = relationship(
+        back_populates='receipt_entry'
+    )
+    product_items: Mapped[list['ProductItemDB']] = relationship(
         back_populates='receipt_entry'
     )
 

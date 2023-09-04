@@ -30,6 +30,7 @@ if TYPE_CHECKING:
     from app.models import ReceiptEntryDB
     from app.models import ReceiptFileDB
     from app.models import StoreDB
+    from app.models import ProductItemDB
 
 
 class UserDB(IDFieldDBMixin, TimeStampDBMixin, Base):
@@ -60,6 +61,9 @@ class UserDB(IDFieldDBMixin, TimeStampDBMixin, Base):
     receipt_files: Mapped[list['ReceiptFileDB']] = relationship(back_populates='user')
     stores: Mapped[list['StoreDB']] = relationship(
         secondary=store_users_association_table, back_populates='users'
+    )
+    product_items: Mapped[list['ProductItemDB']] = relationship(
+        back_populates='user'
     )
 
     def __repr__(self):

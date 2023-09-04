@@ -22,7 +22,7 @@ def test_create_store(client):
 
 
 def test_search_store_with_one_letter(client):
-    response = client.get('/store/search', params={'q': 'A'})
+    response = client.get("/store/search", params={"q": "A"})
     data = response.json()
     assert response.status_code == 200
     assert isinstance(data, list)
@@ -30,12 +30,12 @@ def test_search_store_with_one_letter(client):
 
 
 def test_search_specific_store(client):
-    response = client.get('/store/search', params={'q': 'Ald'})
+    response = client.get("/store/search", params={"q": "Ald"})
     data = response.json()
     assert response.status_code == 200
     assert len(data) == 1
     store = data[0]
-    assert store['name'] == 'Aldi'
+    assert store["name"] == "Aldi"
 
 
 def test_read_single_store(client):
@@ -85,10 +85,10 @@ def test_update_store(client):
 
 
 def test_delete_store(client):
-    response = client.delete('/store/1')
+    response = client.delete("/store/1")
     data = response.json()
     assert response.status_code == 200
-    assert data['message'] == 'STORE_DELETED'
+    assert data["message"] == "STORE_DELETED"
 
-    response = client.get('/store/1')
+    response = client.get("/store/1")
     assert response.status_code == 404
