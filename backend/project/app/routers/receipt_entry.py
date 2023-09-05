@@ -19,16 +19,23 @@ router = APIRouter(
 async def create_receipt_entry(
     schema: models.ReceiptEntryCreate, user: VerifiedUser, db: GetDB
 ):
-    """Create new receipt entry"""
+    """Create new receipt entry
+    Optional parameter: store_id (int | UUID)
+
+    Raises:\n
+        404: {detail:"STORE_NOT_FOUND" }
+    """
     new_receipt_entry = await crud.receipt_entry.create(db, schema, user)
-    if schema.store_id:
-        store = await crud.store.get(db, schema.store_id)
-        if store is None:
-            raise HTTPException(status_code=404, detail="STORE_NOT_FOUND")
-        await store.awaitable_attrs.users
-        if store and user not in store.users:
-            store.users.append(user)
-            await db.commit()
+    if not schema.store_id:
+        return new_receipt_entry
+
+    store = await crud.store.get(db, schema.store_id)
+    if store is None:
+        raise HTTPException(status_code=404, detail="STORE_NOT_FOUND")
+    await store.awaitable_attrs.users
+    if store and user not in store.users:
+        store.users.append(user)
+        await db.commit()
     return new_receipt_entry
 
 
@@ -79,13 +86,26 @@ async def update_receipt_entry(
     Raises:\n
         404: {detail="RECEIPT_ENTRY_NOT_FOUND"}
         403: {detail="NOT_YOUR_RECEIPT_ENTRY"}
+        404: {detail="STORE_NOT_FOUND"}
     """
     receipt_entry_in_db = await crud.receipt_entry.get(db, receipt_entry_id)
     if receipt_entry_in_db is None:
         raise HTTPException(status_code=404, detail="RECEIPT_ENTRY_NOT_FOUND")
     if receipt_entry_in_db.user_id != user.id:
         raise HTTPException(status_code=403, detail="NOT_YOUR_RECEIPT_ENTRY")
-    return await crud.receipt_entry.update(db, update_schema, receipt_entry_in_db)
+    updated_receipt_entry = await crud.receipt_entry.update(
+        db, update_schema, receipt_entry_in_db
+    )
+    if not update_schema.store_id:
+        return updated_receipt_entry
+    store = await crud.store.get(db, update_schema.store_id)
+    if store is None:
+        raise HTTPException(status_code=404, detail="STORE_NOT_FOUND")
+    await store.awaitable_attrs.users
+    if user not in store.users:
+        store.users.append(user)
+        await db.commit()
+    return update_receipt_entry
 
 
 @router.delete("/{receipt_entry_id}")

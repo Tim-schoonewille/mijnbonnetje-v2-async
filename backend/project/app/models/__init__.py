@@ -74,8 +74,11 @@ from .receipt_file import ReceiptFileDB, ReceiptFile, ReceiptFileCreate, Receipt
 from .receipt_scan import ReceiptScanDB, ReceiptScan, ReceiptScanCreate, ReceiptScanUpdate
 from .product_item import ProductItemDB, ProductItem, ProductItemCreate, ProductItemUpdate
 
+from .receipt import Receipt
+
 
 SubscriptionWithTier.model_rebuild()
 ItemWithUser.model_rebuild()
 UserWithItems.model_rebuild()
 StoreWithReceiptEntries.model_rebuild()
+Receipt.model_rebuild()

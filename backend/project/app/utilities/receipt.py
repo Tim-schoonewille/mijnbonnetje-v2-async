@@ -64,7 +64,7 @@ async def handle_receipt_file(
     receipt_file: UploadFile,
     entry_id: int | UUID,
     folder: str,
-):
+) -> models.ReceiptFileDB:
     file_path_on_disk = await write_receipt_file_to_disk(receipt_file, entry_id, folder)
     input_schema = models.ReceiptFileCreate(
         receipt_entry_id=entry_id,
