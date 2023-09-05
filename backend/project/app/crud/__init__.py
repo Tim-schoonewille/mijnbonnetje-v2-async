@@ -11,3 +11,4 @@ from .receipt_entry import receipt_entry # noqa
 from .receipt_file import receipt_file # noqa
 from .receipt_scan import receipt_scan # noqa
 from .store import store # noqa
+from .product_item import product_item # noqa
