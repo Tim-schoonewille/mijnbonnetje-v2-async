@@ -42,12 +42,14 @@ def create_email_verification_token(sub: str) -> str:
 
 def create_password_token(sub: str, jti: str) -> str:
     expires = datetime.utcnow() + timedelta(seconds=settings.PASSWORD_TOKEN_EXPIRES)
-    return create_token({
-        "sub": sub,
-        "exp": expires,
-        "jti": jti,
-        "_type": "password",
-    })
+    return create_token(
+        {
+            "sub": sub,
+            "exp": expires,
+            "jti": jti,
+            "_type": "password",
+        }
+    )
 
 
 def extract_payload(token: models.Token) -> dict:

@@ -21,15 +21,15 @@ async def create_store(user: VerifiedUser, schema: models.StoreCreate, db: GetDB
     return await crud.store.create(db, schema, user)
 
 
-@router.get('/search', response_model=list[models.Store])
+@router.get("/search", response_model=list[models.Store])
 async def search_store(q: str, user: VerifiedUser, db: GetDB):
-    """ Search for a store by parameter q (string) requires verified user token"""
+    """Search for a store by parameter q (string) requires verified user token"""
     return await crud.store.search(db, user, q)
 
 
-@router.get('/user', response_model=list[models.Store])
+@router.get("/user", response_model=list[models.Store])
 async def read_user_stores(user_: VerifiedUser, db: GetDB):
-    print('USER:::::', user_)
+    print("USER:::::", user_)
     await user_.awaitable_attrs.stores
     return user_.stores
 
@@ -60,9 +60,9 @@ async def update_store(
     store_id: int | UUID, update_schema: models.StoreUpdate, sudo: SudoUser, db: GetDB
 ):
     """Update specific store (requires sudo login)
-c
-    Raises:\n
-        404: {detail: "STORE_NOT_FOUND"}
+    c
+        Raises:\n
+            404: {detail: "STORE_NOT_FOUND"}
     """
     store_in_db = await crud.store.get(db, store_id)
     if store_in_db is None:
@@ -70,14 +70,12 @@ c
     return await crud.store.update(db, update_schema, store_in_db)
 
 
-@router.delete('/{store_id}')
-async def delete_store(
-    store_id: int | UUID, sudo: SudoUser, db: GetDB
-):
+@router.delete("/{store_id}")
+async def delete_store(store_id: int | UUID, sudo: SudoUser, db: GetDB):
     """delete specific store (requires sudo login)
-c
-    Raises:\n
-        404: {detail: "STORE_NOT_FOUND"}
+    c
+        Raises:\n
+            404: {detail: "STORE_NOT_FOUND"}
     """
     store_in_db = await crud.store.get(db, store_id)
     if store_in_db is None:

@@ -93,11 +93,14 @@ async def login_user(
         401: too many login attempts: {detail: 'LOCKED_OUT}
     """
     return await handle_login(
-        email=schema_in.email, password=schema_in.password,
+        email=schema_in.email,
+        password=schema_in.password,
         bg_tasks=bg_tasks,
-        request=request, response=response,
-        settings=settings, cache=redis_client,
-        db=db
+        request=request,
+        response=response,
+        settings=settings,
+        cache=redis_client,
+        db=db,
     )
 
 
@@ -116,9 +119,7 @@ async def logout(
     Revoke refresh tokens associated with the user.
     Delete access and refresh tokens from cookies.
     """
-    return await handle_logout(
-        user=user, res=res, settings=settings, db=db
-    )
+    return await handle_logout(user=user, res=res, settings=settings, db=db)
 
 
 @router.get("/verify-token")
@@ -140,7 +141,7 @@ async def verify_token(
     return handle_token()
 
 
-@router.get('/verify-fresh-token')
+@router.get("/verify-fresh-token")
 @log_traffic()
 async def verify_fresh_token(
     user: FreshTokenUser,
@@ -156,10 +157,10 @@ async def verify_fresh_token(
         404: {detail: 'INVALID_USER}\n
         401: {detail: 'REQUIRES_FRESH_TOKEN'}
     """
-    return {'fresh': True}
+    return {"fresh": True}
 
 
-@router.get('/verify-sudo-token')
+@router.get("/verify-sudo-token")
 @log_traffic()
 async def verify_sudo_token(user: SudoUser, request: Request) -> dict[str, bool]:
     """
@@ -172,7 +173,7 @@ async def verify_sudo_token(user: SudoUser, request: Request) -> dict[str, bool]
         404: {detail: 'INVALID_USER}\n
         403: {detail: 'REQUIRES_SUDO'}
     """
-    return {'sudo': True}
+    return {"sudo": True}
 
 
 @router.get("/email/verify/new")
@@ -196,9 +197,7 @@ async def request_email_verification_code(
 
 @router.get("/email/verify/")
 @log_traffic()
-async def verify_email(
-    token: str, request: Request, db: GetDB
-):
+async def verify_email(token: str, request: Request, db: GetDB):
     """
     Verify a user's email address.
 
@@ -250,13 +249,11 @@ async def verify_new_password_request(
         400: {detail: 'INVALID_TOKEN_SUB'}\n
     """
     return await handle_verify_new_password_request(
-        new_password=schema.new_password,
-        raw_password_token=token,
-        db=db
+        new_password=schema.new_password, raw_password_token=token, db=db
     )
 
 
-@router.get('/twofactor/', response_model=models.Tokens)
+@router.get("/twofactor/", response_model=models.Tokens)
 async def handle_two_factor_otp(
     otp_session_id: UUID,
     otp: str,
@@ -279,15 +276,15 @@ async def handle_two_factor_otp(
         otp=otp,
     )
     if not user_id:
-        raise HTTPException(status_code=401, detail='INVALID_OTP')
+        raise HTTPException(status_code=401, detail="INVALID_OTP")
     user = await crud.user.get(db, user_id)
     if user is None:
-        raise HTTPException(status_code=404, detail='USER_NOT_FOUND')
+        raise HTTPException(status_code=404, detail="USER_NOT_FOUND")
     await register_new_login(user, db, request, fresh=True)
     return await create_login_tokens(user, response, db)
 
 
-@router.patch('/twofactor/enable/{action}')
+@router.patch("/twofactor/enable/{action}")
 # @log_traffic()
 async def update_two_factor_authentication(
     action: bool,
@@ -302,7 +299,7 @@ async def update_two_factor_authentication(
     return dict(TwoFactorEnabled=action)
 
 
-@router.get('/twofactor/renew')
+@router.get("/twofactor/renew")
 async def twofactor_renew(
     otp_session_id: UUID,
     cache: GetCache,
@@ -316,7 +313,7 @@ async def twofactor_renew(
     otp_cache_key = settings.OTP_CACHE_PREFIX + str(otp_session_id)
     otp_object_in_cache = await get_otp_object(otp_cache_key, cache)
     if otp_object_in_cache is None:
-        raise HTTPException(status_code=400, detail='INVALID_SESSION_ID')
+        raise HTTPException(status_code=400, detail="INVALID_SESSION_ID")
 
     cache.delete(otp_cache_key)
     return await register_new_otp(cache, otp_object_in_cache.user_id)
@@ -326,9 +323,7 @@ async def twofactor_renew(
 
 
 async def handle_signup(
-    schema: models.UserCreate,
-    bg_tasks: BackgroundTasks,
-    db: AsyncSession
+    schema: models.UserCreate, bg_tasks: BackgroundTasks, db: AsyncSession
 ) -> dict[str, str]:
     user = await crud.user.get_by_email(db, schema.email)
     if user:
@@ -363,12 +358,9 @@ async def handle_login(
 
     await consume_refresh_tokens(user=user, db=db)
     if user.two_factor:
-        new_otp = await register_new_otp(
-            cache=cache,
-            user_id=user.id
-        )
+        new_otp = await register_new_otp(cache=cache, user_id=user.id)
         send_otp(email, new_otp, bg_tasks)
-        return dict(TwoFactor='sent')
+        return dict(TwoFactor="sent")
     await register_new_login(user, db, request, fresh=True)
     return await create_login_tokens(user, response, db)
 
@@ -379,7 +371,7 @@ async def handle_logout(
     await crud.refresh_token.revoke(db, user.id)
     res.delete_cookie(settings.ACCESS_TOKEN_COOKIE_NAME, domain=settings.DOMAIN)
     res.delete_cookie(settings.REFRESH_TOKEN_COOKIE_NAME, domain=settings.DOMAIN)
-    return dict(message='Logged off')
+    return dict(message="Logged off")
 
 
 def handle_token() -> dict[str, bool]:
@@ -394,13 +386,13 @@ async def handle_new_verification_code(
 
     email_verification_code = create_email_verification_token(user.email)
     send_verification_code_email(user.email, email_verification_code, bgtasks)
-    return dict(message='NEW_VERIFICATION_CODE_SENT')
+    return dict(message="NEW_VERIFICATION_CODE_SENT")
 
 
 async def handle_verify_email(token: str, db: AsyncSession) -> dict[str, str]:
     email_token = models.Token(jwt=token)
     if not token_is_valid(email_token) or token_is_expired(email_token):
-        raise HTTPException(status_code=400, detail='INVALID_TOKEN')
+        raise HTTPException(status_code=400, detail="INVALID_TOKEN")
 
     payload = extract_payload(email_token)
     user_email, _type = payload["sub"], payload["_type"]
@@ -408,13 +400,13 @@ async def handle_verify_email(token: str, db: AsyncSession) -> dict[str, str]:
         raise HTTPException(status_code=400, detail="INVALID_TOKEN")
 
     await crud.user.verify_email(db, user_email)
-    return dict(status='verified')
+    return dict(status="verified")
 
 
 async def handle_new_password_token(email: str, db: AsyncSession) -> dict[str, str]:
     db_user: models.UserDB = await crud.user.get_by_email(db, email)
     if db_user is None:
-        raise HTTPException(status_code=404, detail='INVALID_EMAIL')
+        raise HTTPException(status_code=404, detail="INVALID_EMAIL")
 
     jti = str(uuid4())
     token = create_password_token(sub=str(db_user.id), jti=jti)
@@ -437,11 +429,9 @@ async def handle_verify_new_password_request(
 
     user_in_db = await crud.user.get(db, user_id)
     if user_in_db is None:
-        raise HTTPException(
-            status_code=400, detail="INVALID_TOKEN_SUB"
-        )
+        raise HTTPException(status_code=400, detail="INVALID_TOKEN_SUB")
 
     new_password = convert_to_hash(new_password)
     await crud.user.update_password(db, user_in_db, new_password)
     await crud.refresh_token.revoke(db, user_id)
-    return dict(message='Password updated!')
+    return dict(message="Password updated!")

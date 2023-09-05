@@ -49,14 +49,14 @@ class ReceiptEntryDB(
 
     user: Mapped["UserDB"] = relationship(back_populates="receipt_entries")
     store: Mapped[list["StoreDB"]] = relationship(back_populates="receipt_entries")
-    receipt_files: Mapped[list['ReceiptFileDB']] = relationship(
-        back_populates='receipt_entry'
+    receipt_files: Mapped[list["ReceiptFileDB"]] = relationship(
+        back_populates="receipt_entry"
     )
-    receipt_scans: Mapped[list['ReceiptScanDB']] = relationship(
-        back_populates='receipt_entry'
+    receipt_scans: Mapped[list["ReceiptScanDB"]] = relationship(
+        back_populates="receipt_entry"
     )
-    product_items: Mapped[list['ProductItemDB']] = relationship(
-        back_populates='receipt_entry'
+    product_items: Mapped[list["ProductItemDB"]] = relationship(
+        back_populates="receipt_entry"
     )
 
 
@@ -90,7 +90,7 @@ class ReceiptEntryUpdate(CamelBase):
 
 
 class Receipt(ReceiptEntry):
-    receipt_files: list['ReceiptFile']
-    receipt_scans: list['ReceiptScan']
-    store: Union['Store', None] = None
-    product_items: list['ProductItem'] | None = None
+    receipt_files: list["ReceiptFile"]
+    receipt_scans: list["ReceiptScan"]
+    store: Union["Store", None] = None
+    product_items: list["ProductItem"] | None = None

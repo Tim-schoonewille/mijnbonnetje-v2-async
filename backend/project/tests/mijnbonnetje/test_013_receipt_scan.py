@@ -41,7 +41,7 @@ def test_create_receipt_scan(client):
     assert response.status_code == 201
     assert data["createdAt"] is not None
     assert data["updatedAt"] is None
-    assert data['receiptEntryId'] == 1
+    assert data["receiptEntryId"] == 1
     assert data["receiptFileId"] == dummy_receipt_scan.receipt_file_id
 
 

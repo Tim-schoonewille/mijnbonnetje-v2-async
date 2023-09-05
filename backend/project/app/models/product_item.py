@@ -33,15 +33,17 @@ class ProductItemDB(
     TimeStampDBMixin,
     Base,
 ):
-    __tablename__ = 'product_items'
+    __tablename__ = "product_items"
     purchase_date: Mapped[str]
     name: Mapped[str]
     price: Mapped[float]
     quantity: Mapped[int] = mapped_column(default=1)
 
-    user: Mapped['UserDB'] = relationship(back_populates='product_items')
-    receipt_entry: Mapped['ReceiptEntryDB'] = relationship(back_populates='product_items')
-    store: Mapped['StoreDB'] = relationship(back_populates='product_items')
+    user: Mapped["UserDB"] = relationship(back_populates="product_items")
+    receipt_entry: Mapped["ReceiptEntryDB"] = relationship(
+        back_populates="product_items"
+    )
+    store: Mapped["StoreDB"] = relationship(back_populates="product_items")
 
 
 class ProductItem(

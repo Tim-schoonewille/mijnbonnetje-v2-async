@@ -1,5 +1,6 @@
 # from datetime import date
 from datetime import datetime
+
 # from datetime import timedelta
 from uuid import UUID
 
@@ -18,6 +19,7 @@ from app.utilities.core.dependencies import VerifiedUser
 
 from app.utilities.core.log import log_traffic
 from app.utilities.core.subscription import generate_payment_api
+
 # from app.utilities.core.subscription import get_subscriptions
 from app.utilities.core.subscription import get_payment_pending_subscription
 
@@ -33,7 +35,7 @@ async def read_all_payments(
     request: Request,
     db: GetDB,
 ):
-    """ Return all payment history. """
+    """Return all payment history."""
     results = await crud.payment.get_multi(db, user, **params)
     return results
 
@@ -57,8 +59,10 @@ async def update_payment(
     if payment is None:
         raise HTTPException(status_code=404, detail="INVALID_PAYMENT_ID")
 
-    if payment.status == models.PaymentStatus.COMPLETED \
-       or payment.status == models.PaymentStatus.FAILED:
+    if (
+        payment.status == models.PaymentStatus.COMPLETED
+        or payment.status == models.PaymentStatus.FAILED
+    ):
         raise HTTPException(status_code=400, detail="PAYMENT_COMPLETED_OR_EXPIRED")
 
     update_schema = models.PaymentUpdate(
@@ -80,7 +84,7 @@ async def update_payment(
     return updated_payment
 
 
-@router.get('/pending')
+@router.get("/pending")
 @log_traffic()
 async def read_pending_payment(
     user: VerifiedUser,

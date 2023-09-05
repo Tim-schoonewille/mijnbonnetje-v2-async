@@ -9,6 +9,7 @@ from pydantic import ConfigDict
 from sqlalchemy import ForeignKey
 from sqlalchemy import func
 from sqlalchemy.ext.asyncio import AsyncAttrs
+
 # from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Mapped
@@ -41,15 +42,15 @@ class UserIDFieldDBMixin:
 
 
 class ReceiptEntryIDFieldDBMixin:
-    receipt_entry_id: IDFieldDB = mapped_column(ForeignKey('receipt_entries.id'))
+    receipt_entry_id: IDFieldDB = mapped_column(ForeignKey("receipt_entries.id"))
 
 
 class ReceiptFileIDFieldDBMixin:
-    receipt_file_id: IDFieldDB = mapped_column(ForeignKey('receipt_files.id'))
+    receipt_file_id: IDFieldDB = mapped_column(ForeignKey("receipt_files.id"))
 
 
 class SubscriptionIDFieldDBMixin:
-    subscription_id: IDFieldDB = mapped_column(ForeignKey('subscriptions.id'))
+    subscription_id: IDFieldDB = mapped_column(ForeignKey("subscriptions.id"))
 
 
 class StoreIDFieldDBMixin:
@@ -57,7 +58,7 @@ class StoreIDFieldDBMixin:
 
 
 class TierIDFieldDBMixin:
-    tier_id: IDFieldDB = mapped_column(ForeignKey('tiers.id'))
+    tier_id: IDFieldDB = mapped_column(ForeignKey("tiers.id"))
 
 
 class TimeStampDBMixin:

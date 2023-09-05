@@ -5,6 +5,7 @@ from typing import Optional
 from uuid import UUID
 
 from pydantic import ConfigDict
+
 # from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import relationship
@@ -38,7 +39,7 @@ class PaymentDB(
     UserIDFieldDBMixin,
     SubscriptionIDFieldDBMixin,
     TimeStampDBMixin,
-    Base
+    Base,
 ):
     __tablename__ = "payments"
     # subscription_id: Mapped[int] = mapped_column(ForeignKey("subscriptions.id"))
@@ -58,7 +59,7 @@ class Payment(
     IDFieldSchemaMixin,
     UserIDFieldSchemaMixin,
     SubscriptionIDFieldSchemaMixin,
-    TimeStampSchemaMixin
+    TimeStampSchemaMixin,
 ):
     # subscription_id: int
     payment_date: datetime | None = None

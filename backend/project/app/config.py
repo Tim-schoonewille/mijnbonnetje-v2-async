@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     APP_FQDN: str = "http://frontend.localhost:8000/"
     TRAFFIC_LOGGING: bool = False
     DEFAULT_API_CALL_LIMIT: int = 3
-    TWO_FACTOR_VERIFICATION_LINK: str = APP_FQDN + 'auth/twofactor/'
+    TWO_FACTOR_VERIFICATION_LINK: str = APP_FQDN + "auth/twofactor/"
 
     # Database
     DB_ASYNC_URL: str
@@ -67,12 +67,12 @@ class Settings(BaseSettings):
     MAIL_FROM_EMAIL: EmailStr = "tim@flowerofmine.nl"
 
     # TwoFactor
-    OTP_CACHE_PREFIX: str = 'OTP_'
+    OTP_CACHE_PREFIX: str = "OTP_"
 
     # Static Files
-    STATIC_FOLDER: str = '/public/'
+    STATIC_FOLDER: str = "/public/"
     MAX_FILE_SIZE: int = 2
-    ALLOWED_FILE_TYPES: list = ['image/jpeg', 'image/png']
+    ALLOWED_FILE_TYPES: list = ["image/jpeg", "image/png"]
 
 
 @lru_cache()
@@ -83,9 +83,9 @@ def get_settings() -> Settings:
 
 CACHED_ITEM_PREFIX = "cached_result_"
 
-ROUTERS_ROOT_PATH = 'app/routers'
-ROUTERS_EXCLUDE_FOLDERS = ['__pycache__']
-ROUTERS_EXCLUDE_FILES = ['__init__.py']
+ROUTERS_ROOT_PATH = "app/routers"
+ROUTERS_EXCLUDE_FOLDERS = ["__pycache__"]
+ROUTERS_EXCLUDE_FILES = ["__init__.py"]
 
 
 class CachedItemPrefix(str, Enum):

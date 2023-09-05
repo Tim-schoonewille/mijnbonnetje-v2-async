@@ -29,15 +29,19 @@ class ReceiptFileDB(
     TimeStampDBMixin,
     Base,
 ):
-    __tablename__ = 'receipt_files'
+    __tablename__ = "receipt_files"
     file_name: Mapped[str]
     file_path: Mapped[str]
     file_type: Mapped[str]
     file_size: Mapped[int]
 
-    user: Mapped['UserDB'] = relationship(back_populates='receipt_files')
-    receipt_entry: Mapped['ReceiptEntryDB'] = relationship(back_populates='receipt_files')
-    receipt_scans: Mapped[list['ReceiptScanDB']] = relationship(back_populates='receipt_file')
+    user: Mapped["UserDB"] = relationship(back_populates="receipt_files")
+    receipt_entry: Mapped["ReceiptEntryDB"] = relationship(
+        back_populates="receipt_files"
+    )
+    receipt_scans: Mapped[list["ReceiptScanDB"]] = relationship(
+        back_populates="receipt_file"
+    )
 
 
 class ReceiptFile(

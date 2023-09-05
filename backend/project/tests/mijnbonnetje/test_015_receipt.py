@@ -22,33 +22,33 @@ def test_create_full_receipt_without_product_items(client):
     folder_to_delete = "./public-test/1"
     shutil.rmtree(folder_to_delete)
 
-    store_create = client.post('/store', json={**mock_store_aldi.model_dump()})
+    store_create = client.post("/store", json={**mock_store_aldi.model_dump()})
     assert store_create.status_code == 201
 
     full_receipt = client.post(
-        '/receipt',
-        files={'file': open(test_receipt_file_path, 'rb')},
-        params={'exclude_ai_scan': True}
+        "/receipt",
+        files={"file": open(test_receipt_file_path, "rb")},
+        params={"exclude_ai_scan": True},
     )
     data = full_receipt.json()
     print(data)
     assert full_receipt.status_code == 201
-    receipt_file = data['receiptFiles'][0]
-    receipt_scan = data['receiptScans'][0]
-    assert data['id'] == 1
-    assert receipt_file['id'] == 1
-    assert receipt_scan['id'] == 1
+    receipt_file = data["receiptFiles"][0]
+    receipt_scan = data["receiptScans"][0]
+    assert data["id"] == 1
+    assert receipt_file["id"] == 1
+    assert receipt_scan["id"] == 1
 
 
 def test_read_multiple_receipts(client):
     second_receipt = client.post(
-        '/receipt',
-        files={'file': open(test_receipt_file_path, 'rb')},
-        params={'exclude_ai_scan': True}
+        "/receipt",
+        files={"file": open(test_receipt_file_path, "rb")},
+        params={"exclude_ai_scan": True},
     )
     assert second_receipt.status_code == 201
 
-    response = client.get('/receipt')
+    response = client.get("/receipt")
     data = response.json()
     assert response.status_code == 200
     assert isinstance(data, list)

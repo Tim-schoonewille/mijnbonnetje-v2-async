@@ -100,8 +100,10 @@ async def get_user(
         refresh_token_payload = extract_payload(refresh_token)
         if not await is_refresh_revoked(db, refresh_token_payload["jti"]):
             raise HTTPException(status_code=490, detail="REFRESH_TOKEN_REVOKED")
-        print('REFRESHING!!!!!!!!!!!!!!!!!')
-        access_token = create_access_token(sub=refresh_token_payload["sub"], fresh=False)
+        print("REFRESHING!!!!!!!!!!!!!!!!!")
+        access_token = create_access_token(
+            sub=refresh_token_payload["sub"], fresh=False
+        )
         access_token = models.Token(jwt=access_token)
         store_token(
             res=res, key=settings.ACCESS_TOKEN_COOKIE_NAME, value=access_token.jwt
@@ -138,7 +140,7 @@ async def get_user_api_call_log(
 
 async def get_sudo(user: models.UserDB = Depends(get_user)) -> models.UserDB:
     if not user.sudo:
-        raise HTTPException(status_code=403, detail='REQUIRES_SUDO')
+        raise HTTPException(status_code=403, detail="REQUIRES_SUDO")
     return user
 
 
@@ -147,11 +149,11 @@ async def get_fresh_user(
     req: Request,
 ) -> models.UserDB:
     access_token = retreive_token(req, key=settings.ACCESS_TOKEN_COOKIE_NAME)
-    requires_fresh_login = HTTPException(status_code=401, detail='REQUIRES_FRESH_TOKEN')
+    requires_fresh_login = HTTPException(status_code=401, detail="REQUIRES_FRESH_TOKEN")
     if token_is_expired(access_token):
         raise requires_fresh_login
     payload = extract_payload(access_token)
-    token_is_fresh = payload.get('fresh', None)
+    token_is_fresh = payload.get("fresh", None)
     if not token_is_fresh:
         raise requires_fresh_login
     return user
@@ -162,14 +164,13 @@ async def register_new_otp(cache: Redis, user_id: int | UUID):
     cache.set(
         name=settings.OTP_CACHE_PREFIX + str(new_otp.id),
         value=pickle.dumps(new_otp.model_dump()),
-        ex=600
+        ex=600,
     )
     return new_otp.model_dump()
 
 
 async def get_otp_object(
-    otp_cache_key: str,
-    cache: Redis
+    otp_cache_key: str, cache: Redis
 ) -> models.TwoFactorSchema | None:
     otp_pickled_object = cache.get(otp_cache_key)
     if otp_pickled_object is None:
@@ -180,7 +181,9 @@ async def get_otp_object(
 
 
 async def verify_otp_session_id(
-    session_id: UUID, otp: str, cache: Redis,
+    session_id: UUID,
+    otp: str,
+    cache: Redis,
 ):
     otp_cache_key = settings.OTP_CACHE_PREFIX + str(session_id)
     otp_object = await get_otp_object(otp_cache_key, cache)
@@ -194,6 +197,6 @@ async def verify_otp_session_id(
     cache.set(
         name=otp_cache_key,
         value=pickle.dumps(otp_object.model_dump()),
-        ex=ttl_from_otp_cache
+        ex=ttl_from_otp_cache,
     )
     return otp_object.user_id

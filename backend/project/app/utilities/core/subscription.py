@@ -127,7 +127,8 @@ async def get_payment_pending_subscription(
 ) -> models.SubscriptionDB | None:
     today = date.today()
     pending_subscriptions = (
-        sub for sub in subscriptions
+        sub
+        for sub in subscriptions
         if not sub.active and sub.end_date and sub.end_date > today
     )
     return next(pending_subscriptions, None)

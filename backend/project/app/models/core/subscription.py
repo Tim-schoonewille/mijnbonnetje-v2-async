@@ -32,11 +32,7 @@ if TYPE_CHECKING:
 
 
 class SubscriptionDB(
-    IDFieldDBMixin,
-    UserIDFieldDBMixin,
-    TierIDFieldDBMixin,
-    TimeStampDBMixin,
-    Base
+    IDFieldDBMixin, UserIDFieldDBMixin, TierIDFieldDBMixin, TimeStampDBMixin, Base
 ):
     __tablename__ = "subscriptions"
     start_date: Mapped[date]
@@ -69,12 +65,11 @@ class SubscriptionCreate(CamelBase, SubscriptionBase):
     end_date: date
     # tier_id: int
 
-    @field_validator('start_date')
+    @field_validator("start_date")
     def validate_start_date_is_not_before_today(cls, value):
         if value < date.today():
             raise HTTPException(
-               status_code=422,
-               detail="Start date can't be before current date"
+                status_code=422, detail="Start date can't be before current date"
             )
         return value
 

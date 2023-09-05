@@ -57,17 +57,17 @@ class UserDB(IDFieldDBMixin, TimeStampDBMixin, Base):
     payments: Mapped[List["PaymentDB"]] = relationship(back_populates="user")
     items: Mapped[List["ItemDB"]] = relationship(back_populates="user")
 
-    receipt_entries: Mapped[List["ReceiptEntryDB"]] = relationship(back_populates="user")
-    receipt_files: Mapped[list['ReceiptFileDB']] = relationship(back_populates='user')
-    stores: Mapped[list['StoreDB']] = relationship(
-        secondary=store_users_association_table, back_populates='users'
+    receipt_entries: Mapped[List["ReceiptEntryDB"]] = relationship(
+        back_populates="user"
     )
-    product_items: Mapped[list['ProductItemDB']] = relationship(
-        back_populates='user'
+    receipt_files: Mapped[list["ReceiptFileDB"]] = relationship(back_populates="user")
+    stores: Mapped[list["StoreDB"]] = relationship(
+        secondary=store_users_association_table, back_populates="users"
     )
+    product_items: Mapped[list["ProductItemDB"]] = relationship(back_populates="user")
 
     def __repr__(self):
-        return f'<User({self.id}) {self.email}>'
+        return f"<User({self.id}) {self.email}>"
 
 
 class User(IDFieldSchemaMixin, TimeStampSchemaMixin):

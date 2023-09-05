@@ -14,22 +14,22 @@ def init_routers_old(app: FastAPI):
         if os.path.isdir(os.path.join(ROOT_PATH, folder))
         and folder not in EXCLUDE_FOLDERS
     ]
-    folders = ['.', *sub_folders]
+    folders = [".", *sub_folders]
 
     for folder in folders:
-        if folder == '.':
-            router_path = 'app.routers.'
+        if folder == ".":
+            router_path = "app.routers."
         else:
-            router_path = f'app.routers.{folder}.'
+            router_path = f"app.routers.{folder}."
 
         router_files = [
             filename[:-3]
-            for filename in os.listdir(ROOT_PATH + '/' + folder)
-            if filename.endswith('.py') and filename not in EXCLUDE_FILES
+            for filename in os.listdir(ROOT_PATH + "/" + folder)
+            if filename.endswith(".py") and filename not in EXCLUDE_FILES
         ]
 
         for router_name in router_files:
-            router_module = __import__(router_path + router_name, fromlist=['router'])
+            router_module = __import__(router_path + router_name, fromlist=["router"])
             router = router_module.router
             app.include_router(router)
 
@@ -49,9 +49,11 @@ def init_routers(app: FastAPI, folder: str = ""):
         for filename in os.listdir(current_folder)
         if filename.endswith(".py") and filename not in EXCLUDE_FILES
     ]
-    router_import_path = router_path.replace('/', '.')
+    router_import_path = router_path.replace("/", ".")
     for router_name in router_files:
-        router_module = __import__(router_import_path + router_name, fromlist=["router"])
+        router_module = __import__(
+            router_import_path + router_name, fromlist=["router"]
+        )
         router = router_module.router
         app.include_router(router)
 

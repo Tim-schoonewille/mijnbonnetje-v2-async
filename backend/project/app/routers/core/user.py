@@ -32,7 +32,7 @@ async def get_self(
     return user
 
 
-@router.patch('', response_model=models.User)
+@router.patch("", response_model=models.User)
 async def update_self(user: FreshTokenUser, schema: models.UserUpdate, db: GetDB):
     return await crud.user.update(db, schema, user)
 

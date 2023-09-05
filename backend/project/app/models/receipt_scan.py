@@ -27,10 +27,12 @@ class ReceiptScanDB(
     TimeStampDBMixin,
     Base,
 ):
-    __tablename__ = 'receipt_scans'
+    __tablename__ = "receipt_scans"
     scan: Mapped[str]
-    receipt_entry: Mapped['ReceiptEntryDB'] = relationship(back_populates='receipt_scans')
-    receipt_file: Mapped['ReceiptFileDB'] = relationship(back_populates='receipt_scans')
+    receipt_entry: Mapped["ReceiptEntryDB"] = relationship(
+        back_populates="receipt_scans"
+    )
+    receipt_file: Mapped["ReceiptFileDB"] = relationship(back_populates="receipt_scans")
 
 
 class ReceiptScan(IDFieldSchemaMixin, TimeStampSchemaMixin):

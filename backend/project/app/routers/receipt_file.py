@@ -12,10 +12,10 @@ from app.utilities.core.dependencies import ParametersDepends
 from app.utilities.core.dependencies import VerifiedUser
 from app.utilities.core.dependencies import GetSettings
 
-router = APIRouter(prefix=settings.URL_PREFIX + '/receipt-file', tags=['receipt-file'])
+router = APIRouter(prefix=settings.URL_PREFIX + "/receipt-file", tags=["receipt-file"])
 
 
-@router.post('/', response_model=models.ReceiptFile, status_code=201)
+@router.post("/", response_model=models.ReceiptFile, status_code=201)
 async def create_receipt_file(
     user: VerifiedUser,
     file: UploadFile,
@@ -40,29 +40,29 @@ async def create_receipt_file(
     return await handle_receipt_file(db, user, file, entry_id, settings.STATIC_FOLDER)
 
 
-@router.get('/', response_model=list[models.ReceiptFile])
+@router.get("/", response_model=list[models.ReceiptFile])
 async def read_multiple_receipt_files(
     user: VerifiedUser,
     params: ParametersDepends,
     db: GetDB,
 ):
-    """ Return multiple receipt files, depending on given parameters
+    """Return multiple receipt files, depending on given parameters
     Requires verified user token
     """
     return await crud.receipt_file.get_multi(db, user, **params)
 
 
-@router.get('/{receipt_file_id}', response_model=models.ReceiptFile)
+@router.get("/{receipt_file_id}", response_model=models.ReceiptFile)
 async def read_specific_receipt_file(
     receipt_file_id: int | UUID,
     user: VerifiedUser,
     db: GetDB,
 ):
-    """ Returns specific receipt file from database, requires verified user token
+    """Returns specific receipt file from database, requires verified user token
 
-        Raises:\n
-            403: {detail: "NOT_YOUR_RECEIPT_FILE"}\n
-            404: {detail: "RECEIPT_FILE_NOT_FOUND"}\n
+    Raises:\n
+        403: {detail: "NOT_YOUR_RECEIPT_FILE"}\n
+        404: {detail: "RECEIPT_FILE_NOT_FOUND"}\n
     """
     receipt_file_in_db = await crud.receipt_file.get(db, receipt_file_id)
     if receipt_file_in_db is None:
@@ -72,19 +72,19 @@ async def read_specific_receipt_file(
     return receipt_file_in_db
 
 
-@router.delete('/{receipt_file_id}', response_model=dict[str, str])
+@router.delete("/{receipt_file_id}", response_model=dict[str, str])
 async def delete_receipt_file(
     receipt_file_id: int | UUID,
     user: VerifiedUser,
     settings: GetSettings,
     db: GetDB,
 ):
-    """ deeletes a specific receipt file from database, requires verified user token
+    """deeletes a specific receipt file from database, requires verified user token
 
-        Raises:\n
-            403: {detail: "NOT_YOUR_RECEIPT_FILE"}\n
-            404: {detail: "RECEIPT_FILE_NOT_FOUND"}\n
-            404: {detail: "RECEIPT_IMAGE_NOT_FOUND"}\n
+    Raises:\n
+        403: {detail: "NOT_YOUR_RECEIPT_FILE"}\n
+        404: {detail: "RECEIPT_FILE_NOT_FOUND"}\n
+        404: {detail: "RECEIPT_IMAGE_NOT_FOUND"}\n
     """
     receipt_file_in_db = await crud.receipt_file.get(db, receipt_file_id)
     if receipt_file_in_db is None:

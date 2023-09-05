@@ -2,6 +2,7 @@ from functools import wraps
 from uuid import UUID
 
 from fastapi import Request
+
 # from motor.motor_asyncio import AsyncIOMotorClient  # type: ignore
 
 from app import models
@@ -68,11 +69,12 @@ def convert_query_params_to_dict(query_parameters: str) -> dict[str, str] | None
 
     param_dict = {
         key: value
-        for param in query_parameters.split('&')
-        if (key_value := param.split('=')) and len(key_value) == 2
+        for param in query_parameters.split("&")
+        if (key_value := param.split("=")) and len(key_value) == 2
         for key, value in [key_value]
     }
     return param_dict
+
 
 # async def get_api_traffic(mongodb: AsyncIOMotorClient):
 #     collection = mongodb[settings.API_TRAFFIC_COLLECTION]

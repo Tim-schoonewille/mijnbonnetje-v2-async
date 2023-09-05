@@ -17,6 +17,7 @@ from app.utilities.core.subscription import get_payment_pending_subscription
 from app.utilities.core.subscription import get_subscriptions
 from app.utilities.core.subscription import read_multi_subs_with_tier_and_payments
 from app.utilities.core.subscription import read_single_sub_with_tier_and_payments
+
 # from app.utilities.core.subscription import update_subscription_active_status
 from app.utilities.core.log import log_traffic
 
@@ -41,7 +42,7 @@ async def read_all_active_subscriptions(
     request: Request,
     db: GetDB,
 ):
-    """ Return all subscriptions """
+    """Return all subscriptions"""
     results = await read_multi_subs_with_tier_and_payments(
         db=db, user=user, params=params
     )

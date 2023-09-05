@@ -43,12 +43,10 @@ class StoreDB(
     receipt_entries: Mapped[list["ReceiptEntryDB"]] = relationship(
         back_populates="store"
     )
-    users: Mapped[list['UserDB']] = relationship(
-        secondary=store_users_association_table, back_populates='stores'
+    users: Mapped[list["UserDB"]] = relationship(
+        secondary=store_users_association_table, back_populates="stores"
     )
-    product_items: Mapped[list['ProductItemDB']] = relationship(
-        back_populates='store'
-    )
+    product_items: Mapped[list["ProductItemDB"]] = relationship(back_populates="store")
 
 
 class Store(IDFieldSchemaMixin, TimeStampSchemaMixin):

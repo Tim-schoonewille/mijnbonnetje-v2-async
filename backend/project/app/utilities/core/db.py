@@ -1,5 +1,6 @@
 import random
 from datetime import date
+
 # from datetime import datetime
 from datetime import timedelta
 from uuid import uuid4
@@ -27,7 +28,7 @@ async def fill_db(db: AsyncSession) -> None:
         description="Pro tier with unlimited access",
         api_call_limit=100,
     )
-    store = models.StoreDB(name='Aldi', city='Brunssum', country='NL')
+    store = models.StoreDB(name="Aldi", city="Brunssum", country="NL")
     async with db as sess:
         sess.add(super_user)
         sess.add(tier_pro)

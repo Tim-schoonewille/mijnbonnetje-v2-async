@@ -12,20 +12,20 @@ from app.utilities.core.dependencies import GetDB
 from app.utilities.core.dependencies import ParametersDepends
 
 
-router = APIRouter(prefix=settings.URL_PREFIX + '/product-item', tags=['product-item'])
+router = APIRouter(prefix=settings.URL_PREFIX + "/product-item", tags=["product-item"])
 
 
-@router.post('/', response_model=models.ProductItem, status_code=201)
+@router.post("/", response_model=models.ProductItem, status_code=201)
 async def create_product_item(
     user: VerifiedUser,
     schema: models.ProductItemCreate,
     db: GetDB,
 ):
-    """Create a product item, requires verified user token """
+    """Create a product item, requires verified user token"""
     return await crud.product_item.create(db, schema, user)
 
 
-@router.get('/', response_model=list[models.ProductItem])
+@router.get("/", response_model=list[models.ProductItem])
 async def read_multiple_product_items(
     user: VerifiedUser,
     params: ParametersDepends,
@@ -38,13 +38,13 @@ async def read_multiple_product_items(
     return await crud.product_item.get_multi(db, user, **params)
 
 
-@router.get('/{product_item_id}', response_model=models.ProductItem)
+@router.get("/{product_item_id}", response_model=models.ProductItem)
 async def read_specific_product_item(
     product_item_id: int | UUID,
     user: VerifiedUser,
     db: GetDB,
 ):
-    """ Read specific product item in database.
+    """Read specific product item in database.
 
     Raises:\n
         404: {detail: " PRODUCT_ITEM_NOT_FOUND"}
@@ -58,14 +58,14 @@ async def read_specific_product_item(
     return product_item_in_db
 
 
-@router.patch('/{product_item_id}', response_model=models.ProductItem)
+@router.patch("/{product_item_id}", response_model=models.ProductItem)
 async def update_specific_product_item(
     product_item_id: int | UUID,
     schema: models.ProductItemUpdate,
     user: VerifiedUser,
     db: GetDB,
 ):
-    """ Update specific product item in database.
+    """Update specific product item in database.
 
     Raises:\n
         404: {detail: " PRODUCT_ITEM_NOT_FOUND"}
@@ -79,7 +79,7 @@ async def update_specific_product_item(
     return await crud.product_item.update(db, schema, product_item_in_db)
 
 
-@router.delete('/{product_item_id}', response_model=dict[str, str])
+@router.delete("/{product_item_id}", response_model=dict[str, str])
 async def delete_specific_product_item(
     product_item_id: int | UUID,
     user: VerifiedUser,

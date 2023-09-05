@@ -107,5 +107,7 @@ async def scan_receipt(path_to_img: str) -> str:
 async def refresh_receipt_entry(
     db: AsyncSession, entry: models.ReceiptEntryDB
 ) -> models.ReceiptEntryDB:
-    await db.refresh(entry, ['receipt_files', 'receipt_scans', 'store', 'product_items'])
+    await db.refresh(
+        entry, ["receipt_files", "receipt_scans", "store", "product_items"]
+    )
     return entry

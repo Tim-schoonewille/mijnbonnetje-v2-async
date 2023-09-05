@@ -82,6 +82,6 @@ def create_test_tables(drop: bool = False):
         Base.metadata.drop_all(bind=test_sync_engine)
     Base.metadata.create_all(bind=test_sync_engine)
     with Session(test_sync_engine) as session:
-        new_user = models.UserDB(id=10, email='testing@test.pytest', password='testing')
+        new_user = models.UserDB(id=10, email="testing@test.pytest", password="testing")
         session.add(new_user)
         session.commit()

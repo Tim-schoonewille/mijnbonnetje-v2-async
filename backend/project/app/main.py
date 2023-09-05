@@ -13,16 +13,16 @@ log = logging.getLogger("uvicorn")
 
 
 def create_application(testing: bool = False) -> FastAPI:
-    static_folder_path = '.' + settings.STATIC_FOLDER
+    static_folder_path = "." + settings.STATIC_FOLDER
     if not os.path.exists(static_folder_path):
         os.makedirs(static_folder_path)
 
-    origins = ['http://frontend.localhost:3000', 'http://dev.localhost:3000']
+    origins = ["http://frontend.localhost:3000", "http://dev.localhost:3000"]
     application = FastAPI(title="mijnbonnetje.nl")
     application.mount(
         settings.STATIC_FOLDER,
-        StaticFiles(directory=f'.{settings.STATIC_FOLDER}'),
-        name='static'
+        StaticFiles(directory=f".{settings.STATIC_FOLDER}"),
+        name="static",
     )
     application.add_middleware(
         CORSMiddleware,

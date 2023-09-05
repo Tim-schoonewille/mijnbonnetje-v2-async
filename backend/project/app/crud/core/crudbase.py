@@ -32,7 +32,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         try:
             object = await db.get(self.model, id)
         except DBAPIError:
-            raise HTTPException(status_code=404, detail='NOT_FOUND')
+            raise HTTPException(status_code=404, detail="NOT_FOUND")
         return object
 
     async def get_multi(

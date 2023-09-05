@@ -49,7 +49,7 @@ async def create_full_receipt(
     return receipt
 
 
-@router.get('/', response_model=list[models.Receipt])
+@router.get("/", response_model=list[models.Receipt])
 async def read_multiple_receipts(
     user: VerifiedUser,
     params: ParametersDepends,

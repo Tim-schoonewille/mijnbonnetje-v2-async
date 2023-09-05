@@ -39,7 +39,7 @@ def get_settings_override():
     settings.REDIS_LOGIN_PREFIX = "test_login_attempts_user"
     settings.LOGIN_LOCKOUT_TIME = 5
     settings.MONGO_DB_DB = settings.MONGO_DB_TESTDB
-    settings.STATIC_FOLDER = '/public-test'
+    settings.STATIC_FOLDER = "/public-test"
     return settings
 
 
@@ -77,7 +77,7 @@ def test_app():
 @pytest.fixture(scope="session")
 def client():
     app = create_application(testing=True)
-    app.mount('/public', StaticFiles(directory='public-test'), name='public-test')
+    app.mount("/public", StaticFiles(directory="public-test"), name="public-test")
     app.dependency_overrides[get_settings] = get_settings_override
     app.dependency_overrides[get_db] = db_session
     app.dependency_overrides[get_verified_user] = get_verified_user_override

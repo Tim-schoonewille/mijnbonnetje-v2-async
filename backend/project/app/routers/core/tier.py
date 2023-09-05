@@ -63,7 +63,7 @@ async def create_new_tier(
     request: Request,
     db: GetDB,
 ):
-    """ Create a new Tier (requires sudo token) """
+    """Create a new Tier (requires sudo token)"""
     new_tier = await crud.tier.create(db, input_schema, sudo)
     return new_tier
 
