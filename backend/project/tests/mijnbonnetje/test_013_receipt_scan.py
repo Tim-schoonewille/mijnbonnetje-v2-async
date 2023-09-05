@@ -4,7 +4,9 @@ import shutil
 from app import models
 from app.db import create_test_tables
 
-dummy_receipt_scan = models.ReceiptScanCreate(receipt_file_id=1, scan="lalalalalalal")
+dummy_receipt_scan = models.ReceiptScanCreate(
+    receipt_entry_id=1, receipt_file_id=1, scan="lalalalalalal"
+)
 
 
 test_receipt_file_path = "./tests/files/test_receipt.jpg"
@@ -39,6 +41,7 @@ def test_create_receipt_scan(client):
     assert response.status_code == 201
     assert data["createdAt"] is not None
     assert data["updatedAt"] is None
+    assert data['receiptEntryId'] == 1
     assert data["receiptFileId"] == dummy_receipt_scan.receipt_file_id
 
 

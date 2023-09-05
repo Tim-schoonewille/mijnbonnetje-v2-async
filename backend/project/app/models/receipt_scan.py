@@ -9,34 +9,39 @@ from app.models.base import Base
 from app.models.base import CamelBase
 from app.models.base import IDFieldDBMixin
 from app.models.base import IDFieldSchemaMixin
+from app.models.base import ReceiptEntryIDFieldDBMixin
 from app.models.base import ReceiptFileIDFieldDBMixin
 from app.models.base import TimeStampDBMixin
 from app.models.base import TimeStampSchemaMixin
 
 
 if TYPE_CHECKING:
+    from app.models import ReceiptEntryDB
     from app.models import ReceiptFileDB
 
 
 class ReceiptScanDB(
     IDFieldDBMixin,
+    ReceiptEntryIDFieldDBMixin,
     ReceiptFileIDFieldDBMixin,
     TimeStampDBMixin,
     Base,
 ):
     __tablename__ = 'receipt_scans'
     scan: Mapped[str]
-
+    receipt_entry: Mapped['ReceiptEntryDB'] = relationship(back_populates='receipt_scans')
     receipt_file: Mapped['ReceiptFileDB'] = relationship(back_populates='receipt_scans')
 
 
 class ReceiptScan(IDFieldSchemaMixin, TimeStampSchemaMixin):
+    receipt_entry_id: int | UUID
     receipt_file_id: int | UUID
     scan: str
     model_config = ConfigDict(from_attributes=True)
 
 
 class ReceiptScanCreate(CamelBase):
+    receipt_entry_id: int | UUID
     receipt_file_id: int | UUID
     scan: str
 

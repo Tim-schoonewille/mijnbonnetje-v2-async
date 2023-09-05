@@ -79,6 +79,7 @@ async def handle_receipt_file(
 async def handle_receipt_scan(
     db: AsyncSession,
     user: models.UserDB,
+    receipt_entry_id: int | UUID,
     receipt_file_id: int | UUID,
     receipt_file_path: str,
 ) -> models.ReceiptScanDB:
@@ -86,7 +87,9 @@ async def handle_receipt_scan(
         raise HTTPException(status_code=404, detail="INVALID_FILE_PATH")
     receipt_scan = await scan_receipt(receipt_file_path)
     receipt_scan_schema = models.ReceiptScanCreate(
-        receipt_file_id=receipt_file_id, scan=receipt_scan
+        receipt_entry_id=receipt_entry_id,
+        receipt_file_id=receipt_file_id,
+        scan=receipt_scan,
     )
     return await crud.receipt_scan.create(db, receipt_scan_schema, user)
 
@@ -99,3 +102,10 @@ async def scan_receipt(path_to_img: str) -> str:
     img = img.convert("L")
     extraction = pt.image_to_string(img)
     return extraction
+
+
+async def refresh_receipt_entry(
+    db: AsyncSession, entry: models.ReceiptEntryDB
+) -> models.ReceiptEntryDB:
+    await db.refresh(entry, ['receipt_files', 'receipt_scans', 'store', 'product_items'])
+    return entry

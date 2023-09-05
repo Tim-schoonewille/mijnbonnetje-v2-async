@@ -1,6 +1,7 @@
 from datetime import date
 from typing import Optional
 from typing import TYPE_CHECKING
+from typing import Union
 from uuid import UUID
 
 from pydantic import ConfigDict
@@ -24,8 +25,13 @@ from app.models.base import UserIDFieldSchemaMixin
 if TYPE_CHECKING:
     from app.models import UserDB
     from app.models import ReceiptFileDB
+    from app.models import ReceiptScanDB
     from app.models import StoreDB
     from app.models import ProductItemDB
+    from app.models import ReceiptFile
+    from app.models import ReceiptScan
+    from app.models import Store
+    from app.models import ProductItem
 
 
 class ReceiptEntryDB(
@@ -44,6 +50,9 @@ class ReceiptEntryDB(
     user: Mapped["UserDB"] = relationship(back_populates="receipt_entries")
     store: Mapped[list["StoreDB"]] = relationship(back_populates="receipt_entries")
     receipt_files: Mapped[list['ReceiptFileDB']] = relationship(
+        back_populates='receipt_entry'
+    )
+    receipt_scans: Mapped[list['ReceiptScanDB']] = relationship(
         back_populates='receipt_entry'
     )
     product_items: Mapped[list['ProductItemDB']] = relationship(
@@ -78,3 +87,10 @@ class ReceiptEntryUpdate(CamelBase):
     total_amount: int | None = None
     warranty: int | None = None
     category: Categories | None = None
+
+
+class Receipt(ReceiptEntry):
+    receipt_files: list['ReceiptFile']
+    receipt_scans: list['ReceiptScan']
+    store: Union['Store', None] = None
+    product_items: list['ProductItem'] | None = None

@@ -66,6 +66,7 @@ from .receipt_entry import (
     ReceiptEntry,
     ReceiptEntryCreate,
     ReceiptEntryUpdate,
+    Receipt,
 )
 
 from .store import StoreDB, Store, StoreCreate, StoreUpdate, StoreWithReceiptEntries
@@ -73,8 +74,6 @@ from .store import StoreDB, Store, StoreCreate, StoreUpdate, StoreWithReceiptEnt
 from .receipt_file import ReceiptFileDB, ReceiptFile, ReceiptFileCreate, ReceiptFileUpdate
 from .receipt_scan import ReceiptScanDB, ReceiptScan, ReceiptScanCreate, ReceiptScanUpdate
 from .product_item import ProductItemDB, ProductItem, ProductItemCreate, ProductItemUpdate
-
-from .receipt import Receipt
 
 
 SubscriptionWithTier.model_rebuild()

@@ -40,6 +40,7 @@ async def create_receipt_scan(
     return await handle_receipt_scan(
         db=db,
         user=user,
+        receipt_entry_id=receipt_file_in_db.receipt_entry_id,
         receipt_file_id=receipt_file_id,
         receipt_file_path=receipt_file_path,
     )
