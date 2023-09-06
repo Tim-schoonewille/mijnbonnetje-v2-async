@@ -53,3 +53,29 @@ def test_read_multiple_receipts(client):
     assert response.status_code == 200
     assert isinstance(data, list)
     assert len(data) == 2
+
+
+def test_read_specific_receipt(client):
+    response = client.get('/receipt/1')
+    data = response.json()
+    print(data)
+    receipt_file = data['receiptFiles'][0]
+    receipt_scan = data['receiptScans'][0]
+    assert response.status_code == 200
+    assert data['createdAt'] is not None
+    assert data['updatedAt'] is None
+    assert receipt_file['id'] == 1
+    assert receipt_file['receiptEntryId'] == 1
+    assert receipt_file['fileName'] == 'test_receipt.jpg'
+    assert receipt_file['fileType'] == 'image/jpeg'
+    assert receipt_file['fileSize'] == 186030
+    assert receipt_scan['id'] == 1
+    assert isinstance(receipt_scan['scan'], str)
+
+
+def test_delete_specific_receipt(client):
+    response = client.delete('/receipt/1')
+    data = response.json()
+    print(data)
+    assert response.status_code == 200
+    assert data['message'] == "RECEIPT_DELETED"

@@ -50,10 +50,10 @@ class ReceiptEntryDB(
     user: Mapped["UserDB"] = relationship(back_populates="receipt_entries")
     store: Mapped[list["StoreDB"]] = relationship(back_populates="receipt_entries")
     receipt_files: Mapped[list["ReceiptFileDB"]] = relationship(
-        back_populates="receipt_entry"
+        back_populates="receipt_entry", cascade="all, delete"
     )
     receipt_scans: Mapped[list["ReceiptScanDB"]] = relationship(
-        back_populates="receipt_entry"
+        back_populates="receipt_entry", cascade="all, delete"
     )
     product_items: Mapped[list["ProductItemDB"]] = relationship(
         back_populates="receipt_entry"
@@ -74,7 +74,7 @@ class ReceiptEntry(
 
 
 class ReceiptEntryCreate(CamelBase):
-    store_id: int | UUID | None = None
+    store_id: int | UUID | None = Field(default=None, gt=0)
     purchase_date: str = Field(default_factory=lambda: str(date.today()))
     total_amount: int = Field(default=0)
     warranty: int = Field(default=0)
@@ -82,7 +82,7 @@ class ReceiptEntryCreate(CamelBase):
 
 
 class ReceiptEntryUpdate(CamelBase):
-    store_id: int | UUID | None = None
+    store_id: int | UUID | None = Field(default=0, gt=0)
     purchase_date: date | None = None
     total_amount: int | None = None
     warranty: int | None = None

@@ -1,11 +1,14 @@
 import io
+import json
 import os
 from uuid import uuid4, UUID
 
 import aiofiles  # type: ignore
+import openai
 import pytesseract as pt  # type: ignore
 from fastapi import UploadFile, HTTPException
 from PIL import Image  # type: ignore
+from PIL import ImageFilter
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import crud
@@ -99,8 +102,10 @@ async def scan_receipt(path_to_img: str) -> str:
         img_data = await f.read()
 
     img = Image.open(io.BytesIO(img_data))
+    img = img.filter(ImageFilter.SHARPEN)
     img = img.convert("L")
     extraction = pt.image_to_string(img)
+    print(extraction)
     return extraction
 
 
@@ -111,3 +116,30 @@ async def refresh_receipt_entry(
         entry, ["receipt_files", "receipt_scans", "store", "product_items"]
     )
     return entry
+
+
+def parse_receipt_with_openai(
+    prompt_query: str,
+    gpt_model: str = 'text-davinci-003',
+    max_tokens: int = 1000,
+    temp: int = 0,
+) -> list:
+    prompt_question = """
+    can you parse this receipt scan and return to me the items in json format? I only want you to respond with json. No need to format it for my view, if you do that, I get alot clutter that I don't need. Try to get me the best possible JSON response as possible.  I want the json to look like this array of objects: \n
+    { "name": "<name:string>", "price": <price:float>, "quantity": <quantity:integer> } 
+    """
+    prompt = prompt_question + prompt_query
+    openai.api_key = settings.OPENAI_API_KEY
+    result = openai.Completion.create(
+        model=gpt_model,
+        prompt=prompt,
+        max_tokens=max_tokens,
+        temperature=temp,
+    )
+    print('OPENAI CALL RESULT:\n', result)
+    try:
+        items = json.loads(result['choices'][0]['text'])
+        print('ITEM:::\n\n', items)
+    except json.decoder.JSONDecodeError:
+        return []
+    return items

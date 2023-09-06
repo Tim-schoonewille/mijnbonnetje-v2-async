@@ -71,8 +71,11 @@ class Settings(BaseSettings):
 
     # Static Files
     STATIC_FOLDER: str = "/public/"
-    MAX_FILE_SIZE: int = 2
+    MAX_FILE_SIZE: int = 4
     ALLOWED_FILE_TYPES: list = ["image/jpeg", "image/png"]
+
+    # OpenAI
+    OPENAI_API_KEY: str
 
 
 @lru_cache()

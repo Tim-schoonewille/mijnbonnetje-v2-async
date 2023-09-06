@@ -330,7 +330,7 @@ async def handle_signup(
         raise HTTPException(status_code=409, detail="DUPLICATE_EMAIL")
     schema.password = convert_to_hash(schema.password)
     user = await crud.user.create(db=db, schema_in=schema)
-    email_verification_token = create_email_verification_token(user.id)
+    email_verification_token = create_email_verification_token(user.email)
     send_verification_code_email(user.email, email_verification_token, bg_tasks)
     return user
 

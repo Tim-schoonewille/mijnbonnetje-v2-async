@@ -10,6 +10,7 @@ from app.config import settings
 from app.utilities.receipt import handle_receipt_file
 from app.utilities.receipt import handle_receipt_scan
 from app.utilities.receipt import refresh_receipt_entry
+from app.utilities.receipt import parse_receipt_with_openai
 from app.utilities.core.dependencies import GetDB
 from app.utilities.core.dependencies import GetSettings
 from app.utilities.core.dependencies import ParametersDepends
@@ -38,7 +39,7 @@ async def create_full_receipt(
         entry_id=receipt_entry.id,
         folder=settings.STATIC_FOLDER,
     )
-    await handle_receipt_scan(
+    receipt_scan = await handle_receipt_scan(
         db=db,
         user=user,
         receipt_entry_id=receipt_file.receipt_entry_id,
@@ -46,6 +47,10 @@ async def create_full_receipt(
         receipt_file_path=receipt_file.file_path,
     )
     receipt = await refresh_receipt_entry(db, receipt_entry)
+    if exclude_ai_scan is False:
+        items = parse_receipt_with_openai(receipt_scan.scan)
+        print('[+] FROM THE ROUTER::::::')
+        print(items)
     return receipt
 
 
@@ -60,3 +65,47 @@ async def read_multiple_receipts(
     """
     receipts = await crud.receipt_entry.get_multi(db, user, **params)
     return [await refresh_receipt_entry(db, entry) for entry in receipts]
+
+
+@router.get('/{receipt_id}', response_model=models.Receipt)
+async def read_specific_full_receipt(
+    receipt_id: int | UUID,
+    user: VerifiedUser,
+    db: GetDB,
+):
+    """Retreive a full receipt from database with:
+    entry, file, scan, store?, product_items?
+
+    Raises:\n
+        404: {detail:"RECEIPT_NOT_FOUND"}
+        403: {detail: "ACCESS_DENIED"}
+    """
+    receipt = await crud.receipt_entry.get(db, receipt_id)
+    if receipt is None:
+        raise HTTPException(status_code=404, detail="RECEIPT_NOT_FOUND")
+    if receipt.user_id != user.id:
+        raise HTTPException(status_code=403, detail="ACCESS_DENIED")
+    return await refresh_receipt_entry(db, receipt)
+
+
+@router.delete('/{receipt_id}')
+async def delete_specific_full_receipt(
+    receipt_id: int | UUID,
+    user: VerifiedUser,
+    db: GetDB,
+):
+    """Delete a full receipt from database with:
+
+    Raises:\n
+        404: {detail:"RECEIPT_NOT_FOUND"}
+        403: {detail: "ACCESS_DENIED"}
+    """
+    receipt = await crud.receipt_entry.get(db, receipt_id)
+    if receipt is None:
+        raise HTTPException(status_code=404, detail="RECEIPT_NOT_FOUND")
+    if receipt.user_id != user.id:
+        raise HTTPException(status_code=403, detail="ACCESS_DENIED")
+    await refresh_receipt_entry(db, receipt)
+
+    await crud.receipt_entry.remove(db, receipt)
+    return dict(message="RECEIPT_DELETED")
