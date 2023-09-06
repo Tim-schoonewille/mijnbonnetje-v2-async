@@ -46,11 +46,12 @@ async def create_full_receipt(
         receipt_file_id=receipt_file.id,
         receipt_file_path=receipt_file.file_path,
     )
-    receipt = await refresh_receipt_entry(db, receipt_entry)
     if exclude_ai_scan is False:
         items = parse_receipt_with_openai(receipt_scan.scan)
         print('[+] FROM THE ROUTER::::::')
         print(items)
+
+    receipt = await refresh_receipt_entry(db, receipt_entry)
     return receipt
 
 

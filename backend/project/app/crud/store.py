@@ -13,6 +13,8 @@ class CRUDStore(
 ):
     async def search(self, db: AsyncSession, user: models.UserDB, q: str):
         """Find a store in DB"""
+        if q is None:
+            return []
         all_stores = await self.get_multi(db, user)
         result = [
             store

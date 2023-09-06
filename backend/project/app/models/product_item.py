@@ -1,3 +1,4 @@
+from typing import Optional
 from typing import TYPE_CHECKING
 from uuid import UUID
 
@@ -36,8 +37,8 @@ class ProductItemDB(
     __tablename__ = "product_items"
     purchase_date: Mapped[str]
     name: Mapped[str]
-    price: Mapped[float]
-    quantity: Mapped[int] = mapped_column(default=1)
+    price: Mapped[Optional[float]]
+    quantity: Mapped[Optional[int]] = mapped_column(default=1)
 
     user: Mapped["UserDB"] = relationship(back_populates="product_items")
     receipt_entry: Mapped["ReceiptEntryDB"] = relationship(
@@ -55,8 +56,8 @@ class ProductItem(
     store_id: int | UUID | None = None
     purchase_date: str
     name: str
-    price: float
-    quantity: int
+    price: float | None
+    quantity: int | None
     model_config = ConfigDict(from_attributes=True)
 
 
@@ -65,8 +66,8 @@ class ProductItemCreate(CamelBase):
     store_id: int | UUID | None = None
     purchase_date: str
     name: str
-    price: float = Field(gt=0)
-    quantity: int = Field(ge=1, default=1)
+    price: float | None = Field(ge=0, default=1)
+    quantity: int | None = Field(ge=1, default=1)
 
 
 class ProductItemUpdate(CamelBase):

@@ -103,8 +103,9 @@ async def scan_receipt(path_to_img: str) -> str:
 
     img = Image.open(io.BytesIO(img_data))
     img = img.filter(ImageFilter.SHARPEN)
-    img = img.convert("L")
-    extraction = pt.image_to_string(img)
+    # img = img.convert("L")
+    config = "--psm 1"
+    extraction = pt.image_to_string(img, lang='nld', config=config)
     print(extraction)
     return extraction
 
@@ -123,11 +124,18 @@ def parse_receipt_with_openai(
     gpt_model: str = 'text-davinci-003',
     max_tokens: int = 1000,
     temp: int = 0,
-) -> list:
-    prompt_question = """
+) -> dict:
+    prompt_question_old = """
     can you parse this receipt scan and return to me the items in json format? I only want you to respond with json. No need to format it for my view, if you do that, I get alot clutter that I don't need. Try to get me the best possible JSON response as possible.  I want the json to look like this array of objects: \n
     { "name": "<name:string>", "price": <price:float>, "quantity": <quantity:integer> } 
     """
+    prompt_question = """
+    can you parse this receipt scan and return to me the items in json format? I only want you to respond with json. No need to format it for my view, if you do that, I get alot clutter that I don't need. Try to get me the best possible JSON response as possible. Also,if you can find the: Total Price of receipt, the store of the receipt, and the location of said store, I also want you to send that back to me.\n If you can't define the store with name an city, or not the total price, just leave it at null.\nI want the json to look like this object: \n
+    {"store": {"name": <name_of_store:string>, "city": <city_of_store:string>},
+    "totalPrice": <total_price_as_on_the_receipt:float(number)>, "productItems":
+    [array of objects:{ "name": "<name:string>", "price": <price:float>, "quantity": <quantity:integer> }] 
+    """
+    
     prompt = prompt_question + prompt_query
     openai.api_key = settings.OPENAI_API_KEY
     result = openai.Completion.create(
@@ -141,5 +149,5 @@ def parse_receipt_with_openai(
         items = json.loads(result['choices'][0]['text'])
         print('ITEM:::\n\n', items)
     except json.decoder.JSONDecodeError:
-        return []
+        return {}
     return items
