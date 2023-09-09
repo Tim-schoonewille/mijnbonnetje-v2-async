@@ -10,7 +10,7 @@ from app.config import settings
 from app.utilities.receipt import handle_receipt_file
 from app.utilities.receipt import handle_receipt_scan
 from app.utilities.receipt import refresh_receipt_entry
-from app.utilities.receipt import parse_receipt_with_openai
+from app.utilities.receipt import handle_receipt_ocr
 from app.utilities.core.dependencies import GetDB
 from app.utilities.core.dependencies import GetSettings
 from app.utilities.core.dependencies import ParametersDepends
@@ -23,7 +23,7 @@ router = APIRouter(prefix=settings.URL_PREFIX + "/receipt", tags=["receipt"])
 @router.post("/", response_model=models.Receipt, status_code=201)
 async def create_full_receipt(
     *,
-    exclude_ai_scan: bool = True,
+    include_external_ocr: bool = False,
     user: VerifiedUser,
     file: UploadFile,
     settings: GetSettings,
@@ -46,12 +46,13 @@ async def create_full_receipt(
         receipt_file_id=receipt_file.id,
         receipt_file_path=receipt_file.file_path,
     )
-    if exclude_ai_scan is False:
-        items = parse_receipt_with_openai(receipt_scan.scan)
-        print('[+] FROM THE ROUTER::::::')
-        print(items)
-
-    receipt = await refresh_receipt_entry(db, receipt_entry)
+    receipt = await handle_receipt_ocr(
+        db=db,
+        user=user,
+        entry=receipt_entry,
+        file_path=receipt_file.file_path,
+        external_ocr=include_external_ocr,
+    )
     return receipt
 
 

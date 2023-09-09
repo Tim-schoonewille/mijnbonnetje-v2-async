@@ -1,0 +1,229 @@
+{
+    "ocr_type": "receipts",
+    "request_id": "P_83.81.146.242_lmbytx2d_wkw",
+    "ref_no": "ocr_python_123",
+    "file_name": "triade-bon.jpg",
+    "request_received_on": 1694260288166,
+    "success": true,
+    "image_width": 4080,
+    "image_height": 2296,
+    "image_rotation": -1.558,
+    "recognition_completed_on": 1694260290621,
+    "receipts": [
+        {
+            "merchant_name": "Triade44",
+            "merchant_address": null,
+            "merchant_phone": null,
+            "merchant_website": null,
+            "merchant_tax_reg_no": null,
+            "merchant_company_reg_no": null,
+            "region": null,
+            "mall": null,
+            "country": "EU",
+            "receipt_no": "0452030919",
+            "date": "2023-06-30",
+            "time": "12:33",
+            "items": [
+                {
+                    "amount": 2.55,
+                    "category": null,
+                    "description": "Thee",
+                    "flags": "",
+                    "qty": 1,
+                    "remarks": null,
+                    "tags": null,
+                    "unitPrice": null
+                },
+                {
+                    "amount": 0.75,
+                    "category": null,
+                    "description": "honing",
+                    "flags": "",
+                    "qty": null,
+                    "remarks": null,
+                    "tags": null,
+                    "unitPrice": null
+                },
+                {
+                    "amount": 2.95,
+                    "category": null,
+                    "description": "Verse Munt thee",
+                    "flags": "",
+                    "qty": 1,
+                    "remarks": null,
+                    "tags": null,
+                    "unitPrice": null
+                },
+                {
+                    "amount": 0.75,
+                    "category": null,
+                    "description": "honing",
+                    "flags": "",
+                    "qty": null,
+                    "remarks": null,
+                    "tags": null,
+                    "unitPrice": null
+                },
+                {
+                    "amount": 9.75,
+                    "category": null,
+                    "description": "Broodje Taco",
+                    "flags": "",
+                    "qty": 1,
+                    "remarks": null,
+                    "tags": null,
+                    "unitPrice": null
+                },
+                {
+                    "amount": 11.75,
+                    "category": null,
+                    "description": "Triade plank brie",
+                    "flags": "",
+                    "qty": 1,
+                    "remarks": null,
+                    "tags": null,
+                    "unitPrice": null
+                },
+                {
+                    "amount": 4.95,
+                    "category": null,
+                    "description": "Dubbele espresso",
+                    "flags": "",
+                    "qty": 1,
+                    "remarks": null,
+                    "tags": null,
+                    "unitPrice": null
+                },
+                {
+                    "amount": 33.45,
+                    "category": null,
+                    "description": "Totaal",
+                    "flags": "",
+                    "qty": null,
+                    "remarks": null,
+                    "tags": null,
+                    "unitPrice": null
+                },
+                {
+                    "amount": 33.45,
+                    "category": null,
+                    "description": "9,00%:30,69 2,76",
+                    "flags": "",
+                    "qty": null,
+                    "remarks": null,
+                    "tags": null,
+                    "unitPrice": null
+                },
+                {
+                    "amount": 33.45,
+                    "category": null,
+                    "description": "BTW",
+                    "flags": "",
+                    "qty": 30.69,
+                    "remarks": null,
+                    "tags": null,
+                    "unitPrice": null
+                }
+            ],
+            "currency": "EUR",
+            "total": 33.45,
+            "subtotal": null,
+            "tax": null,
+            "service_charge": null,
+            "tip": null,
+            "payment_method": null,
+            "payment_details": null,
+            "credit_card_type": null,
+            "credit_card_number": null,
+            "ocr_text": "        Triade44\n  Een Bijzonder Lunch Caf\u00e9\n 5               30/06/2023 12:33\n #0                       24257\n Deelnemer pin\n #Naam                      Prijs\n 1 Thee                     2,55\n    honing                   0,75\n 1 Verse Munt thee          2,95\n    honing                   0,75\n 1 Broodje Taco             9,75\n 1 Triade plank brie        11,75\n 1 Dubbele espresso          4,95\n Totaal                 \u20ac 33,45\n            Netto BTW Totaal\n 9,00%:     30,69 2,76 33,45\n BTW\n            30,69 2,76 33,45\n totaal:\n bedankt voor uw bezoek!!\n Triade 44\n Rimburgerweg 44\n 6445PA Brunssum\n 0452030919\n 1111111\n Zgtriade.nl",
+            "ocr_confidence": 98.4,
+            "width": 1856,
+            "height": 3780,
+            "avg_char_width": 55.9454,
+            "avg_line_height": 84.9945,
+            "conf_amount": 89,
+            "source_locations": {
+                "date": [
+                    [
+                        {
+                            "y": 1227,
+                            "x": 782
+                        },
+                        {
+                            "y": 371,
+                            "x": 793
+                        },
+                        {
+                            "y": 373,
+                            "x": 881
+                        },
+                        {
+                            "y": 1229,
+                            "x": 870
+                        }
+                    ]
+                ],
+                "receipt_no": [
+                    [
+                        {
+                            "y": 2215,
+                            "x": 3559
+                        },
+                        {
+                            "y": 1505,
+                            "x": 3552
+                        },
+                        {
+                            "y": 1504,
+                            "x": 3645
+                        },
+                        {
+                            "y": 2214,
+                            "x": 3652
+                        }
+                    ]
+                ],
+                "merchant_name": [
+                    [
+                        {
+                            "y": 1753,
+                            "x": 155
+                        },
+                        {
+                            "y": 527,
+                            "x": 204
+                        },
+                        {
+                            "y": 536,
+                            "x": 442
+                        },
+                        {
+                            "y": 1762,
+                            "x": 393
+                        }
+                    ]
+                ],
+                "doc": [
+                    [
+                        {
+                            "y": 2233,
+                            "x": -29
+                        },
+                        {
+                            "y": 192,
+                            "x": -2
+                        },
+                        {
+                            "y": 246,
+                            "x": 4156
+                        },
+                        {
+                            "y": 2288,
+                            "x": 4129
+                        }
+                    ]
+                ]
+            }
+        }
+    ]
+}

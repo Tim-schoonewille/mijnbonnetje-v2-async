@@ -91,7 +91,7 @@ async def update_receipt_entry(
         raise HTTPException(status_code=404, detail="RECEIPT_ENTRY_NOT_FOUND")
     if receipt_entry_in_db.user_id != user.id:
         raise HTTPException(status_code=403, detail="NOT_YOUR_RECEIPT_ENTRY")
-    if update_schema.store_id:
+    if update_schema.store_id and update_schema.store_id != 0:
         store = await crud.store.get(db, update_schema.store_id)
         if store is None:
             raise HTTPException(status_code=404, detail="STORE_NOT_FOUND")
@@ -99,7 +99,7 @@ async def update_receipt_entry(
         if user not in store.users:
             store.users.append(user)
             await db.commit()
-    if not update_schema.store_id:
+    if not update_schema.store_id and receipt_entry_in_db.store_id is not None:
         store = await crud.store.get(db, receipt_entry_in_db.store_id)
         if store is None:
             raise HTTPException(status_code=404, detail="STORE_NOT_FOUND")

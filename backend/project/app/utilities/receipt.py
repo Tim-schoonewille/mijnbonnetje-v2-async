@@ -1,3 +1,4 @@
+import httpx
 import io
 import json
 import os
@@ -14,6 +15,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app import crud
 from app import models
 from app.config import settings
+from app.utilities.store import create_or_get_store_id
+from app.utilities.product_item import create_product_entries
 
 
 async def write_receipt_file_to_disk(
@@ -102,11 +105,10 @@ async def scan_receipt(path_to_img: str) -> str:
         img_data = await f.read()
 
     img = Image.open(io.BytesIO(img_data))
-    img = img.filter(ImageFilter.SHARPEN)
+    # img = img.filter(ImageFilter.SHARPEN)
     # img = img.convert("L")
     config = "--psm 1"
-    extraction = pt.image_to_string(img, lang='nld', config=config)
-    print(extraction)
+    extraction = pt.image_to_string(img, config=config)
     return extraction
 
 
@@ -121,7 +123,7 @@ async def refresh_receipt_entry(
 
 def parse_receipt_with_openai(
     prompt_query: str,
-    gpt_model: str = 'text-davinci-003',
+    gpt_model: str = 'gpt-3.5-turbo',
     max_tokens: int = 1000,
     temp: int = 0,
 ) -> dict:
@@ -130,10 +132,10 @@ def parse_receipt_with_openai(
     { "name": "<name:string>", "price": <price:float>, "quantity": <quantity:integer> } 
     """
     prompt_question = """
-    can you parse this receipt scan and return to me the items in json format? I only want you to respond with json. No need to format it for my view, if you do that, I get alot clutter that I don't need. Try to get me the best possible JSON response as possible. Also,if you can find the: Total Price of receipt, the store of the receipt, and the location of said store, I also want you to send that back to me.\n If you can't define the store with name an city, or not the total price, just leave it at null.\nI want the json to look like this object: \n
+    can you parse this receipt scan and return to me the items in json format? I only want you to respond with json. No need to format it for my view, if you do that, I get alot clutter that I don't need. Try to get me the best possible JSON response as possible. Also,if you can find the: Total Price of receipt, the store of the receipt, and the location of said store, I also want you to send that back to me.\n If you can't define the store with name an city, or not the total price, just leave it at null, but if possible, calculate the total price from the individual items that you have found.\nI want the json to look like this object: \n
     {"store": {"name": <name_of_store:string>, "city": <city_of_store:string>},
     "totalPrice": <total_price_as_on_the_receipt:float(number)>, "productItems":
-    [array of objects:{ "name": "<name:string>", "price": <price:float>, "quantity": <quantity:integer> }] 
+    [array of objects:{ "name": "<name:string>", "price": <price:float>, "quantity": <quantity:integer (default: 1)> }] 
     """
     
     prompt = prompt_question + prompt_query
@@ -141,13 +143,74 @@ def parse_receipt_with_openai(
     result = openai.Completion.create(
         model=gpt_model,
         prompt=prompt,
+        # messages=[{'role': 'user', 'content': prompt}],
         max_tokens=max_tokens,
         temperature=temp,
     )
     print('OPENAI CALL RESULT:\n', result)
     try:
         items = json.loads(result['choices'][0]['text'])
-        print('ITEM:::\n\n', items)
+        # items = json.loads(result['choices'][0]['message']['content'])
+    
+        # print('ITEM:::\n\n', items)
     except json.decoder.JSONDecodeError:
         return {}
     return items
+
+
+async def handle_receipt_ocr(
+    db: AsyncSession,
+    user: models.UserDB,
+    entry: models.ReceiptEntryDB,
+    file_path: str,
+    external_ocr: bool = False,
+) -> models.ReceiptEntryDB:
+    """handles the receipt parsing ocr"""
+    if external_ocr:
+        data = await get_external_ocr_data(file_path=file_path)
+    else:
+        data = await get_mock_ocr_data()
+
+    ocr_receipt = data['receipts'][0]
+    store_name = ocr_receipt['merchant_name']
+    total_amount = ocr_receipt['total']
+    product_items = ocr_receipt['items']
+
+    store_id = await create_or_get_store_id(db, user, store_name)
+    entry_update_schema = models.ReceiptEntryUpdate(
+        store_id=store_id,
+        total_amount=int(total_amount*100))
+    await create_product_entries(db, user, entry.id, store_id, product_items)
+    await crud.receipt_entry.update(db, entry_update_schema, entry)
+    return await refresh_receipt_entry(db, entry)
+
+
+async def get_external_ocr_data(file_path: str) -> dict:
+    """OCR receipt scan with external API"""
+    endpoint = 'https://ocr.asprise.com/api/v1/receipt'
+    print('file path: ', file_path)
+    async with httpx.AsyncClient() as client:
+        async with aiofiles.open(file_path, mode='rb') as file:
+            file_content = await file.read()
+        files = {'file': file_content}
+        print(files)
+        response = await client.post(
+            endpoint,
+            data={
+                "api_key": "TEST",
+                "recognizer": "auto",
+                "ref_no": "ocr_pyton_123",
+            },
+            files=files
+        )
+        data = response.json()
+
+    return data
+
+
+async def get_mock_ocr_data() -> dict:
+    """ Gets data from JSON file that is a replica from external API"""
+    mock_json_data = './data/triade_bon.json'
+    with open(mock_json_data, 'r') as f:
+        data = json.load(f)
+    return data

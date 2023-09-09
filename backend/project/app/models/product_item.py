@@ -35,7 +35,7 @@ class ProductItemDB(
     Base,
 ):
     __tablename__ = "product_items"
-    purchase_date: Mapped[str]
+    purchase_date: Mapped[Optional[str]]
     name: Mapped[str]
     price: Mapped[Optional[float]]
     quantity: Mapped[Optional[int]] = mapped_column(default=1)
@@ -54,7 +54,7 @@ class ProductItem(
 ):
     receipt_entry_id: int | UUID
     store_id: int | UUID | None = None
-    purchase_date: str
+    purchase_date: str | None = None
     name: str
     price: float | None
     quantity: int | None
@@ -64,7 +64,7 @@ class ProductItem(
 class ProductItemCreate(CamelBase):
     receipt_entry_id: int | UUID
     store_id: int | UUID | None = None
-    purchase_date: str
+    purchase_date: str | None = None
     name: str
     price: float | None = Field(ge=0, default=1)
     quantity: int | None = Field(ge=1, default=1)

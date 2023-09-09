@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     # Database
     DB_ASYNC_URL: str
     DB_SYNC_URL: str
-    DB_SQL_ECHO: bool = False
+    DB_SQL_ECHO: bool = True
     DB_TEST_ASYNC_URL: str
     DB_TEST_SYNC_URL: str
 

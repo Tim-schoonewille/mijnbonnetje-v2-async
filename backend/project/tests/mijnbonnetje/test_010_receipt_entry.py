@@ -46,6 +46,7 @@ def test_update_specific_receipt_entry(client):
         "receipt-entry/1", json={**update_schema.model_dump(exclude_unset=True)}
     )
     data = response.json()
+    print(data)
     assert response.status_code == 200
     assert data["updatedAt"] is not None
     assert data["category"] == models.Categories.FOOD
