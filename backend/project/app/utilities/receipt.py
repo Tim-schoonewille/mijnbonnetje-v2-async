@@ -15,6 +15,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app import crud
 from app import models
 from app.config import settings
+from app.utilities.store import add_user_to_store
 from app.utilities.store import create_or_get_store_id
 from app.utilities.product_item import create_product_entries
 
@@ -151,7 +152,7 @@ def parse_receipt_with_openai(
     try:
         items = json.loads(result['choices'][0]['text'])
         # items = json.loads(result['choices'][0]['message']['content'])
-    
+
         # print('ITEM:::\n\n', items)
     except json.decoder.JSONDecodeError:
         return {}
@@ -162,6 +163,7 @@ async def handle_receipt_ocr(
     db: AsyncSession,
     user: models.UserDB,
     entry: models.ReceiptEntryDB,
+    scan: models.ReceiptScanDB,
     file_path: str,
     external_ocr: bool = False,
 ) -> models.ReceiptEntryDB:
@@ -171,16 +173,21 @@ async def handle_receipt_ocr(
     else:
         data = await get_mock_ocr_data()
 
+    await crud.receipt_scan.update(db, models.ReceiptScanUpdate(scan_json=data), scan)
     ocr_receipt = data['receipts'][0]
+    purchase_date = ocr_receipt['date']
     store_name = ocr_receipt['merchant_name']
     total_amount = ocr_receipt['total']
     product_items = ocr_receipt['items']
 
     store_id = await create_or_get_store_id(db, user, store_name)
+    await add_user_to_store(db, user, store_id)
     entry_update_schema = models.ReceiptEntryUpdate(
         store_id=store_id,
-        total_amount=int(total_amount*100))
-    await create_product_entries(db, user, entry.id, store_id, product_items)
+        total_amount=int(total_amount*100),
+        purchase_date=str(purchase_date),
+    )
+    await create_product_entries(db, user, entry.id, purchase_date, store_id, product_items)
     await crud.receipt_entry.update(db, entry_update_schema, entry)
     return await refresh_receipt_entry(db, entry)
 
@@ -188,12 +195,10 @@ async def handle_receipt_ocr(
 async def get_external_ocr_data(file_path: str) -> dict:
     """OCR receipt scan with external API"""
     endpoint = 'https://ocr.asprise.com/api/v1/receipt'
-    print('file path: ', file_path)
     async with httpx.AsyncClient() as client:
         async with aiofiles.open(file_path, mode='rb') as file:
             file_content = await file.read()
         files = {'file': file_content}
-        print(files)
         response = await client.post(
             endpoint,
             data={
@@ -204,7 +209,8 @@ async def get_external_ocr_data(file_path: str) -> dict:
             files=files
         )
         data = response.json()
-
+    if data['success'] is False:
+        raise HTTPException(status_code=400, detail="EXTERNAL_API_LIMIT_EXCEEDED")
     return data
 
 

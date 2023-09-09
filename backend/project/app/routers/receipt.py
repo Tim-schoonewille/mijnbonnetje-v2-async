@@ -29,6 +29,20 @@ async def create_full_receipt(
     settings: GetSettings,
     db: GetDB,
 ):
+    """ Creates a full receipt. 
+    Intended for frontend to create a receipt from file.
+    Handles:\n
+        Creating an entry\n
+        Uploading a file\n
+        ocr scan\n
+        update the entry with store and product items\n
+
+    Raises:\n
+        400: {detail: "EXTERNAL_API_LIMIT_EXCEEDED}\n
+        400: {detail: "ERROR_IN_FILE"}\n
+        400: {detail: "FILE_TOO_LARGE_MAX_X_MB"}\n
+        400: {detail: "INVALID_FILE_TYPE}\n
+    """
     receipt_entry = await crud.receipt_entry.create(
         db=db, schema_in=models.ReceiptEntryCreate(), user=user
     )
@@ -50,6 +64,7 @@ async def create_full_receipt(
         db=db,
         user=user,
         entry=receipt_entry,
+        scan=receipt_scan,
         file_path=receipt_file.file_path,
         external_ocr=include_external_ocr,
     )

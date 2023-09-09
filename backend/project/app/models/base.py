@@ -1,4 +1,6 @@
 from datetime import datetime
+from typing import Annotated
+from typing import Any
 from typing import Optional
 from uuid import uuid4
 from uuid import UUID
@@ -15,6 +17,7 @@ from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import MappedColumn
+from sqlalchemy.types import JSON
 
 from app.config import settings
 from app.utilities.core.models import to_camel
@@ -24,13 +27,15 @@ if settings.ID_UUID is True:
     OptionalIDFieldDB = Mapped[Optional[UUID]]
     id_field_db_default = uuid4
 else:
+    id_field_db_default = None  # type: ignore
     IDFieldDB = Mapped[int]  # type: ignore
     OptionalIDFieldDB = Mapped[Optional[int]]  # type: ignore
-    id_field_db_default = None  # type: ignore
 
 
 class Base(AsyncAttrs, DeclarativeBase):
-    pass
+    type_annotation_map = {
+        dict[str, Any]: JSON
+    }
 
 
 class IDFieldDBMixin:

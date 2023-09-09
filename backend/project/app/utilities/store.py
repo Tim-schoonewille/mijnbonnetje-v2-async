@@ -1,5 +1,6 @@
 from uuid import UUID
 
+from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import crud
@@ -19,3 +20,13 @@ async def create_or_get_store_id(db: AsyncSession, user: models.UserDB, name: st
     print('GETTING STORE!!!!!!')
     store = list_stores[0]
     return store.id
+
+
+async def add_user_to_store(db: AsyncSession, user: models.UserDB, store_id: int | UUID) -> None:
+    store = await crud.store.get(db, store_id)
+    if store is None:
+        raise HTTPException(status_code=404, detail="STORE_NOT_FOUND")
+    await store.awaitable_attrs.users
+    if user not in store.users:
+        store.users.append(user)
+        # await db.commit()

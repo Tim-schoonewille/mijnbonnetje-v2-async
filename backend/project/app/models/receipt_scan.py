@@ -1,3 +1,5 @@
+from typing import Any
+from typing import Optional
 from typing import TYPE_CHECKING
 from uuid import UUID
 
@@ -29,6 +31,7 @@ class ReceiptScanDB(
 ):
     __tablename__ = "receipt_scans"
     scan: Mapped[str]
+    scan_json: Mapped[Optional[dict[str, Any]]]
     receipt_entry: Mapped["ReceiptEntryDB"] = relationship(
         back_populates="receipt_scans"
     )
@@ -39,6 +42,7 @@ class ReceiptScan(IDFieldSchemaMixin, TimeStampSchemaMixin):
     receipt_entry_id: int | UUID
     receipt_file_id: int | UUID
     scan: str
+    # scan_json: dict[str, Any]
     model_config = ConfigDict(from_attributes=True)
 
 
@@ -49,4 +53,4 @@ class ReceiptScanCreate(CamelBase):
 
 
 class ReceiptScanUpdate(CamelBase):
-    pass
+    scan_json: dict[str, Any]

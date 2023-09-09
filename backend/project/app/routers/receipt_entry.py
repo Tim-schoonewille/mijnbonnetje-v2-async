@@ -6,6 +6,7 @@ from fastapi import HTTPException
 from app import crud
 from app import models
 from app.config import settings
+from app.utilities.store import add_user_to_store
 from app.utilities.core.dependencies import GetDB
 from app.utilities.core.dependencies import ParametersDepends
 from app.utilities.core.dependencies import VerifiedUser
@@ -33,6 +34,7 @@ async def create_receipt_entry(
         if store and user not in store.users:
             store.users.append(user)
             await db.commit()
+        await add_user_to_store(db, user, schema.store_id)
     new_receipt_entry = await crud.receipt_entry.create(db, schema, user)
     return new_receipt_entry
 

@@ -29,7 +29,7 @@ def test_create_full_receipt_without_product_items(client):
     full_receipt = client.post(
         "/receipt",
         files={"file": open(test_receipt_file_path, "rb")},
-        params={"exclude_ai_scan": True},
+        params={"include_external_ocr": False},
     )
     data = full_receipt.json()
     assert full_receipt.status_code == 201
@@ -50,43 +50,39 @@ def test_create_full_receipt_without_product_items(client):
     assert len(product_items) == 10
 
 
+def test_read_multiple_receipts(client):
+    second_receipt = client.post(
+        "/receipt",
+        files={"file": open(test_receipt_file_path, "rb")},
+        params={"exclude_ai_scan": True},
+    )
+    assert second_receipt.status_code == 201
 
-# def test_read_multiple_receipts(client):
-#     second_receipt = client.post(
-#         "/receipt",
-#         files={"file": open(test_receipt_file_path, "rb")},
-#         params={"exclude_ai_scan": True},
-#     )
-#     assert second_receipt.status_code == 201
-
-#     response = client.get("/receipt")
-#     data = response.json()
-#     assert response.status_code == 200
-#     assert isinstance(data, list)
-#     assert len(data) == 2
-
-
-# def test_read_specific_receipt(client):
-#     response = client.get('/receipt/1')
-#     data = response.json()
-#     print(data)
-#     receipt_file = data['receiptFiles'][0]
-#     receipt_scan = data['receiptScans'][0]
-#     assert response.status_code == 200
-#     assert data['createdAt'] is not None
-#     assert data['updatedAt'] is None
-#     assert receipt_file['id'] == 1
-#     assert receipt_file['receiptEntryId'] == 1
-#     assert receipt_file['fileName'] == 'triade-bon.jpg'
-#     assert receipt_file['fileType'] == 'image/jpeg'
-#     assert receipt_file['fileSize'] == 2225572
-#     assert receipt_scan['id'] == 1
-#     assert isinstance(receipt_scan['scan'], str)
+    response = client.get("/receipt")
+    data = response.json()
+    assert response.status_code == 200
+    assert isinstance(data, list)
+    assert len(data) == 2
 
 
-# def test_delete_specific_receipt(client):
-#     response = client.delete('/receipt/1')
-#     data = response.json()
-#     print(data)
-#     assert response.status_code == 200
-#     assert data['message'] == "RECEIPT_DELETED"
+def test_read_specific_receipt(client):
+    response = client.get('/receipt/1')
+    data = response.json()
+    receipt_file = data['receiptFiles'][0]
+    receipt_scan = data['receiptScans'][0]
+    assert response.status_code == 200
+    assert data['createdAt'] is not None
+    assert receipt_file['id'] == 1
+    assert receipt_file['receiptEntryId'] == 1
+    assert receipt_file['fileName'] == 'triade-bon.jpg'
+    assert receipt_file['fileType'] == 'image/jpeg'
+    assert receipt_file['fileSize'] == 2225572
+    assert receipt_scan['id'] == 1
+    assert isinstance(receipt_scan['scan'], str)
+
+
+def test_delete_specific_receipt(client):
+    response = client.delete('/receipt/1')
+    data = response.json()
+    assert response.status_code == 200
+    assert data['message'] == "RECEIPT_DELETED"

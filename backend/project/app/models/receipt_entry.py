@@ -56,7 +56,7 @@ class ReceiptEntryDB(
         back_populates="receipt_entry", cascade="all, delete"
     )
     product_items: Mapped[list["ProductItemDB"]] = relationship(
-        back_populates="receipt_entry"
+        back_populates="receipt_entry", cascade="all, delete"
     )
 
 
@@ -83,7 +83,7 @@ class ReceiptEntryCreate(CamelBase):
 
 class ReceiptEntryUpdate(CamelBase):
     store_id: int | UUID | None = Field(default=0, gt=0)
-    purchase_date: date | None = None
+    purchase_date: str | None = None
     total_amount: int | None = None
     warranty: int | None = None
     category: Categories | None = None
