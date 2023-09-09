@@ -29,7 +29,7 @@ async def create_full_receipt(
     settings: GetSettings,
     db: GetDB,
 ):
-    """ Creates a full receipt. 
+    """Creates a full receipt.
     Intended for frontend to create a receipt from file.
     Handles:\n
         Creating an entry\n
@@ -85,7 +85,7 @@ async def read_multiple_receipts(
     return [await refresh_receipt_entry(db, entry) for entry in receipts]
 
 
-@router.get('/{receipt_id}', response_model=models.Receipt)
+@router.get("/{receipt_id}", response_model=models.Receipt)
 async def read_specific_full_receipt(
     receipt_id: int | UUID,
     user: VerifiedUser,
@@ -106,7 +106,7 @@ async def read_specific_full_receipt(
     return await refresh_receipt_entry(db, receipt)
 
 
-@router.delete('/{receipt_id}')
+@router.delete("/{receipt_id}")
 async def delete_specific_full_receipt(
     receipt_id: int | UUID,
     user: VerifiedUser,

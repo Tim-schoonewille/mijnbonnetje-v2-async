@@ -33,9 +33,7 @@ else:
 
 
 class Base(AsyncAttrs, DeclarativeBase):
-    type_annotation_map = {
-        dict[str, Any]: JSON
-    }
+    type_annotation_map = {dict[str, Any]: JSON}
 
 
 class IDFieldDBMixin:

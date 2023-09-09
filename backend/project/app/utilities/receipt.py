@@ -124,7 +124,7 @@ async def refresh_receipt_entry(
 
 def parse_receipt_with_openai(
     prompt_query: str,
-    gpt_model: str = 'gpt-3.5-turbo',
+    gpt_model: str = "gpt-3.5-turbo",
     max_tokens: int = 1000,
     temp: int = 0,
 ) -> dict:
@@ -138,7 +138,7 @@ def parse_receipt_with_openai(
     "totalPrice": <total_price_as_on_the_receipt:float(number)>, "productItems":
     [array of objects:{ "name": "<name:string>", "price": <price:float>, "quantity": <quantity:integer (default: 1)> }] 
     """
-    
+
     prompt = prompt_question + prompt_query
     openai.api_key = settings.OPENAI_API_KEY
     result = openai.Completion.create(
@@ -148,9 +148,9 @@ def parse_receipt_with_openai(
         max_tokens=max_tokens,
         temperature=temp,
     )
-    print('OPENAI CALL RESULT:\n', result)
+    print("OPENAI CALL RESULT:\n", result)
     try:
-        items = json.loads(result['choices'][0]['text'])
+        items = json.loads(result["choices"][0]["text"])
         # items = json.loads(result['choices'][0]['message']['content'])
 
         # print('ITEM:::\n\n', items)
@@ -175,18 +175,18 @@ async def handle_receipt_ocr(
         data = await get_mock_ocr_data()
 
     await crud.receipt_scan.update(db, models.ReceiptScanUpdate(scan_json=data), scan)
-    ocr_receipt = data['receipts'][0]
-    purchase_date = ocr_receipt['date']
-    store_name = ocr_receipt['merchant_name']
-    total_amount = ocr_receipt['total']
-    product_items = ocr_receipt['items']
+    ocr_receipt = data["receipts"][0]
+    purchase_date = ocr_receipt["date"]
+    store_name = ocr_receipt["merchant_name"]
+    total_amount = ocr_receipt["total"]
+    product_items = ocr_receipt["items"]
 
     store_id = await create_or_get_store_id(db, user, store_name)
     if not testing:
         await add_user_to_store(db, user, store_id)
     entry_update_schema = models.ReceiptEntryUpdate(
         store_id=store_id,
-        total_amount=int(total_amount*100),
+        total_amount=int(total_amount * 100),
         purchase_date=str(purchase_date),
     )
     await create_product_entries(
@@ -198,11 +198,11 @@ async def handle_receipt_ocr(
 
 async def get_external_ocr_data(file_path: str) -> dict:
     """OCR receipt scan with external API"""
-    endpoint = 'https://ocr.asprise.com/api/v1/receipt'
+    endpoint = "https://ocr.asprise.com/api/v1/receipt"
     async with httpx.AsyncClient() as client:
-        async with aiofiles.open(file_path, mode='rb') as file:
+        async with aiofiles.open(file_path, mode="rb") as file:
             file_content = await file.read()
-        files = {'file': file_content}
+        files = {"file": file_content}
         response = await client.post(
             endpoint,
             data={
@@ -210,17 +210,17 @@ async def get_external_ocr_data(file_path: str) -> dict:
                 "recognizer": "auto",
                 "ref_no": "ocr_pyton_123",
             },
-            files=files
+            files=files,
         )
         data = response.json()
-    if data['success'] is False:
+    if data["success"] is False:
         raise HTTPException(status_code=400, detail="EXTERNAL_API_LIMIT_EXCEEDED")
     return data
 
 
 async def get_mock_ocr_data() -> dict:
-    """ Gets data from JSON file that is a replica from external API"""
-    mock_json_data = './data/triade_bon.json'
-    with open(mock_json_data, 'r') as f:
+    """Gets data from JSON file that is a replica from external API"""
+    mock_json_data = "./data/triade_bon.json"
+    with open(mock_json_data, "r") as f:
         data = json.load(f)
     return data

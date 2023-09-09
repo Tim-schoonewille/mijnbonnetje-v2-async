@@ -45,6 +45,8 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         start_date: str | None = None,
         end_date: str | None = None,
         date_filter: str = "created_at",
+        column_filter: str | None = None,
+        column_filter_value: str | int | UUID | None = None,
     ) -> Sequence[ModelType]:
         """
         Retrieve objects with filters and pagination.
@@ -56,11 +58,14 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         Applies pagination and returns retrieved objects.
         """
         stmt = select(self.model)
-        filter_column = getattr(self.model, date_filter)
+        date_filter_column = getattr(self.model, date_filter)
         if start_date and hasattr(self.model, date_filter):
-            stmt = stmt.where(filter_column >= convert_to_datetime(start_date))
+            stmt = stmt.where(date_filter_column >= convert_to_datetime(start_date))
         if end_date and hasattr(self.model, date_filter):
-            stmt = stmt.filter(filter_column <= convert_to_datetime(end_date))
+            stmt = stmt.filter(date_filter_column <= convert_to_datetime(end_date))
+        if column_filter and hasattr(self.model, column_filter):
+            column_in_object = getattr(self.model, column_filter)
+            stmt = stmt.filter(column_in_object == column_filter_value)
         if user.sudo and user_id:
             try:
                 user_id_column = getattr(self.model, "user_id")

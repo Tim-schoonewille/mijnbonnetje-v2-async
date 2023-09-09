@@ -7,6 +7,8 @@ from app import crud
 from app import models
 from app.config import settings
 from app.utilities.store import add_user_to_store
+from app.utilities.store import remove_user_from_store
+from app.utilities.store import entries_related_to_store
 from app.utilities.core.dependencies import GetDB
 from app.utilities.core.dependencies import ParametersDepends
 from app.utilities.core.dependencies import VerifiedUser
@@ -27,13 +29,6 @@ async def create_receipt_entry(
         404: {detail:"STORE_NOT_FOUND" }
     """
     if schema.store_id:
-        store = await crud.store.get(db, schema.store_id)
-        if store is None:
-            raise HTTPException(status_code=404, detail="STORE_NOT_FOUND")
-        await store.awaitable_attrs.users
-        if store and user not in store.users:
-            store.users.append(user)
-            await db.commit()
         await add_user_to_store(db, user, schema.store_id)
     new_receipt_entry = await crud.receipt_entry.create(db, schema, user)
     return new_receipt_entry
@@ -93,22 +88,12 @@ async def update_receipt_entry(
         raise HTTPException(status_code=404, detail="RECEIPT_ENTRY_NOT_FOUND")
     if receipt_entry_in_db.user_id != user.id:
         raise HTTPException(status_code=403, detail="NOT_YOUR_RECEIPT_ENTRY")
+
     if update_schema.store_id and update_schema.store_id != 0:
-        store = await crud.store.get(db, update_schema.store_id)
-        if store is None:
-            raise HTTPException(status_code=404, detail="STORE_NOT_FOUND")
-        await store.awaitable_attrs.users
-        if user not in store.users:
-            store.users.append(user)
-            await db.commit()
+        await add_user_to_store(db, user, update_schema.store_id)
     if not update_schema.store_id and receipt_entry_in_db.store_id is not None:
-        store = await crud.store.get(db, receipt_entry_in_db.store_id)
-        if store is None:
-            raise HTTPException(status_code=404, detail="STORE_NOT_FOUND")
-        await store.awaitable_attrs.users
-        if user in store.users:
-            store.users.remove(user)
-            await db.commit()
+        await remove_user_from_store(db, user, receipt_entry_in_db.store_id)
+
     updated_receipt_entry = await crud.receipt_entry.update(
         db, update_schema, receipt_entry_in_db
     )
@@ -133,5 +118,11 @@ async def delete_receipt_entry(
         raise HTTPException(status_code=404, detail="RECEIPT_ENTRY_NOT_FOUND")
     if receipt_entry_in_db.user_id != user.id:
         raise HTTPException(status_code=403, detail="NOT_YOUR_RECEIPT_ENTRY")
+    if receipt_entry_in_db.store_id:
+        has_entries_related_to_store = await entries_related_to_store(
+            db, user, receipt_entry_in_db.store_id
+        )
+        if not has_entries_related_to_store:
+            await remove_user_from_store(db, user, receipt_entry_in_db.store_id)
     await crud.receipt_entry.remove(db, receipt_entry_in_db)
     return dict(message="RECEIPT_ENTRY_DELETED")

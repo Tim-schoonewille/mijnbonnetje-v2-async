@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 
 from pydantic import ConfigDict
 from sqlalchemy import Table, Column, ForeignKey
-from sqlalchemy.orm import Mapped
+from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.orm import relationship
 
 
@@ -36,7 +36,7 @@ class StoreDB(
     Base,
 ):
     __tablename__ = "stores"
-    name: Mapped[str]
+    name: Mapped[str] = mapped_column(index=True)
     city: Mapped[str]
     country: Mapped[Optional[str]]
 

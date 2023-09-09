@@ -42,7 +42,7 @@ class ReceiptEntryDB(
     Base,
 ):
     __tablename__ = "receipt_entries"
-    purchase_date: Mapped[Optional[str]]
+    purchase_date: Mapped[Optional[str]] = mapped_column(index=True)
     total_amount: Mapped[int] = mapped_column(default=0)
     warranty: Mapped[int] = mapped_column(default=0)
     category: Mapped[Categories] = mapped_column(default=Categories.OTHER)

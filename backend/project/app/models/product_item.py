@@ -66,8 +66,8 @@ class ProductItemCreate(CamelBase):
     store_id: int | UUID | None = None
     purchase_date: str | None = None
     name: str
-    price: float | None = Field(ge=0, default=1)
-    quantity: int | None = Field(ge=1, default=1)
+    price: float | None = Field(default=1)
+    quantity: int | None = Field(default=1)
 
 
 class ProductItemUpdate(CamelBase):

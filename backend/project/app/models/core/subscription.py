@@ -35,8 +35,8 @@ class SubscriptionDB(
     IDFieldDBMixin, UserIDFieldDBMixin, TierIDFieldDBMixin, TimeStampDBMixin, Base
 ):
     __tablename__ = "subscriptions"
-    start_date: Mapped[date]
-    end_date: Mapped[Optional[date]]
+    start_date: Mapped[date] = mapped_column(index=True)
+    end_date: Mapped[Optional[date]] = mapped_column(index=True)
     # tier_id: Mapped[int] = mapped_column(ForeignKey("tiers.id"))
     active: Mapped[bool] = mapped_column(default=False)
 
