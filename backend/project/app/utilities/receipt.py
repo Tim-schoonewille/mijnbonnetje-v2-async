@@ -166,6 +166,7 @@ async def handle_receipt_ocr(
     scan: models.ReceiptScanDB,
     file_path: str,
     external_ocr: bool = False,
+    testing: bool = False,
 ) -> models.ReceiptEntryDB:
     """handles the receipt parsing ocr"""
     if external_ocr:
@@ -181,13 +182,16 @@ async def handle_receipt_ocr(
     product_items = ocr_receipt['items']
 
     store_id = await create_or_get_store_id(db, user, store_name)
-    await add_user_to_store(db, user, store_id)
+    if not testing:
+        await add_user_to_store(db, user, store_id)
     entry_update_schema = models.ReceiptEntryUpdate(
         store_id=store_id,
         total_amount=int(total_amount*100),
         purchase_date=str(purchase_date),
     )
-    await create_product_entries(db, user, entry.id, purchase_date, store_id, product_items)
+    await create_product_entries(
+        db, user, entry.id, purchase_date, store_id, product_items
+    )
     await crud.receipt_entry.update(db, entry_update_schema, entry)
     return await refresh_receipt_entry(db, entry)
 

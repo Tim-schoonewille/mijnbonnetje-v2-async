@@ -67,6 +67,7 @@ async def create_full_receipt(
         scan=receipt_scan,
         file_path=receipt_file.file_path,
         external_ocr=include_external_ocr,
+        testing=settings.TESTING,
     )
     return receipt
 
