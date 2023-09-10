@@ -66,19 +66,11 @@ async def read_specific_receipt_entry(
         404: {detail="RECEIPT_ENTRY_NOT_FOUND"}
         403: {detail="NOT_YOUR_RECEIPT_ENTRY"}
     """
-    cached_item = get_cached_item(cache, CachedItemPrefix.RECEIPT_ENTRY, receipt_entry_id, user.id)
-    if cached_item:
-        return cached_item
     receipt_entry_in_db = await crud.receipt_entry.get(db, receipt_entry_id)
     if receipt_entry_in_db is None:
         raise HTTPException(status_code=404, detail="RECEIPT_ENTRY_NOT_FOUND")
     if receipt_entry_in_db.user_id != user.id:
         raise HTTPException(status_code=403, detail="NOT_YOUR_RECEIPT_ENTRY")
-    cache.set(
-        name=f'{CachedItemPrefix.RECEIPT_ENTRY}{receipt_entry_id}',
-        value=pickle.dumps(receipt_entry_in_db),
-        ex=settings.CACHE_EXPIRATION_TIME,
-    )
     return receipt_entry_in_db
 
 

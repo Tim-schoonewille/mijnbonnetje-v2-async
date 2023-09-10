@@ -9,7 +9,7 @@ from fastapi import Request
 from fastapi import Response
 from motor.motor_asyncio import AsyncIOMotorClient  # type: ignore
 from passlib.context import CryptContext
-from redis import Redis  # type: ignore
+from redis.asyncio import Redis as AsyncRedis
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import crud
@@ -159,9 +159,10 @@ async def get_fresh_user(
     return user
 
 
-async def register_new_otp(cache: Redis, user_id: int | UUID):
+async def register_new_otp(cache: AsyncRedis, user_id: int | UUID):
     new_otp = models.TwoFactorSchema(user_id=user_id)
-    cache.set(
+    print(new_otp)
+    await cache.set(
         name=settings.OTP_CACHE_PREFIX + str(new_otp.id),
         value=pickle.dumps(new_otp.model_dump()),
         ex=600,
@@ -170,9 +171,9 @@ async def register_new_otp(cache: Redis, user_id: int | UUID):
 
 
 async def get_otp_object(
-    otp_cache_key: str, cache: Redis
+    otp_cache_key: str, cache: AsyncRedis
 ) -> models.TwoFactorSchema | None:
-    otp_pickled_object = cache.get(otp_cache_key)
+    otp_pickled_object = await cache.get(otp_cache_key)
     if otp_pickled_object is None:
         return None
 
@@ -183,7 +184,7 @@ async def get_otp_object(
 async def verify_otp_session_id(
     session_id: UUID,
     otp: str,
-    cache: Redis,
+    cache: AsyncRedis,
 ):
     otp_cache_key = settings.OTP_CACHE_PREFIX + str(session_id)
     otp_object = await get_otp_object(otp_cache_key, cache)
@@ -192,9 +193,9 @@ async def verify_otp_session_id(
     if otp_object.code != otp or otp_object.consumed:
         return False
 
-    ttl_from_otp_cache = cache.ttl(otp_cache_key)
+    ttl_from_otp_cache = await cache.ttl(otp_cache_key)
     otp_object.consumed = True
-    cache.set(
+    await cache.set(
         name=otp_cache_key,
         value=pickle.dumps(otp_object.model_dump()),
         ex=ttl_from_otp_cache,

@@ -14,6 +14,7 @@ from app.utilities.receipt import handle_receipt_scan
 from app.utilities.receipt import refresh_receipt_entry
 from app.utilities.receipt import handle_receipt_ocr
 from app.utilities.core.dependencies import GetCache
+from app.utilities.core.dependencies import GetAsyncCache
 from app.utilities.core.dependencies import GetDB
 from app.utilities.core.dependencies import GetSettings
 from app.utilities.core.dependencies import ParametersDepends
@@ -94,7 +95,7 @@ async def read_multiple_receipts(
 async def read_specific_full_receipt(
     receipt_id: int | UUID,
     user: VerifiedUser,
-    redis: GetCache,
+    cache: GetAsyncCache,
     db: GetDB,
 ):
     """Retreive a full receipt from database with:
@@ -104,7 +105,7 @@ async def read_specific_full_receipt(
         404: {detail:"RECEIPT_NOT_FOUND"}
         403: {detail: "ACCESS_DENIED"}
     """
-    cached_item = get_cached_item(redis, CachedItemPrefix.RECEIPT, receipt_id, user.id)
+    cached_item = await get_cached_item(cache, CachedItemPrefix.RECEIPT, receipt_id, user.id)
     if cached_item:
         return cached_item
 
@@ -115,7 +116,7 @@ async def read_specific_full_receipt(
         raise HTTPException(status_code=403, detail="ACCESS_DENIED")
 
     full_receipt = await refresh_receipt_entry(db, receipt)
-    redis.set(
+    await cache.set(
         name=f'{CachedItemPrefix.RECEIPT}{receipt_id}',
         value=pickle.dumps(full_receipt),
         ex=settings.CACHE_EXPIRATION_TIME,

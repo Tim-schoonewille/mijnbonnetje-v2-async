@@ -8,6 +8,7 @@ from fastapi import HTTPException
 from fastapi import Request
 from fastapi import Response
 from redis import Redis  # type: ignore
+from redis.asyncio import Redis as AsyncRedis
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import crud
@@ -25,7 +26,7 @@ from app.utilities.core.auth import verify_otp_session_id
 from app.utilities.core.dependencies import ActiveUser
 from app.utilities.core.dependencies import FreshTokenUser
 from app.utilities.core.dependencies import GetDB
-from app.utilities.core.dependencies import GetCache
+from app.utilities.core.dependencies import GetAsyncCache
 from app.utilities.core.dependencies import GetSettings
 from app.utilities.core.dependencies import SudoUser
 from app.utilities.core.dependencies import VerifiedUser
@@ -77,7 +78,7 @@ async def login_user(
     response: Response,
     db: GetDB,
     settings: GetSettings,
-    redis_client: GetCache,
+    redis_client: GetAsyncCache,
 ):
     """
     Log in a user and return access and refresh tokens.
@@ -259,7 +260,7 @@ async def handle_two_factor_otp(
     otp: str,
     request: Request,
     response: Response,
-    cache: GetCache,
+    cache: GetAsyncCache,
     db: GetDB,
 ):
     """
@@ -302,7 +303,7 @@ async def update_two_factor_authentication(
 @router.get("/twofactor/renew")
 async def twofactor_renew(
     otp_session_id: UUID,
-    cache: GetCache,
+    cache: GetAsyncCache,
 ):
     """
     Request a new OTP for two factor authentication.
@@ -315,7 +316,7 @@ async def twofactor_renew(
     if otp_object_in_cache is None:
         raise HTTPException(status_code=400, detail="INVALID_SESSION_ID")
 
-    cache.delete(otp_cache_key)
+    await cache.delete(otp_cache_key)
     return await register_new_otp(cache, otp_object_in_cache.user_id)
 
 
@@ -342,18 +343,18 @@ async def handle_login(
     request: Request,
     response: Response,
     settings: Settings,
-    cache: Redis,
+    cache: AsyncRedis,
     db: AsyncSession,
 ) -> dict[str, str]:
     user: models.UserDB = await crud.user.get_by_email(db, email)
     if user is None:
         raise invalid_credentials()
-    login_attempts = redis_login_attempts(user.id, cache)
+    login_attempts = await redis_login_attempts(user.id, cache)
     if login_attempts >= settings.MAX_LOGIN_ATTEMPTS:
         raise HTTPException(status_code=401, detail="LOCKED_OUT")
 
     if not authenticate(plaintext_password=password, user=user):
-        register_login_attempt(user.id, login_attempts, cache)
+        await register_login_attempt(user.id, login_attempts, cache)
         raise invalid_credentials()
 
     await consume_refresh_tokens(user=user, db=db)
