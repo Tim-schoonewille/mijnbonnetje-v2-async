@@ -1,36 +1,27 @@
 import React, { FormEvent, useState } from "react";
+import { AuthService } from "../client";
+import { UserLogin } from '../client/models/UserLogin';
 
-const ENDPOINT = "http://backend.mijnbonnetje.lan:8000/";
+const ENDPOINT = "http://backend.mijnbonnetje.lan:8000";
 
-export default function Login({ onLogin }: { onLogin: (value: any) => void }) {
+export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleSubmit = async (e: FormEvent) => {
     console.log("Loggin in");
     e.preventDefault();
-    const data = { email, password };
-    console.log(data);
+    const userLoginData: UserLogin = {email, password}
     try {
-      const response = await fetch(ENDPOINT + `auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-        credentials: "include",
-      });
-      const responeData = await response.json();
 
-      if (response.ok) {
-        console.log("Logged in");
-        console.log(response)
-        console.log(responeData);
-        onLogin(true)
-      } else {
-        console.error("login failed");
-      }
-    } catch (error) {
-      console.error("Error: ", error);
+      await AuthService.authLoginUser(userLoginData)
+
+
+    } catch(error) {
+      // console.error(error)
+      console.log(error)
     }
+
   };
 
   return (

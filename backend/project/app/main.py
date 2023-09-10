@@ -6,6 +6,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
+from app.utilities.core.open_api import custom_generate_unique_id
 from app.utilities.core.routers import init_routers
 
 
@@ -22,7 +23,9 @@ def create_application(testing: bool = False) -> FastAPI:
         "http://mijnbonnetje.lan:3000",
         "http://frontend.mijnbonnetje.lan:3000"
     ]
-    application = FastAPI(title="mijnbonnetje.nl")
+    application = FastAPI(
+        title="mijnbonnetje.nl",
+        generate_unique_id_function=custom_generate_unique_id)
     application.mount(
         settings.STATIC_FOLDER,
         StaticFiles(directory=f".{settings.STATIC_FOLDER}"),

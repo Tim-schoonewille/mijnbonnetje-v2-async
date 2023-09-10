@@ -1,4 +1,5 @@
 import React, { FormEvent } from "react";
+import { AuthService } from "../client";
 
 export default function Logout({
   onLogout,
@@ -8,19 +9,8 @@ export default function Logout({
   async function handleLogout(e: FormEvent) {
     e.preventDefault();
     try {
-      const response = await fetch(
-        "http://backend.mijnbonnetje.lan:8000/auth/logout",
-        {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-        }
-      );
-      if (response.ok) {
-        onLogout(false);
-      } else {
-        console.log("logout failed");
-      }
+      await AuthService.authLogout()
+      onLogout(false)
     } catch (error) {
       console.error("error:", error);
     }
