@@ -58,7 +58,10 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         Applies pagination and returns retrieved objects.
         """
         stmt = select(self.model)
-        date_filter_column = getattr(self.model, date_filter)
+        try:
+            date_filter_column = getattr(self.model, date_filter)
+        except AttributeError:
+            raise HTTPException(status_code=400, detail="DATE_FILTER_INVALID")
         if start_date and hasattr(self.model, date_filter):
             stmt = stmt.where(date_filter_column >= convert_to_datetime(start_date))
         if end_date and hasattr(self.model, date_filter):

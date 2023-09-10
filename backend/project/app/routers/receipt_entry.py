@@ -1,3 +1,4 @@
+import pickle
 from uuid import UUID
 
 from fastapi import APIRouter
@@ -6,12 +7,16 @@ from fastapi import HTTPException
 from app import crud
 from app import models
 from app.config import settings
+from app.config import CachedItemPrefix
+from app.utilities.core.redis import get_cached_item
 from app.utilities.store import add_user_to_store
 from app.utilities.store import remove_user_from_store
 from app.utilities.store import entries_related_to_store
+from app.utilities.core.dependencies import GetCache
 from app.utilities.core.dependencies import GetDB
 from app.utilities.core.dependencies import ParametersDepends
 from app.utilities.core.dependencies import VerifiedUser
+from app.utilities.core.dependencies import UserLimitedAPICalls
 
 router = APIRouter(
     prefix=settings.URL_PREFIX + "/receipt-entry", tags=["receipt-entry"]
@@ -20,7 +25,7 @@ router = APIRouter(
 
 @router.post("/", response_model=models.ReceiptEntry, status_code=201)
 async def create_receipt_entry(
-    schema: models.ReceiptEntryCreate, user: VerifiedUser, db: GetDB
+    schema: models.ReceiptEntryCreate, user: UserLimitedAPICalls, db: GetDB
 ):
     """Create new receipt entry
     Optional parameter: store_id (int | UUID)
@@ -51,6 +56,7 @@ async def read_multiple_receipt_entries(
 async def read_specific_receipt_entry(
     receipt_entry_id: int | UUID,
     user: VerifiedUser,
+    cache: GetCache,
     db: GetDB,
 ):
     """
@@ -60,11 +66,19 @@ async def read_specific_receipt_entry(
         404: {detail="RECEIPT_ENTRY_NOT_FOUND"}
         403: {detail="NOT_YOUR_RECEIPT_ENTRY"}
     """
+    cached_item = get_cached_item(cache, CachedItemPrefix.RECEIPT_ENTRY, receipt_entry_id, user.id)
+    if cached_item:
+        return cached_item
     receipt_entry_in_db = await crud.receipt_entry.get(db, receipt_entry_id)
     if receipt_entry_in_db is None:
         raise HTTPException(status_code=404, detail="RECEIPT_ENTRY_NOT_FOUND")
     if receipt_entry_in_db.user_id != user.id:
         raise HTTPException(status_code=403, detail="NOT_YOUR_RECEIPT_ENTRY")
+    cache.set(
+        name=f'{CachedItemPrefix.RECEIPT_ENTRY}{receipt_entry_id}',
+        value=pickle.dumps(receipt_entry_in_db),
+        ex=settings.CACHE_EXPIRATION_TIME,
+    )
     return receipt_entry_in_db
 
 

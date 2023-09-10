@@ -8,16 +8,18 @@ from app import crud, models
 from app.config import settings
 from app.utilities.receipt import handle_receipt_file
 from app.utilities.core.dependencies import GetDB
+from app.utilities.core.dependencies import GetSettings
 from app.utilities.core.dependencies import ParametersDepends
 from app.utilities.core.dependencies import VerifiedUser
-from app.utilities.core.dependencies import GetSettings
+from app.utilities.core.dependencies import UserLimitedAPICalls
+
 
 router = APIRouter(prefix=settings.URL_PREFIX + "/receipt-file", tags=["receipt-file"])
 
 
 @router.post("/", response_model=models.ReceiptFile, status_code=201)
 async def create_receipt_file(
-    user: VerifiedUser,
+    user: UserLimitedAPICalls,
     file: UploadFile,
     entry_id: int | UUID,
     settings: GetSettings,

@@ -10,14 +10,16 @@ from app.config import settings
 from app.utilities.core.dependencies import GetDB
 from app.utilities.core.dependencies import ParametersDepends
 from app.utilities.core.dependencies import VerifiedUser
+from app.utilities.core.dependencies import UserLimitedAPICalls
 from app.utilities.receipt import handle_receipt_scan
+
 
 router = APIRouter(prefix=f"{settings.URL_PREFIX}/receipt-scan", tags=["receipt-scan"])
 
 
 @router.post("/", response_model=models.ReceiptScan, status_code=201)
 async def create_receipt_scan(
-    user: VerifiedUser,
+    user: UserLimitedAPICalls,
     receipt_file_id: int | UUID,
     db: GetDB,
 ):

@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     # Database
     DB_ASYNC_URL: str
     DB_SYNC_URL: str
-    DB_SQL_ECHO: bool = False
+    DB_SQL_ECHO: bool = True
     DB_TEST_ASYNC_URL: str
     DB_TEST_SYNC_URL: str
 
@@ -95,6 +95,8 @@ class CachedItemPrefix(str, Enum):
     ITEM = f"{CACHED_ITEM_PREFIX}item_"
     USER = f"{CACHED_ITEM_PREFIX}user_"
     TIER = f"{CACHED_ITEM_PREFIX}tier_"
+    RECEIPT = f'{CACHED_ITEM_PREFIX}receipt_'
+    RECEIPT_ENTRY = f'{CACHED_ITEM_PREFIX}receipt_entry_'
 
 
 settings = get_settings()

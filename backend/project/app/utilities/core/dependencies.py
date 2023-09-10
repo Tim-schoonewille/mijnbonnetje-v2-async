@@ -3,6 +3,7 @@ from typing import Annotated
 from fastapi import Depends
 from motor.motor_asyncio import AsyncIOMotorClient  # type: ignore
 from redis import Redis  # type: ignore
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import models
@@ -28,3 +29,4 @@ GetMongoDB = Annotated[AsyncIOMotorClient, Depends(get_mongo_db)]
 GetSettings = Annotated[Settings, Depends(get_settings)]
 ParametersDepends = Annotated[dict, Depends(parameters)]
 GetCache = Annotated[Redis, Depends(cache)]
+

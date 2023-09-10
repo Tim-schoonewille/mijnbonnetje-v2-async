@@ -2,6 +2,7 @@ import pickle
 from functools import wraps
 from uuid import UUID
 
+from fastapi import HTTPException
 from redis import Redis  # type: ignore
 
 from app.config import settings, CachedItemPrefix
@@ -70,3 +71,21 @@ def cache_item(prefix: CachedItemPrefix, id_name: str):
         return wrapper
 
     return decorator
+
+
+def get_cached_item(
+    cache: Redis,
+    prefix: CachedItemPrefix,
+    id: int | UUID,
+    user_id: int | UUID | None = None,
+):
+    """ Helper function to receive an item from cache"""
+    cached_item = cache.get(f'{prefix}{id}')
+    if not cached_item:
+        return
+    cached_item = pickle.loads(cached_item)
+    if not user_id:
+        return cached_item
+    if cached_item.user_id != user_id:
+        raise HTTPException(status_code=403, detail="ACCESS_DENIED")
+    return cached_item
