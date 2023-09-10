@@ -17,7 +17,11 @@ def create_application(testing: bool = False) -> FastAPI:
     if not os.path.exists(static_folder_path):
         os.makedirs(static_folder_path)
 
-    origins = ["http://frontend.localhost:3000", "http://dev.localhost:3000"]
+    origins = [
+        "http://frontend.localhost:3000",
+        "http://mijnbonnetje.lan:3000",
+        "http://frontend.mijnbonnetje.lan:3000"
+    ]
     application = FastAPI(title="mijnbonnetje.nl")
     application.mount(
         settings.STATIC_FOLDER,

@@ -86,7 +86,7 @@ def store_token(res: Response, key: str, value: str) -> None:
         domain=settings.DOMAIN,
         secure=settings.COOKIE_SECURE,
         max_age=settings.REFRESH_TOKEN_EXPIRES * 2,
-        samesite="strict",
+        samesite='lax',
     )
 
 

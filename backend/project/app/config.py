@@ -40,8 +40,9 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
 
     # cookie settings
-    DOMAIN: str = "frontend.localhost"
+    DOMAIN: str = "mijnbonnetje.lan"
     COOKIE_SECURE: bool = False
+    SAME_SITE: str = 'strict'
 
     # REDIS
     REDIS_PASSWORD: str

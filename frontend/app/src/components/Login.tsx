@@ -1,8 +1,8 @@
 import React, { FormEvent, useState } from "react";
 
-const ENDPOINT = "http://frontend.localhost:8000/";
+const ENDPOINT = "http://backend.mijnbonnetje.lan:8000/";
 
-export default function Login() {
+export default function Login({ onLogin }: { onLogin: (value: any) => void }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -12,18 +12,19 @@ export default function Login() {
     const data = { email, password };
     console.log(data);
     try {
-      const response = await fetch(
-        ENDPOINT + `auth/login`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data),
-          credentials: "include",
-        }
-      );
+      const response = await fetch(ENDPOINT + `auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+        credentials: "include",
+      });
+      const responeData = await response.json();
 
       if (response.ok) {
         console.log("Logged in");
+        console.log(response)
+        console.log(responeData);
+        onLogin(true)
       } else {
         console.error("login failed");
       }
@@ -43,7 +44,7 @@ export default function Login() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            />
+          />
         </div>
         <div>
           <label>Password:</label>
@@ -52,13 +53,12 @@ export default function Login() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            />
+          />
         </div>
         <div>
           <button>Login</button>
         </div>
       </form>
-
     </div>
   );
 }
