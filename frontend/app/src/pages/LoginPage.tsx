@@ -1,12 +1,16 @@
 import React from "react";
-import Header from "../components/Header";
-import Login from "../components/Login";
+import LoginForm from "../components/LoginForm";
+import { Center, Container, Heading } from "@chakra-ui/react";
+
 
 export default function LoginPage() {
+
   return (
-    <>
-      <h1>LOGIN PAGE</h1>
-      <Login />
-    </>
+      <Container maxW="md">
+        <Center>
+        <Heading mt={10} mb={10} size="2xl">Login</Heading>
+      </Center>
+      <LoginForm />
+    </Container>
   );
 }

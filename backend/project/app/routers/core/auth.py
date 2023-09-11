@@ -69,7 +69,7 @@ async def register_new_user(
     return await handle_signup(schema_in, bg_tasks, db)
 
 
-@router.post("/login", response_model=Union[models.User, dict[str, str]])
+@router.post("/login", response_model=dict[str, str])
 @log_traffic()
 async def login_user(
     schema_in: models.UserLogin,
@@ -328,7 +328,7 @@ async def handle_signup(
 ) -> dict[str, str]:
     user = await crud.user.get_by_email(db, schema.email)
     if user:
-        raise HTTPException(status_code=409, detail="DUPLICATE_EMAIL")
+        raise HTTPException(status_code=400, detail="DUPLICATE_EMAIL")
     schema.password = convert_to_hash(schema.password)
     user = await crud.user.create(db=db, schema_in=schema)
     email_verification_token = create_email_verification_token(user.email)

@@ -41,7 +41,7 @@ export class AuthService {
      */
     public static authRegisterNewUser(
         requestBody: UserCreate,
-    ): CancelablePromise<User> {
+    ): CancelablePromise<ApiResponse<any>> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/auth/signup',
@@ -69,7 +69,7 @@ export class AuthService {
      *
      * 401: too many login attempts: {detail: 'LOCKED_OUT}
      * @param requestBody
-     * @returns any Successful Response
+     * @returns string Successful Response
      * @throws ApiError
      */
     public static authLoginUser(
@@ -95,7 +95,7 @@ export class AuthService {
      * @returns any Successful Response
      * @throws ApiError
      */
-    public static authLogout(): CancelablePromise<any> {
+    public static authLogout(): CancelablePromise<ApiResponse<any>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/auth/logout',
@@ -119,7 +119,7 @@ export class AuthService {
      * @returns any Successful Response
      * @throws ApiError
      */
-    public static authVerifyToken(): CancelablePromise<any> {
+    public static authVerifyToken(): CancelablePromise<ApiResponse<any>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/auth/verify-token',

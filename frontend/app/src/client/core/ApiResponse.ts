@@ -1,5 +1,5 @@
 export default interface ApiResponse<T>{
-  body: object;
+  body: T;
   ok: boolean;
   status: number;
   statusText: string;
