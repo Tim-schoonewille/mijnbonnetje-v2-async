@@ -12,6 +12,7 @@ import type { ApiResult } from './ApiResult';
 import { CancelablePromise } from './CancelablePromise';
 import type { OnCancel } from './CancelablePromise';
 import type { OpenAPIConfig } from './OpenAPI';
+import ApiResponse from './ApiResponse';
 
 export const isDefined = <T>(value: T | null | undefined): value is Exclude<T, null | undefined> => {
     return value !== undefined && value !== null;
@@ -43,7 +44,7 @@ export const isFormData = (value: any): value is FormData => {
 };
 
 export const isSuccess = (status: number): boolean => {
-    return status >= 200 && status < 300;
+    return status >= 200 && status < 500;
 };
 
 export const base64 = (str: string): string => {
@@ -258,25 +259,25 @@ export const catchErrorCodes = (options: ApiRequestOptions, result: ApiResult): 
     }
 
     const error = errors[result.status];
-    if (error) {
-        throw new ApiError(options, result, error);
-    }
+    // if (error) {
+    //     throw new ApiError(options, result, error);
+    // }
 
-    if (!result.ok) {
-        const errorStatus = result.status ?? 'unknown';
-        const errorStatusText = result.statusText ?? 'unknown';
-        const errorBody = (() => {
-            try {
-                return JSON.stringify(result.body, null, 2);
-            } catch (e) {
-                return undefined;
-            }
-        })();
+    // if (!result.ok) {
+    //     const errorStatus = result.status ?? 'unknown';
+    //     const errorStatusText = result.statusText ?? 'unknown';
+    //     const errorBody = (() => {
+    //         try {
+    //             return JSON.stringify(result.body, null, 2);
+    //         } catch (e) {
+    //             return undefined;
+    //         }
+    //     })();
 
-        throw new ApiError(options, result,
-            `Generic Error: status: ${errorStatus}; status text: ${errorStatusText}; body: ${errorBody}`
-        );
-    }
+    //     throw new ApiError(options, result,
+    //         `Generic Error: status: ${errorStatus}; status text: ${errorStatusText}; body: ${errorBody}`
+    //     );
+    // }
 };
 
 /**
@@ -300,7 +301,7 @@ export const request = <T>(config: OpenAPIConfig, options: ApiRequestOptions, ax
                 const responseBody = getResponseBody(response);
                 const responseHeader = getResponseHeader(response, options.responseHeader);
 
-                const result: ApiResult = {
+                const result: any = {
                     url,
                     ok: isSuccess(response.status),
                     status: response.status,
@@ -308,9 +309,9 @@ export const request = <T>(config: OpenAPIConfig, options: ApiRequestOptions, ax
                     body: responseHeader ?? responseBody,
                 };
 
-                catchErrorCodes(options, result);
+                //catchErrorCodes(options, result);
 
-                resolve(result.body);
+                resolve(result);
             }
         } catch (error) {
             reject(error);

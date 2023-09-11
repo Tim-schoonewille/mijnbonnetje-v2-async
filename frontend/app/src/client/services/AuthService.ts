@@ -12,6 +12,7 @@ import type { ValidateRequestNewPassword } from '../models/ValidateRequestNewPas
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
+import ApiResponse from '../core/ApiResponse';
 
 export class AuthService {
 
@@ -73,7 +74,7 @@ export class AuthService {
      */
     public static authLoginUser(
         requestBody: UserLogin,
-    ): CancelablePromise<(User | Record<string, string>)> {
+    ): CancelablePromise<ApiResponse<object>> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/auth/login',
