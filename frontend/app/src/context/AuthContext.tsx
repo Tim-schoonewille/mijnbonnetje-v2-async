@@ -20,25 +20,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [tokenIsVerified, setTokenIsVerified] = useState(false);
 
-  useEffect(() => {
-    async function checkTokenValidity() {
-      try {
-        const response = await AuthService.authVerifyToken()
 
-        if (response.status === 200) {
-          setTokenIsVerified(true)
-          setIsLoggedIn(true)
-        }
-        if (response.status !== 200) {
-          setTokenIsVerified(false)
-        }
-
-      } catch (e) {
-        console.error(e)
-      }
-    }
-    checkTokenValidity()
-  },[])
 
   return (
     <AuthContext.Provider

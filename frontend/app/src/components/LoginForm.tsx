@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { Box, FormControl, FormLabel, Input, Button } from "@chakra-ui/react";
+import {
+  Box,
+  FormControl,
+  FormLabel,
+  Input,
+  Button,
+  useToast,
+} from "@chakra-ui/react";
 import { AuthService } from "../client";
 import { useAuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -9,6 +16,7 @@ const LoginForm: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const toast = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -16,8 +24,15 @@ const LoginForm: React.FC = () => {
     try {
       const response = await AuthService.authLoginUser({ email, password });
       if (response.status === 200) {
-        setIsLoggedIn(true)
-        navigate('/')
+        toast({
+          title: "Login succes",
+          description: "Welcome back to mijnbonnetje.lan",
+          status: "success",
+          duration: 2000,
+          isClosable: true,
+        });
+        setIsLoggedIn(true);
+        navigate("/");
       }
     } catch (e) {
       console.error(e);
