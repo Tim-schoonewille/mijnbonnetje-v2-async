@@ -43,7 +43,7 @@ export class ReceiptService {
   public static receiptCreateFullReceipt(
     formData: Body_receipt_create_full_receipt,
     includeExternalOcr: boolean = false
-  ): CancelablePromise<Receipt> {
+  ): CancelablePromise<ApiResponse<any>> {
     return __request(OpenAPI, {
       method: "POST",
       url: "/receipt/",
@@ -111,7 +111,7 @@ export class ReceiptService {
    */
   public static receiptReadSpecificFullReceipt(
     receiptId: number | string
-  ): CancelablePromise<Receipt> {
+  ): CancelablePromise<ApiResponse<any>> {
     return __request(OpenAPI, {
       method: "GET",
       url: "/receipt/{receipt_id}",
@@ -138,7 +138,7 @@ export class ReceiptService {
    */
   public static receiptDeleteSpecificFullReceipt(
     receiptId: number | string
-  ): CancelablePromise<any> {
+  ): CancelablePromise<ApiResponse<any>> {
     return __request(OpenAPI, {
       method: "DELETE",
       url: "/receipt/{receipt_id}",

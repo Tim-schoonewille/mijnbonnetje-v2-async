@@ -11,6 +11,8 @@ import AuthProvider, { useAuthContext } from "./context/AuthContext";
 import LogoutPage from "./pages/LogoutPage";
 import AddReceiptPage from "./pages/AddReceiptPage";
 import ReceiptsPage from "./pages/ReceiptsPage";
+import VerifyEmailPage from "./pages/VerifyEmailPage";
+import SingleReceiptPage from "./pages/SingleReceiptPage";
 
 export const App = () => {
   return (
@@ -21,10 +23,12 @@ export const App = () => {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/receipts" element={<ReceiptsPage />} />
+            <Route path="/receipts/:id" element={<SingleReceiptPage />} />
             <Route path="/addreceipt" element={<AddReceiptPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/logout" element={<LogoutPage />} />
-            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/auth/login" element={<LoginPage />} />
+            <Route path="/auth/logout" element={<LogoutPage />} />
+            <Route path="/auth/register" element={<RegisterPage />} />
+            <Route path="/auth/verify-email" element={<VerifyEmailPage />} />
           </Routes>
         </Router>
       </AuthProvider>

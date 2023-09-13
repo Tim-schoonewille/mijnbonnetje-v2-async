@@ -62,7 +62,7 @@ const Navbar: React.FC = () => {
         )}
         <Spacer />
         {isLoggedIn ? (
-          <Link to="/logout">
+          <Link to="/auth/logout">
             <ChakraLink as="span">
               <Button colorScheme="teal" size="sm">
                 Logout
@@ -71,7 +71,7 @@ const Navbar: React.FC = () => {
           </Link>
         ) : (
           <>
-            <Link to="/login">
+            <Link to="/auth/login">
               <ChakraLink as="span">
                 <Button colorScheme="teal" size="sm">
                   Login
@@ -79,7 +79,7 @@ const Navbar: React.FC = () => {
               </ChakraLink>
             </Link>
 
-            <Link to="/register">
+            <Link to="/auth/register">
               <ChakraLink as="span">
                 <Button colorScheme="teal" size="sm" ml={2}>
                   Register

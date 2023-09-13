@@ -24,17 +24,17 @@ export default function RequiresValidToken({ children }: { children: any }) {
                 description:'The page you tried to visit requires a login!',
                 status:'warning',
                 duration: 4000,
-                isClosable: false,
+                isClosable: true,
             })
           setTokenIsVerified(false);
-          navigate("/login");
+          navigate("/auth/login");
         }
       } catch (e) {
         console.error(e);
       }
     }
     checkTokenValidity();
-  }, [setTokenIsVerified, setIsLoggedIn, navigate]);
+  }, [setTokenIsVerified, setIsLoggedIn, navigate, toast]);
 
   if (!tokenIsVerified) {
     return <h1>Requires token!</h1>;

@@ -13,7 +13,7 @@ export default function LogoutPage() {
         const response = await AuthService.authLogout();
         if (response.status === 200) {
           setIsLoggedIn(false);
-          navigate("/login");
+          navigate("/auth/login");
         }
       } catch (e) {
         console.error(e);

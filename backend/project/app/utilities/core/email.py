@@ -44,7 +44,7 @@ def send_verification_code_email(
     with open(email_template_path, "r") as f:
         template = f.read()
 
-    link = f"{settings.APP_FQDN}{settings.URL_PREFIX}auth/email/verify?token={code}"
+    link = f"{settings.APP_FQDN}{settings.URL_PREFIX}auth/verify-email/?token={code}"
     subject = "Verify email address"
     # response = send_mail(
     #     to=to,

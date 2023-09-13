@@ -214,7 +214,7 @@ export class AuthService {
      */
     public static authVerifyEmail(
         token: string,
-    ): CancelablePromise<any> {
+    ): CancelablePromise<ApiResponse<any>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/auth/email/verify/',
