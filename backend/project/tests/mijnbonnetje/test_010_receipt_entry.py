@@ -1,5 +1,6 @@
 from app import models
 from app.db import create_test_tables
+from app.mongodb import drop_test_mongodb_database
 
 dummy_receipt_entry = models.ReceiptEntryCreate(
     total_amount=69,
@@ -8,11 +9,13 @@ dummy_receipt_entry = models.ReceiptEntryCreate(
 )
 
 
-def test_create_receipt_entries(client):
+async def test_create_receipt_entries(client):
+    await drop_test_mongodb_database()
     create_test_tables(drop=True)
     input_schema = dummy_receipt_entry
     response = client.post("/receipt-entry/", json={**input_schema.model_dump()})
     data = response.json()
+    print(data)
     assert response.status_code == 201
     assert data["purchaseDate"] == input_schema.purchase_date
     assert data["totalAmount"] == input_schema.total_amount
@@ -41,7 +44,7 @@ def test_read_specific_receipt_entry(client):
 
 
 def test_update_specific_receipt_entry(client):
-    update_schema = models.ReceiptEntryUpdate(category=models.Categories.FOOD)
+    update_schema = models.ReceiptEntryUpdate(category=models.Categories.CLOTHING)
     response = client.patch(
         "receipt-entry/1", json={**update_schema.model_dump(exclude_unset=True)}
     )
@@ -49,7 +52,7 @@ def test_update_specific_receipt_entry(client):
     print(data)
     assert response.status_code == 200
     assert data["updatedAt"] is not None
-    assert data["category"] == models.Categories.FOOD
+    assert data["category"] == models.Categories.CLOTHING
 
 
 def test_delete_receipt_entry(client):

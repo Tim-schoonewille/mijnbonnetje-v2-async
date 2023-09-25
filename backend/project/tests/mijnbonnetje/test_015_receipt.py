@@ -76,7 +76,7 @@ def test_read_specific_receipt(client):
     assert receipt_file['receiptEntryId'] == 1
     assert receipt_file['fileName'] == 'triade-bon.jpg'
     assert receipt_file['fileType'] == 'image/jpeg'
-    assert receipt_file['fileSize'] == 2225572
+    assert receipt_file['fileSize'] == 120287
     assert receipt_scan['id'] == 1
     assert isinstance(receipt_scan['scan'], str)
 

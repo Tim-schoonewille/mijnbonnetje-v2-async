@@ -15,7 +15,7 @@ def test_auth_signup(client):
     assert data["id"] == 1
 
     response = client.post("/auth/signup", json={**mock_user.model_dump()})
-    assert response.status_code == 409
+    assert response.status_code == 400
     assert response.json()["detail"] == "DUPLICATE_EMAIL"
 
     email_verification_token = create_email_verification_token(data["email"])

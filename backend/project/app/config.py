@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     # Database
     DB_ASYNC_URL: str
     DB_SYNC_URL: str
-    DB_SQL_ECHO: bool = True
+    DB_SQL_ECHO: bool = False
     DB_TEST_ASYNC_URL: str
     DB_TEST_SYNC_URL: str
 
@@ -98,6 +98,9 @@ class CachedItemPrefix(str, Enum):
     TIER = f"{CACHED_ITEM_PREFIX}tier_"
     RECEIPT = f'{CACHED_ITEM_PREFIX}receipt_'
     RECEIPT_ENTRY = f'{CACHED_ITEM_PREFIX}receipt_entry_'
+    PROXY_IP = f'{CACHED_ITEM_PREFIX}proxy_ip_'
 
+
+PROXY_IPS = ['2.1.1.1:80', '3.2.2.2:80', '4.3.3.3:80', '5.4.4.4:80']
 
 settings = get_settings()

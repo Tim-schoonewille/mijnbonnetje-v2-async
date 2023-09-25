@@ -58,13 +58,15 @@ async def get_sudo_override():
 async def get_user_api_call_log_override(
     mongo: AsyncIOMotorClient = Depends(get_test_mongo_db),
     settings: Settings = Depends(get_settings_override),
+    db: AsyncSession = Depends(override_get_db),
 ):
     collection = mongo[settings.API_CALL_LOG_COLLECTION]
     no_authorization = await api_calls_exceeded(collection, 1, 10)
     if no_authorization:
-        raise HTTPException(status_code=403, detail="request amount exceeded")
-    return None
+        raise HTTPException(status_code=403, detail="request amount exceededddddddddddddddddddddddd")
 
+    user = await crud.user.get(db, 10)
+    return user
 
 @pytest.fixture(scope="module")
 def test_app():

@@ -10,7 +10,10 @@ test_receipt_file_path = "./tests/files/test_receipt.jpg"
 def test_create_receipt_file(client):
     create_test_tables(drop=True)
     folder_to_delete = "./public-test/1"
-    shutil.rmtree(folder_to_delete)
+    try:
+        shutil.rmtree(folder_to_delete)
+    except FileNotFoundError:
+        pass
     receipt_entry_schema = models.ReceiptEntryCreate(total_amount=69)
     response = client.post(
         "/receipt-entry", json={**receipt_entry_schema.model_dump(exclude_unset=True)}

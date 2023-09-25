@@ -2,7 +2,12 @@ from enum import Enum
 
 
 class Categories(str, Enum):
-    FOOD = "food"
+    GROCERIES = "groceries"
+    RESTAURANT = "restaurant"
     ELECTRONICS = "electronics"
+    CLOTHING = "clothing"
     MEDIA = "media"
-    OTHER = "other"
+    EVENTS = "events"
+    HARDWARE = "hardware"
+    SUPPLIES = "supplies"
+    OTHER = "OTHER"

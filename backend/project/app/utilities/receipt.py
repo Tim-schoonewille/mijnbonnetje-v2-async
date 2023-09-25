@@ -199,7 +199,12 @@ async def handle_receipt_ocr(
 async def get_external_ocr_data(file_path: str) -> dict:
     """OCR receipt scan with external API"""
     endpoint = "https://ocr.asprise.com/api/v1/receipt"
-    async with httpx.AsyncClient() as client:
+    ip = '35.227.176.71:3128'
+    proxy = {
+        'http://': f'http://{ip}',
+        'https://': f'http://{ip}'
+        }
+    async with httpx.AsyncClient(proxies=proxy, verify=True) as client:
         async with aiofiles.open(file_path, mode="rb") as file:
             file_content = await file.read()
         files = {"file": file_content}
@@ -211,8 +216,10 @@ async def get_external_ocr_data(file_path: str) -> dict:
                 "ref_no": "ocr_pyton_123",
             },
             files=files,
+            timeout=10
         )
         data = response.json()
+        print(data)
     if data["success"] is False:
         raise HTTPException(status_code=400, detail="EXTERNAL_API_LIMIT_EXCEEDED")
     return data
