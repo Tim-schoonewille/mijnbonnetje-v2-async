@@ -34,6 +34,7 @@ async def create_full_receipt(
     file: UploadFile,
     settings: GetSettings,
     db: GetDB,
+    cache: GetAsyncCache,
 ):
     """Creates a full receipt.
     Intended for frontend to create a receipt from file.
@@ -74,6 +75,7 @@ async def create_full_receipt(
         file_path=receipt_file.file_path,
         external_ocr=include_external_ocr,
         testing=settings.TESTING,
+        cache=cache,
     )
     return receipt
 

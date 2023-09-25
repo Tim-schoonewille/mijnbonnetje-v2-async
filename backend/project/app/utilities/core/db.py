@@ -35,7 +35,7 @@ async def fill_db(db: AsyncSession) -> None:
         sess.add(store)
         await sess.commit()
 
-    # await create_mock_users(db)
+    await create_mock_users(db)
     # all_mock_users = await read_all_mock_users(db)
     # await create_mock_items(db, all_mock_users)
     # # await create_mock_login_records(db, all_mock_users)

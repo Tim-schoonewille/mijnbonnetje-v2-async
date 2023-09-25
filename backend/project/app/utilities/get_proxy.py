@@ -29,24 +29,31 @@ class ProxyInCache:
         ipv4 = 'http://ipv4.icanhazip.com'
         accepted_status_codes = [200, 201, 202, 203, 204, 205]
         async with httpx.AsyncClient(proxies=proxies, verify=True) as client:
-            response = await client.get(ipv4, timeout=10)
+            response = await client.get(ip_endpoint, timeout=10)
             print(response.text)
             if response.status_code in accepted_status_codes:
                 return True
         return False
 
 
-async def get_working_proxy(cache: AsyncRedis, proxy_ips: list[str]) -> str:
-    for proxy in proxy_ips:
+async def get_working_proxy(cache: AsyncRedis) -> str | None:
+    proxies_pickled = await cache.get('proxies')
+    if proxies_pickled is None:
+        return None
+    proxies = pickle.loads(proxies_pickled)
+    for proxy in proxies:
         cached_proxy = await get_proxy_from_cache(cache=cache, proxy_ip=proxy)
         if cached_proxy is None:
             cached_proxy = await create_cached_proxy(cache=cache, proxy_ip=proxy)
-        if cached_proxy.total_calls == 5:
+        if cached_proxy.total_calls == 3:
+            continue
+        if not await cached_proxy.test_proxy():
             continue
         cached_proxy.increment_total_calls()
         print('total amount called:', cached_proxy.total_calls)
         await update_proxy_in_cache(cache=cache, proxy_object=cached_proxy)
         return cached_proxy.ip_with_port
+    return None
 
 
 async def get_proxy_from_cache(cache: AsyncRedis, proxy_ip: str) -> ProxyInCache | None:

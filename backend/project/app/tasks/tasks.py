@@ -1,4 +1,6 @@
 import asyncio
+import pickle
+import os
 from datetime import datetime, date, time
 from pathlib import Path
 
@@ -55,3 +57,21 @@ def task_log_traffic() -> None:
     traffic_log_path = Path("./reports/traffic_logs/")
     with open(f"{traffic_log_path}/{today}.txt", "w") as f:
         f.write(str(api_traffic))
+
+
+@celery_app.task
+def task_update_proxy_list_to_cache() -> None:
+    async def update_proxy_list_to_cache() -> None:
+        from app.tasks.utils.proxy_scanner import ProxyScanner
+        from redis import asyncio as aioredis
+
+        endpoint = "https://ipv4.icanhazip.com"
+        proxy_scanner = ProxyScanner('./utils/proxies.txt', endpoint)
+        await proxy_scanner.test_all_proxies()
+        redis = aioredis.from_url(f'redis://:{settings.REDIS_PASSWORD}@localhost:6379')
+        async with redis.client() as client:
+            await client.set('proxies', pickle.dumps(proxy_scanner.working_proxies))
+
+    asyncio.run(update_proxy_list_to_cache())
+    print(os.getcwd())
+    return

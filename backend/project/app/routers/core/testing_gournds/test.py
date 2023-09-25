@@ -1,3 +1,4 @@
+import pickle
 from typing import Annotated
 
 from fastapi import APIRouter, Depends
@@ -45,5 +46,19 @@ async def test_proxy_cache_return(
     user: VerifiedUser,
     cache: GetAsyncCache,
 ):
-    ip = await get_working_proxy(cache, PROXY_IPS)
+    proxies_pickled = await cache.get('proxies')
+    if proxies_pickled is None:
+        return {'error': 'no proxies in cache'}
+    proxies = pickle.loads(proxies_pickled)
+    ip = await get_working_proxy(cache)
     return ip
+
+
+@router.get('/test-working-proxy-list-in-cache')
+async def test_working_proxy_list_in_cache(user: VerifiedUser, cache: GetAsyncCache):
+    proxies_pickled = await cache.get('proxies')
+    if proxies_pickled is None:
+        return {'error': 'no proxies in cache'}
+    proxies = pickle.loads(proxies_pickled)
+    print(proxies)
+    return proxies

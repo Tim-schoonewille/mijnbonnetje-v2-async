@@ -52,6 +52,8 @@ async def startup_event():
     # sync_create_tables(drop=True)
     # from app.db import create_tables
     # await create_tables(drop=True)
+    # from app.utilities.core.redis import cache
+    # cache().flushdb()
 
 
 @app.on_event("shutdown")

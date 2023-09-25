@@ -10,11 +10,13 @@ import pytesseract as pt  # type: ignore
 from fastapi import UploadFile, HTTPException
 from PIL import Image  # type: ignore
 from PIL import ImageFilter
+from redis.asyncio import Redis as AsyncRedis
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import crud
 from app import models
 from app.config import settings
+from app.utilities.get_proxy import get_working_proxy
 from app.utilities.store import add_user_to_store
 from app.utilities.store import create_or_get_store_id
 from app.utilities.product_item import create_product_entries
@@ -165,12 +167,13 @@ async def handle_receipt_ocr(
     entry: models.ReceiptEntryDB,
     scan: models.ReceiptScanDB,
     file_path: str,
+    cache: AsyncRedis,
     external_ocr: bool = False,
     testing: bool = False,
 ) -> models.ReceiptEntryDB:
     """handles the receipt parsing ocr"""
     if external_ocr:
-        data = await get_external_ocr_data(file_path=file_path)
+        data = await get_external_ocr_data(file_path=file_path, cache=cache)
     else:
         data = await get_mock_ocr_data()
 
@@ -196,10 +199,11 @@ async def handle_receipt_ocr(
     return await refresh_receipt_entry(db, entry)
 
 
-async def get_external_ocr_data(file_path: str) -> dict:
+async def get_external_ocr_data(file_path: str, cache: AsyncRedis) -> dict:
     """OCR receipt scan with external API"""
     endpoint = "https://ocr.asprise.com/api/v1/receipt"
-    ip = '35.227.176.71:3128'
+    ip = await get_working_proxy(cache=cache)
+    # ip = '138.199.23.163:8443'
     proxy = {
         'http://': f'http://{ip}',
         'https://': f'http://{ip}'
@@ -216,7 +220,7 @@ async def get_external_ocr_data(file_path: str) -> dict:
                 "ref_no": "ocr_pyton_123",
             },
             files=files,
-            timeout=10
+            timeout=20
         )
         data = response.json()
         print(data)
