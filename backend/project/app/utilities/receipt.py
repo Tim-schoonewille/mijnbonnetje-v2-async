@@ -193,7 +193,13 @@ async def handle_receipt_ocr(
         purchase_date=str(purchase_date),
     )
     await create_product_entries(
-        db, user, entry.id, purchase_date, store_id, product_items
+        db=db,
+        user=user,
+        entry_id=entry.id,
+        purchase_date=purchase_date,
+        store_id=store_id,
+        items=product_items,
+        total_amount=total_amount
     )
     await crud.receipt_entry.update(db, entry_update_schema, entry)
     return await refresh_receipt_entry(db, entry)

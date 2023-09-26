@@ -12,7 +12,7 @@ from app.utilities.core.redis import get_cached_item
 from app.utilities.store import add_user_to_store
 from app.utilities.store import remove_user_from_store
 from app.utilities.store import entries_related_to_store
-from app.utilities.core.dependencies import GetCache
+from app.utilities.core.dependencies import CountParameterDepends, GetCache
 from app.utilities.core.dependencies import GetDB
 from app.utilities.core.dependencies import ParametersDepends
 from app.utilities.core.dependencies import VerifiedUser
@@ -50,6 +50,24 @@ async def read_multiple_receipt_entries(
     (requires verifiied user token, or sudo token for all)
     """
     return await crud.receipt_entry.get_multi(db, user, **params)
+
+
+@router.get('/count')
+async def count_receipt_entries(
+    params: CountParameterDepends,
+    user: VerifiedUser,
+    db: GetDB,
+):
+    """
+    Returns the amount of entries in DB.\n
+    Can be filtered on a specific date in format: 'YYYY-MM-DD'.\n
+    Custom filter can also be applied, but requires knowledge of the model.\n
+
+    Raises:\n
+        400: {detail: "DATE_FILTER_INVALID"}
+    """
+    result = await crud.receipt_entry.count(db=db, user_id=user.id, **params)
+    return result
 
 
 @router.get("/{receipt_entry_id}", response_model=models.ReceiptEntry)

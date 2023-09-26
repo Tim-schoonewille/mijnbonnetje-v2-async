@@ -15,7 +15,7 @@ from app.utilities.core.auth import get_user_api_call_log
 from app.utilities.core.auth import get_sudo
 from app.utilities.core.auth import get_verified_user
 from app.utilities.core.auth import get_user
-from app.utilities.core.crud import parameters
+from app.utilities.core.crud import count_parameters, parameters
 from app.utilities.core.redis import cache
 from app.utilities.core.redis import async_cache
 
@@ -29,5 +29,6 @@ GetDB = Annotated[AsyncSession, Depends(get_db)]
 GetMongoDB = Annotated[AsyncIOMotorClient, Depends(get_mongo_db)]
 GetSettings = Annotated[Settings, Depends(get_settings)]
 ParametersDepends = Annotated[dict, Depends(parameters)]
+CountParameterDepends = Annotated[dict, Depends(count_parameters)]
 GetCache = Annotated[Redis, Depends(cache)]
 GetAsyncCache = Annotated[AsyncRedis, Depends(async_cache)]

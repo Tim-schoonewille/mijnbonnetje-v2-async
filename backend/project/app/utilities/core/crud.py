@@ -25,3 +25,16 @@ async def parameters(
         "end_date": end_date,
         "date_filter": date_filter,
     }
+
+
+async def count_parameters(
+    start_date: str | None = None,
+    end_date: str | None = None,
+    date_filter: str = "created_at",
+) -> dict:
+    return {
+        "start_date": start_date,
+        "end_date": end_date,
+        "date_filter": date_filter,
+    }
+

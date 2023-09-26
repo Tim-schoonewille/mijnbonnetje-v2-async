@@ -1,3 +1,4 @@
+from datetime import timedelta
 from typing import Any
 from typing import Generic
 from typing import Optional
@@ -9,6 +10,7 @@ from uuid import UUID
 from fastapi import HTTPException
 from pydantic import BaseModel
 from sqlalchemy import select
+from sqlalchemy import func
 from sqlalchemy.exc import DBAPIError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -120,3 +122,30 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         await db.delete(object)
         await db.commit()
         return None
+
+    async def count(
+        self,
+        db: AsyncSession,
+        user_id: int | UUID,
+        sudo: bool = False,
+        start_date: str | None = None,
+        end_date: str | None = None,
+        date_filter: str = "created_at",
+    ):
+        """Counts total entries"""
+        stmt = select(func.count(self.model.id))  # type: ignore
+        try:
+            date_filter_column = getattr(self.model, date_filter)
+        except AttributeError:
+            raise HTTPException(status_code=400, detail="DATE_FILTER_INVALID")
+
+        if start_date and hasattr(self.model, date_filter):
+            stmt = stmt.filter(date_filter_column > convert_to_datetime(start_date))
+        if end_date and hasattr(self.model, date_filter):
+            stmt = stmt.filter(date_filter_column < (convert_to_datetime(end_date) + timedelta(days=1)))
+
+        if not sudo and hasattr(self.model, 'user_id'):
+            stmt = stmt.filter(self.model.user_id == user_id)  # type: ignore
+
+        result = await db.execute(stmt)
+        return result.scalar()

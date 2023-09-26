@@ -65,7 +65,8 @@ def task_update_proxy_list_to_cache() -> None:
         from app.tasks.utils.proxy_scanner import ProxyScanner
         from redis import asyncio as aioredis
 
-        endpoint = "https://ipv4.icanhazip.com"
+        # endpoint = "https://ipv4.icanhazip.com"
+        endpoint = "https://api.ipify.org?format=json"
         proxy_scanner = ProxyScanner('./utils/proxies.txt', endpoint)
         await proxy_scanner.test_all_proxies()
         redis = aioredis.from_url(f'redis://:{settings.REDIS_PASSWORD}@localhost:6379')
