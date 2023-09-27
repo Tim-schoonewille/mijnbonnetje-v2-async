@@ -4,8 +4,13 @@
 /* eslint-disable */
 
 export enum Categories {
-    FOOD = 'food',
+    GROCERIES = 'groceries',
+    RESTAURANT = 'restaurant',
     ELECTRONICS = 'electronics',
+    CLOTHING = 'clothing',
     MEDIA = 'media',
-    OTHER = 'other',
+    EVENTS = 'events',
+    HARDWARE = 'hardware',
+    SUPPLIES = 'supplies',
+    OTHER = 'OTHER',
 }

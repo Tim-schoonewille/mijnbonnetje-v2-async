@@ -42,4 +42,49 @@ export class TestService {
         });
     }
 
+    /**
+     * Test Proxy
+     * @param proxy
+     * @returns any Successful Response
+     * @throws ApiError
+     */
+    public static testTestProxy(
+        proxy: string = '185.162.229.188:80',
+    ): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/test/test-proxy',
+            query: {
+                'proxy': proxy,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+
+    /**
+     * Test Proxy Cache Return
+     * @returns any Successful Response
+     * @throws ApiError
+     */
+    public static testTestProxyCacheReturn(): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/test/test-proxy-cache-return',
+        });
+    }
+
+    /**
+     * Test Working Proxy List In Cache
+     * @returns any Successful Response
+     * @throws ApiError
+     */
+    public static testTestWorkingProxyListInCache(): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/test/test-working-proxy-list-in-cache',
+        });
+    }
+
 }

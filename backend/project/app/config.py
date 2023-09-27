@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     TESTING: bool = bool(0)
     ID_UUID: bool = False
     URL_PREFIX: str = ""
-    APP_FQDN: str = "http://frontend.mijnbonnetje.lan:3000/"
+    APP_FQDN: str = 'http://frontend.mijnbonnetje.lan:3000/'
     TRAFFIC_LOGGING: bool = False
     DEFAULT_API_CALL_LIMIT: int = 30
     TWO_FACTOR_VERIFICATION_LINK: str = APP_FQDN + "auth/twofactor/"
@@ -40,7 +40,7 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
 
     # cookie settings
-    DOMAIN: str = "mijnbonnetje.lan"
+    DOMAIN: str
     COOKIE_SECURE: bool = False
     SAME_SITE: str = 'strict'
 

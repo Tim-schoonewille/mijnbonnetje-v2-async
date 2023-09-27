@@ -12,7 +12,6 @@ import type { ValidateRequestNewPassword } from '../models/ValidateRequestNewPas
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-import ApiResponse from '../core/ApiResponse';
 
 export class AuthService {
 
@@ -41,7 +40,7 @@ export class AuthService {
      */
     public static authRegisterNewUser(
         requestBody: UserCreate,
-    ): CancelablePromise<ApiResponse<any>> {
+    ): CancelablePromise<User> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/auth/signup',
@@ -74,7 +73,7 @@ export class AuthService {
      */
     public static authLoginUser(
         requestBody: UserLogin,
-    ): CancelablePromise<ApiResponse<object>> {
+    ): CancelablePromise<Record<string, string>> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/auth/login',
@@ -95,7 +94,7 @@ export class AuthService {
      * @returns any Successful Response
      * @throws ApiError
      */
-    public static authLogout(): CancelablePromise<ApiResponse<any>> {
+    public static authLogout(): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/auth/logout',
@@ -119,7 +118,7 @@ export class AuthService {
      * @returns any Successful Response
      * @throws ApiError
      */
-    public static authVerifyToken(): CancelablePromise<ApiResponse<any>> {
+    public static authVerifyToken(): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/auth/verify-token',
@@ -214,7 +213,7 @@ export class AuthService {
      */
     public static authVerifyEmail(
         token: string,
-    ): CancelablePromise<ApiResponse<any>> {
+    ): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/auth/email/verify/',

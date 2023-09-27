@@ -18,7 +18,18 @@ export default function RequiresValidToken({ children }: { children: any }) {
           setTokenIsVerified(true);
           setIsLoggedIn(true);
         }
-        if (response.status !== 200) {
+        else if (response.body['detail'] === 'EMAIL_NOT_VERIFIED') {
+          toast({
+            title: "Verify your email!",
+            description: "Please check your inbox to for an email verification link",
+            status: 'info',
+            duration: 10000,
+            isClosable: true,
+          })
+          setIsLoggedIn(true)
+          navigate('/auth/verify-email/new')
+        }
+        else if (response.status !== 200) {
             toast({
                 title:'Requires login',
                 description:'The page you tried to visit requires a login!',

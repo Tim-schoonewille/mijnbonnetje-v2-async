@@ -77,6 +77,43 @@ export class ReceiptEntryService {
     }
 
     /**
+     * Count Receipt Entries
+     * Returns the amount of entries in DB.
+     *
+     * Can be filtered on a specific date in format: 'YYYY-MM-DD'.
+     *
+     * Custom filter can also be applied, but requires knowledge of the model.
+     *
+     *
+     * Raises:
+     *
+     * 400: {detail: "DATE_FILTER_INVALID"}
+     * @param startDate
+     * @param endDate
+     * @param dateFilter
+     * @returns any Successful Response
+     * @throws ApiError
+     */
+    public static receiptEntryCountReceiptEntries(
+        startDate?: (string | null),
+        endDate?: (string | null),
+        dateFilter: string = 'created_at',
+    ): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/receipt-entry/count',
+            query: {
+                'start_date': startDate,
+                'end_date': endDate,
+                'date_filter': dateFilter,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+
+    /**
      * Read Specific Receipt Entry
      * Retreive a specific receipt entry (requires verifieduser token)
      *
