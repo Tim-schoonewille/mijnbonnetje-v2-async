@@ -7,7 +7,7 @@ import { ColorModeSwitcher } from "../../ColorModeSwitcher";
 type NavDesktopProps = {
   links: navLinkMapping[];
 };
-export default function NavDesktop({links}: NavDesktopProps) {
+export default function NavDesktop({ links }: NavDesktopProps) {
   return (
     <Flex display={["none", "none", "flex", "flex"]} gap="60px">
       <Flex
@@ -28,8 +28,12 @@ export default function NavDesktop({links}: NavDesktopProps) {
       </Flex>
       <ColorModeSwitcher justifySelf="flex-end" />
       <Flex as="ul" justifyContent="space-between" alignItems="center" gap={2}>
-        <Button>Login</Button>
-        <Button>Signup</Button>
+        <NavLink to="/auth/login">
+          <Button>Login</Button>
+        </NavLink>
+        <NavLink to="/auth/register">
+          <Button variant='outline'>Register</Button>
+        </NavLink>
       </Flex>
     </Flex>
   );

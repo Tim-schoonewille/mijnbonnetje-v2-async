@@ -39,16 +39,32 @@ export default function NavMobile({ links }: NavMobileProps) {
           <DrawerCloseButton />
           <DrawerHeader m="0 auto" pr={19}>
             <Flex gap={5}>
-              <Button w="auto">Login</Button> <Button>Signup</Button>
+              <NavLink to="/auth/login">
+                <Button w="auto" onClick={onClose}>
+                  Login
+                </Button>
+              </NavLink>
+              <NavLink to="/auth/register">
+                <Button variant='outline' w="auto" onClick={onClose}>
+                  register
+                </Button>
+              </NavLink>
             </Flex>
           </DrawerHeader>
 
           <DrawerBody>
-            <Flex as="ul" flexDirection={"column"} listStyleType="none">
+            <Flex
+              as="ul"
+              flexDirection={"column"}
+              listStyleType="none"
+              justifyContent="flex-end"
+            >
               {links.map((navlink) => {
                 return (
-                  <Link as="li">
-                    <NavLink to={navlink.route}>{navlink.name}</NavLink>
+                  <Link as="li" key={navlink.route} ml="auto" fontSize="4xl">
+                    <NavLink to={navlink.route} onClick={onClose}>
+                      {navlink.name}
+                    </NavLink>
                   </Link>
                 );
               })}

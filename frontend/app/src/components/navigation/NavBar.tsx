@@ -4,6 +4,7 @@ import { Link as NavLink } from "react-router-dom";
 import { ColorModeSwitcher } from "../../ColorModeSwitcher";
 import NavDesktop from "./NavDesktop";
 import NavMobile from "./NavMobile";
+import { CopyIcon } from "@chakra-ui/icons";
 
 export type navLinkMapping = {
   name: string;
@@ -31,8 +32,18 @@ export default function NavBar() {
   ];
 
   return (
-    <Flex m={[2, 2, 5, 5]} justifyContent="space-between" alignItems="center">
-      <Heading>Mijnbonnetje.nl</Heading>
+    <Flex
+      p={[2, 2, 5, 5]}
+      mb="24px"
+      justifyContent="space-between"
+      alignItems="center"
+      boxShadow="base"
+    >
+      <Heading size="lg">
+        <NavLink to="/">
+        <CopyIcon /> &nbsp;
+          Mijnbonnetje.nl</NavLink>
+      </Heading>
       <NavDesktop links={navLinkMappings} />
       <NavMobile links={navLinkMappings} />
     </Flex>
