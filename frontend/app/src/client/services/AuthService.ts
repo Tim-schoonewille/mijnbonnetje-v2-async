@@ -73,7 +73,7 @@ export class AuthService {
    */
   public static authLoginUser(
     requestBody: UserLogin
-  ): CancelablePromise<Record<string, string>> {
+  ): CancelablePromise<ApiResponse<any>> {
     return __request(OpenAPI, {
       method: "POST",
       url: "/auth/login",

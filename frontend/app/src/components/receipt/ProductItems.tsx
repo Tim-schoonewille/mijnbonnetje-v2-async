@@ -3,9 +3,13 @@ import SingleProductItem from "./SingleProductItem";
 import { Flex, Icon, Text } from "@chakra-ui/react";
 
 import { MdProductionQuantityLimits} from 'react-icons/md'
+import { ProductItem } from "../../client";
 
-export default function ProductItems() {
-  const foo = [1, 1, 1, 1, 1, 1, 1, 1, 1,1,1,1,1,1,1,1,1,1,1,1];
+type ProductItemsProps = {
+  productItems: ProductItem[] | undefined | null
+}
+export default function ProductItems({productItems}: ProductItemsProps) {
+  if (productItems === null || productItems === undefined) return <Text>Error loading products</Text>
   return (
     <>
       <Flex flexDirection="column" gap={3}>
@@ -13,8 +17,8 @@ export default function ProductItems() {
           <Icon as={MdProductionQuantityLimits} mr="9px" /> Product Items
         </Text>
         <Flex flexDirection="column" gap='12px'>
-          {foo.map((product) => {
-            return <SingleProductItem />;
+          {productItems.map((product) => {
+            return <SingleProductItem key={product.id} product={product}/>;
           })}
         </Flex>
       </Flex>

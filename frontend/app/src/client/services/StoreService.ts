@@ -9,6 +9,7 @@ import type { StoreUpdate } from '../models/StoreUpdate';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
+import ApiResponse from '../core/ApiResponse';
 
 export class StoreService {
 
@@ -97,7 +98,7 @@ export class StoreService {
      * @returns Store Successful Response
      * @throws ApiError
      */
-    public static storeReadUserStores(): CancelablePromise<Array<Store>> {
+    public static storeReadUserStores(): CancelablePromise<ApiResponse<any>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/store/user',

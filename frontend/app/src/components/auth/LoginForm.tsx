@@ -1,5 +1,6 @@
 import {
   Button,
+  Center,
   Flex,
   FormControl,
   FormErrorMessage,
@@ -8,8 +9,13 @@ import {
   Input,
   InputGroup,
   InputRightElement,
+  Spinner,
+  Text,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
+import { AuthService } from "../../client";
+import { useAuthContext } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
@@ -17,10 +23,42 @@ export default function LoginForm() {
   const [show, setShow] = useState(false);
   const [emailError, setEmailError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const { setIsLoggedIn } = useAuthContext();
+  const navigate = useNavigate()
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    alert(email);
+    setErrorMessage("");
+    setSuccessMessage("");
+
+    if (!email || !password) {
+      setErrorMessage("Please fill in all the forms!");
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const response = await AuthService.authLoginUser({ email, password });
+
+      if (response.status === 200) {
+        setIsLoading(false);
+        setIsLoggedIn(true);
+        setSuccessMessage("Succesfull login!");
+        setErrorMessage("");
+        navigate('/receipts')
+      } else {
+        setSuccessMessage("");
+        setErrorMessage("Invalid credentials");
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsLoading(false);
+    }
   }
   return (
     <Flex
@@ -69,6 +107,11 @@ export default function LoginForm() {
         )}
       </FormControl>
       <Button type="submit">Login</Button>
+      <Center>
+        {isLoading && <Spinner />}
+        {successMessage && <Text color={"green.400"}>{successMessage}</Text>}
+        {errorMessage && <Text color={"red.400"}>{errorMessage}</Text>}
+      </Center>
     </Flex>
   );
 }

@@ -1,5 +1,5 @@
 import React from "react";
-import { ReceiptEntry } from "../../client";
+import { ReceiptEntry, Store } from "../../client";
 import TruncatedReceipt from "./TruncatedReceipt";
 import { Box, Divider, SimpleGrid } from "@chakra-ui/react";
 
@@ -7,10 +7,11 @@ import { Link as NavLink } from "react-router-dom";
 
 export type ReceiptsProps = {
   receipts: ReceiptEntry[] | null;
+  stores: Store[] | null;
 };
 
-export default function Receipts({ receipts }: ReceiptsProps) {
-  const foo = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+export default function Receipts({ receipts, stores }: ReceiptsProps) {
+  if (!receipts) return <h1>No files...</h1>
   return (
     <>
       <SimpleGrid
@@ -19,11 +20,13 @@ export default function Receipts({ receipts }: ReceiptsProps) {
         spacingX="24px"
         spacingY="32px"
       >
-        {foo.map((receipt) => {
+        {receipts.map((receipt) => {
+          const store = stores?.find((store) => store.id === receipt.storeId)
+          console.log(store)
           return (
-            <Box>
-              <NavLink to={`/receipts/${receipt}`}>
-                <TruncatedReceipt />
+            <Box key={receipt.id}>
+              <NavLink to={`/receipts/${receipt.id}`}>
+                <TruncatedReceipt receipt={receipt} store={store}/>
               </NavLink>
               <Divider visibility={["visible", "hidden"]} />
             </Box>

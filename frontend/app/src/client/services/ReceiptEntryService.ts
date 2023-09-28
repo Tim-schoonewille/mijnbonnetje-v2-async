@@ -9,6 +9,7 @@ import type { ReceiptEntryUpdate } from '../models/ReceiptEntryUpdate';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
+import ApiResponse from '../core/ApiResponse';
 
 export class ReceiptEntryService {
 
@@ -58,7 +59,7 @@ export class ReceiptEntryService {
         startDate?: (string | null),
         endDate?: (string | null),
         dateFilter: string = 'created_at',
-    ): CancelablePromise<Array<ReceiptEntry>> {
+    ): CancelablePromise<ApiResponse<any>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/receipt-entry/',

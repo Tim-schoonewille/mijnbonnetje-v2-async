@@ -15,14 +15,14 @@ export default function LoginPage() {
         <Heading size="xl">Login</Heading>
         <LoginForm />
         <Text>
-          <Link>
+          <Link as='span'>
             <NavLink to="/auth/request-new-password">
               Request new password
             </NavLink>
           </Link>
         </Text>
         <Text>
-          <Link>
+          <Link as='span'>
             <NavLink to="/auth/request-new-email-verification">
               Request new email verification link
             </NavLink>

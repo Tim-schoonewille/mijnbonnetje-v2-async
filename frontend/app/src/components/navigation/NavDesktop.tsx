@@ -20,7 +20,7 @@ export default function NavDesktop({ links }: NavDesktopProps) {
       >
         {links.map((navlink) => {
           return (
-            <Link as="li">
+            <Link as="li" key={navlink.route}>
               <NavLink to={navlink.route}>{navlink.name}</NavLink>
             </Link>
           );

@@ -3,8 +3,14 @@ import { Flex, Icon, Spacer, Text } from "@chakra-ui/react";
 import React from "react";
 import { BiCategoryAlt } from "react-icons/bi";
 import { BsShop } from "react-icons/bs";
+import { ReceiptEntry, Store } from "../../client";
 
-export default function TruncatedReceipt() {
+type TruncatedReceiptProps = {
+  receipt: ReceiptEntry;
+  store: Store | undefined;
+};
+
+export default function TruncatedReceipt({ receipt, store }: TruncatedReceiptProps) {
   return (
     <Flex
       justifyContent={"center"}
@@ -22,18 +28,18 @@ export default function TruncatedReceipt() {
       <Flex alignItems={"center"}>
         <Icon as={BsShop} mr="12px" />
         <Text size={"lg"} as="b">
-          LIDL
+          {store?.name}
         </Text>
         <Spacer />
-        <Text>€ 69.12</Text>
+        <Text>€ {receipt.totalAmount ? receipt.totalAmount / 100 : '?'}</Text>
       </Flex>
       <Flex alignItems={"center"}>
         <Icon as={BiCategoryAlt} mr="12px" />
-        <Text>Boodschappen</Text>
+        <Text>{receipt.category}</Text>
       </Flex>
       <Flex alignItems={"center"}>
         <Icon as={CalendarIcon} mr="12px" />
-        <Text>9-9-2023</Text>
+        <Text>{receipt.purchaseDate}</Text>
       </Flex>
     </Flex>
   );

@@ -59,11 +59,11 @@ export default function RegisterForm() {
         );
       }
       if (response.status === 400) {
-        console.log('I ERROERD OUT')
         setEmailError(true)
         setEmailErrorMessage("E-mail already registerd!");
       }
     } catch (e) {
+      console.error(e)
 
     } finally {
       setIsLoading(false)

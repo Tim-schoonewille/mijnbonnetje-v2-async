@@ -14,12 +14,14 @@ import {
   DrawerCloseButton,
 } from "@chakra-ui/react";
 import { navLinkMapping } from "./NavBar";
+import { useAuthContext } from "../../context/AuthContext";
 
 type NavMobileProps = {
   links: navLinkMapping[];
 };
 export default function NavMobile({ links }: NavMobileProps) {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isLoggedIn } = useAuthContext();
   return (
     <Flex
       display={["flex", "flex", "none", "none"]}
@@ -37,20 +39,7 @@ export default function NavMobile({ links }: NavMobileProps) {
         <DrawerOverlay />
         <DrawerContent>
           <DrawerCloseButton />
-          <DrawerHeader m="0 auto" pr={19}>
-            <Flex gap={5}>
-              <NavLink to="/auth/login">
-                <Button w="auto" onClick={onClose}>
-                  Login
-                </Button>
-              </NavLink>
-              <NavLink to="/auth/register">
-                <Button variant='outline' w="auto" onClick={onClose}>
-                  register
-                </Button>
-              </NavLink>
-            </Flex>
-          </DrawerHeader>
+          <DrawerHeader m="0 auto" pr={19}></DrawerHeader>
 
           <DrawerBody>
             <Flex
@@ -72,10 +61,28 @@ export default function NavMobile({ links }: NavMobileProps) {
           </DrawerBody>
 
           <DrawerFooter>
-            {/* <Button variant="outline" mr={3} onClick={onClose}>
-              Cancel
-            </Button> */}
-            <Button onClick={onClose}>Close</Button>
+            <Flex gap={5}>
+              {isLoggedIn ? (
+                <NavLink to="/auth/logout">
+                  <Button w="auto" onClick={onClose}>
+                    Logout
+                  </Button>
+                </NavLink>
+              ) : (
+                <>
+                  <NavLink to="/auth/login">
+                    <Button w="auto" onClick={onClose}>
+                      Login
+                    </Button>
+                  </NavLink>
+                  <NavLink to="/auth/register">
+                    <Button variant="outline" w="auto" onClick={onClose}>
+                      register
+                    </Button>
+                  </NavLink>
+                </>
+              )}
+            </Flex>
           </DrawerFooter>
         </DrawerContent>
       </Drawer>
