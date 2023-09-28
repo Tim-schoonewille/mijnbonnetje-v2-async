@@ -9,7 +9,6 @@ import {
   Icon,
   Radio,
   RadioGroup,
-  Select,
   Spacer,
   Stack,
 } from "@chakra-ui/react";
@@ -20,8 +19,9 @@ import { RiMoneyDollarBoxLine } from "react-icons/ri";
 export default function ReceiptOrderByMenu() {
   const [dateOrderByRadio, setDateOrderByradio] = useState("1");
   const [moneyOrderByRadio, setMoneyOrderByRadio] = useState("1");
+  const accordionMargin = [0, 0, "200px", "500px"];
   return (
-    <AccordionItem>
+    <AccordionItem ml={accordionMargin} mr={accordionMargin}>
       <h2>
         <AccordionButton>
           <Box as="span" flex="1" textAlign="left">
@@ -55,7 +55,10 @@ export default function ReceiptOrderByMenu() {
             alignItems="center"
           >
             <Icon as={RiMoneyDollarBoxLine} mr="12px" />
-            <RadioGroup onChange={setMoneyOrderByRadio} value={moneyOrderByRadio}>
+            <RadioGroup
+              onChange={setMoneyOrderByRadio}
+              value={moneyOrderByRadio}
+            >
               <Stack direction="row">
                 <Radio value="asc">Ascending</Radio>
                 <Spacer />

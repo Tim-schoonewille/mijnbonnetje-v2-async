@@ -11,7 +11,9 @@ export default function ReceiptBody({ children }: ReceiptBodyProps) {
       minW={["100%", "100%", "600px", "600px"]}
       p={5}
       flexDirection="column"
-      gap={10}
+      gap="64px"
+      boxShadow="base"
+      rounded="base"
     >
       {children}
     </Flex>

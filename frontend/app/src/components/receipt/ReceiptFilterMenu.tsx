@@ -15,8 +15,9 @@ import { BiCategoryAlt } from "react-icons/bi";
 import { HiOutlineFilter } from "react-icons/hi";
 
 export default function ReceiptFilterMenu() {
+  const accordionMargin = [0, 0, '200px', '500px']
   return (
-<AccordionItem>
+<AccordionItem ml={accordionMargin} mr={accordionMargin}>
           <h2>
             <AccordionButton>
               <Box as="span" flex="1" textAlign="left">

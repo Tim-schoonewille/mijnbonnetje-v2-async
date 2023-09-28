@@ -1,5 +1,6 @@
 import {
   Button,
+  Center,
   Flex,
   FormControl,
   FormErrorMessage,
@@ -8,8 +9,11 @@ import {
   Input,
   InputGroup,
   InputRightElement,
+  Spinner,
+  Text,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
+import { AuthService } from "../../client";
 
 export default function RegisterForm() {
   const [email, setEmail] = useState("");
@@ -17,11 +21,53 @@ export default function RegisterForm() {
   const [password2, setPassword2] = useState("");
   const [show, setShow] = useState(false);
   const [emailError, setEmailError] = useState(false);
+  const [emailErrorMessage, setEmailErrorMessage] = useState("");
   const [passwordError, setPasswordError] = useState(false);
+  const [passwordErrorMessage, setPasswordErrorMessage] = useState("");
+  const [success, setSuccess] = useState("");
 
+  const [isLoading, setIsLoading] = useState(false);
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    alert(email);
+    const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+
+    if (!emailRegex.test(email) || !email) {
+      setEmailError(true);
+      setEmailErrorMessage("Invalid email!");
+      return;
+    }
+    if (!password || !password2) {
+      setPasswordError(true);
+      setPasswordErrorMessage("Password required!");
+      return;
+    }
+    if (password !== password2) {
+      setPasswordError(true);
+      setPasswordErrorMessage("Passwords must match!");
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const response = await AuthService.authRegisterNewUser({
+        email,
+        password,
+      });
+      if (response.status === 201) {
+        setSuccess(
+          "Succesfull registration, please verify your email address by clicking the link in your inbox"
+        );
+      }
+      if (response.status === 400) {
+        console.log('I ERROERD OUT')
+        setEmailError(true)
+        setEmailErrorMessage("E-mail already registerd!");
+      }
+    } catch (e) {
+
+    } finally {
+      setIsLoading(false)
+    }
   }
   return (
     <Flex
@@ -43,7 +89,7 @@ export default function RegisterForm() {
         {!emailError ? (
           <FormHelperText>Your email address</FormHelperText>
         ) : (
-          <FormErrorMessage>Email is required.</FormErrorMessage>
+          <FormErrorMessage>{emailErrorMessage}</FormErrorMessage>
         )}
       </FormControl>
 
@@ -66,7 +112,7 @@ export default function RegisterForm() {
             mijnbonnetje.nl will never ask for your passwod
           </FormHelperText>
         ) : (
-          <FormErrorMessage>Email is required.</FormErrorMessage>
+          <FormErrorMessage>{passwordErrorMessage} </FormErrorMessage>
         )}
       </FormControl>
       <FormControl isInvalid={passwordError}>
@@ -86,10 +132,15 @@ export default function RegisterForm() {
         {!passwordError ? (
           <FormHelperText>Retype your password to verify</FormHelperText>
         ) : (
-          <FormErrorMessage>Email is required.</FormErrorMessage>
+          <FormErrorMessage>{passwordErrorMessage}</FormErrorMessage>
         )}
       </FormControl>
       <Button type="submit">Register</Button>
+      <Center>
+        {isLoading && <Spinner />}
+
+        {success && <Text>{success}</Text>}
+      </Center>
     </Flex>
   );
 }

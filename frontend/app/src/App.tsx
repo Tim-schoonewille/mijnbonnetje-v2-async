@@ -12,10 +12,11 @@ import VerifyNewPasswordPage from "./pages/auth/VerifyNewPasswordPage";
 import ReceiptsPage from "./pages/receipt/ReceiptsPage";
 import AddReceiptPage from "./pages/receipt/AddReceiptPage";
 import SingleReceiptPage from "./pages/receipt/SingleReceiptPage";
+import AuthProvider from "./context/AuthContext";
 
 export const App = () => {
   return (
-    <>
+    <AuthProvider>
       <Router>
         <NavBar />
         <Routes>
@@ -43,6 +44,6 @@ export const App = () => {
           <Route path="/add-receipt" element={<AddReceiptPage />} />
         </Routes>
       </Router>
-    </>
+    </AuthProvider>
   );
 };

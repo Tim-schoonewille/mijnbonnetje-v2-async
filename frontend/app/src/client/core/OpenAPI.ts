@@ -20,9 +20,9 @@ export type OpenAPIConfig = {
 };
 
 export const OpenAPI: OpenAPIConfig = {
-    BASE: '',
+    BASE: 'http://backend.mijnbonnetje.lan:8000',
     VERSION: '0.1.0',
-    WITH_CREDENTIALS: false,
+    WITH_CREDENTIALS: true,
     CREDENTIALS: 'include',
     TOKEN: undefined,
     USERNAME: undefined,
