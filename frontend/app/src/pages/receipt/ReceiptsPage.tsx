@@ -3,10 +3,12 @@ import { Accordion, Box, Flex, Spinner } from "@chakra-ui/react";
 import ReceiptFilterMenu from "../../components/receipt/ReceiptFilterMenu";
 import ReceiptOrderByMenu from "../../components/receipt/ReceiptOrderByMenu";
 import { useEffect, useRef, useState } from "react";
+import Receipts from "../../components/receipt/Receipts";
+import { ReceiptEntry } from "../../client";
 
 export default function ReceiptsPage() {
   const [isLoading, setIsLoading] = useState(true);
-
+  const [receipts, setReceipts] = useState<ReceiptEntry[] | null>(null);
   return (
     <>
       <Accordion allowToggle>
@@ -21,53 +23,8 @@ export default function ReceiptsPage() {
         gap={15}
         mt="24px"
       >
-        {isLoading ? (
-          <Spinner />
-        ) : (
-          <>
-            <br />
-            Receipt <br />
-            Receipt <br />
-            Receipt <br />
-            Receipt <br />
-            Receipt <br />
-            Receipt <br />
-            Receipt <br />
-            Receipt <br />
-            Receipt <br />
-            Receipt <br />
-            Receipt <br />
-            Receipt <br />
-            Receipt <br />
-            Receipt <br />
-            Receipt <br />
-            Receipt <br />
-            R Receipt <br />
-            Receipt <br />
-            Receipt <br />
-            Receipt <br />
-            Receipt <br />
-            Receipt <br />
-            Receipt <br />
-            Receipt <br />
-            Receipt <br />
-            Receipt <br />
-            Receipt <br />
-            Receipt <br />
-            eceipt <br />
-            Receipt <br />
-            Receipt <br />
-            Receipt <br />
-            Receipt <br />
-            Receipt <br />
-            Receipt <br />
-            Receipt <br />
-            Receipt <br />
-            Receipt <br />
-            Receipt <br />
-            Receipt <br />
-          </>
-        )}
+        <Receipts receipts={receipts} />
+        {isLoading && <Spinner />}
       </Flex>
     </>
   );

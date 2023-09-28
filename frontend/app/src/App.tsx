@@ -10,6 +10,7 @@ import RequestNewEmailVerificationPage from "./pages/auth/RequestNewEmailVerific
 import LogoutPage from "./pages/auth/LogoutPage";
 import VerifyNewPasswordPage from "./pages/auth/VerifyNewPasswordPage";
 import ReceiptsPage from "./pages/receipt/ReceiptsPage";
+import AddReceiptPage from "./pages/receipt/AddReceiptPage";
 
 export const App = () => {
   return (
@@ -37,6 +38,7 @@ export const App = () => {
           />
 
           <Route path="/receipts" element={<ReceiptsPage />} />
+          <Route path="/add-receipt" element={<AddReceiptPage />} />
         </Routes>
       </Router>
     </>
