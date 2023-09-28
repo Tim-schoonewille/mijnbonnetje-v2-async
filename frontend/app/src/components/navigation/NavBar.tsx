@@ -34,7 +34,6 @@ export default function NavBar() {
   return (
     <Flex
       p={[2, 2, 5, 5]}
-      mb="24px"
       justifyContent="space-between"
       alignItems="center"
       boxShadow="base"

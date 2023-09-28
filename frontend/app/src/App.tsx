@@ -2,12 +2,14 @@ import { ColorModeSwitcher } from "./ColorModeSwitcher";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import NavBar from "./components/navigation/NavBar";
-import LoginPage from "./pages/LoginPage";
-import RegisterPage from "./pages/RegisterPage";
-import VerifyEmailPage from "./pages/VerifyEmailPage";
-import RequestNewPasswordPage from "./pages/RequestNewPasswordPage";
-import RequestNewEmailVerificationPage from "./pages/RequestNewEmailVerificationPage";
-import LogoutPage from "./pages/LogoutPage";
+import LoginPage from "./pages/auth/LoginPage";
+import RegisterPage from "./pages/auth/RegisterPage";
+import VerifyEmailPage from "./pages/auth/VerifyEmailPage";
+import RequestNewPasswordPage from "./pages/auth/RequestNewPasswordPage";
+import RequestNewEmailVerificationPage from "./pages/auth/RequestNewEmailVerificationPage";
+import LogoutPage from "./pages/auth/LogoutPage";
+import VerifyNewPasswordPage from "./pages/auth/VerifyNewPasswordPage";
+import ReceiptsPage from "./pages/receipt/ReceiptsPage";
 
 export const App = () => {
   return (
@@ -26,9 +28,15 @@ export const App = () => {
             element={<RequestNewPasswordPage />}
           />
           <Route
+            path="/auth/verify-new-password"
+            element={<VerifyNewPasswordPage />}
+          />
+          <Route
             path="/auth/request-new-email-verification"
             element={<RequestNewEmailVerificationPage />}
           />
+
+          <Route path="/receipts" element={<ReceiptsPage />} />
         </Routes>
       </Router>
     </>

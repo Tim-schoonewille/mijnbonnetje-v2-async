@@ -1,6 +1,6 @@
 import { Center, Flex, Heading, Link, Text } from "@chakra-ui/react";
 import React from "react";
-import LoginForm from "../components/login/LoginForm";
+import LoginForm from "../../components/auth/LoginForm";
 import { Link as NavLink } from "react-router-dom";
 
 export default function LoginPage() {
@@ -16,12 +16,16 @@ export default function LoginPage() {
         <LoginForm />
         <Text>
           <Link>
-            <NavLink to="/auth/request-new-password">Request new password</NavLink>
+            <NavLink to="/auth/request-new-password">
+              Request new password
+            </NavLink>
           </Link>
         </Text>
         <Text>
           <Link>
-            <NavLink to="/auth/request-new-email-verification">Request new email verification link</NavLink>
+            <NavLink to="/auth/request-new-email-verification">
+              Request new email verification link
+            </NavLink>
           </Link>
         </Text>
       </Flex>

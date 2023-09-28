@@ -1,5 +1,5 @@
 import { Center, Flex, Heading } from "@chakra-ui/react";
-import RegisterForm from "../components/login/RegisterForm";
+import RegisterForm from "../../components/auth/RegisterForm";
 
 export default function RegisterPage() {
   return (
