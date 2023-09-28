@@ -21,7 +21,9 @@ export default function TruncatedReceipt() {
     >
       <Flex alignItems={"center"}>
         <Icon as={BsShop} mr="12px" />
-        <Text size={"lg"}>LIDL</Text>
+        <Text size={"lg"} as="b">
+          LIDL
+        </Text>
         <Spacer />
         <Text>€ 69.12</Text>
       </Flex>

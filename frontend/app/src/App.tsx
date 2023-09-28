@@ -11,6 +11,7 @@ import LogoutPage from "./pages/auth/LogoutPage";
 import VerifyNewPasswordPage from "./pages/auth/VerifyNewPasswordPage";
 import ReceiptsPage from "./pages/receipt/ReceiptsPage";
 import AddReceiptPage from "./pages/receipt/AddReceiptPage";
+import SingleReceiptPage from "./pages/receipt/SingleReceiptPage";
 
 export const App = () => {
   return (
@@ -38,6 +39,7 @@ export const App = () => {
           />
 
           <Route path="/receipts" element={<ReceiptsPage />} />
+          <Route path="/receipts/:id" element={<SingleReceiptPage />} />
           <Route path="/add-receipt" element={<AddReceiptPage />} />
         </Routes>
       </Router>
