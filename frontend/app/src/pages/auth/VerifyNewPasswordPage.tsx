@@ -1,5 +1,6 @@
 import {
   Button,
+  Center,
   Flex,
   FormControl,
   FormErrorMessage,
@@ -9,9 +10,11 @@ import {
   Input,
   InputGroup,
   InputRightElement,
+  Text,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { AuthService, ValidateRequestNewPassword } from "../../client";
 
 export default function VerifyNewPasswordPage() {
   const [password, setPassword] = useState("");
@@ -19,11 +22,44 @@ export default function VerifyNewPasswordPage() {
   const [show, setShow] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
   const [queryParams] = useSearchParams();
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const newPasswordVerificationToken =
     queryParams.get("token") ?? "invalid token";
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (
+      newPasswordVerificationToken === "invalid token" ||
+      !newPasswordVerificationToken
+    ) {
+      setError("Invalid token, request new");
+      return;
+    }
+    if (password !== password2) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    try {
+      const requestBody: ValidateRequestNewPassword = { newPassword: password };
+      const response = await AuthService.authVerifyNewPasswordRequest(
+        newPasswordVerificationToken,
+        requestBody
+      );
+
+      if (response.status === 200) {
+        setError("");
+        setSuccess(
+          "Password succesfully changed, proceed to login with your new credentials."
+        );
+      } else {
+        setError("Invalid token, request new");
+        setSuccess("");
+      }
+    } catch (e) {
+      console.error(e);
+    }
   }
   return (
     <Flex
@@ -33,7 +69,7 @@ export default function VerifyNewPasswordPage() {
       gap={15}
     >
       <Heading size="xl">
-        Verify new password: {newPasswordVerificationToken}
+        Verify new password:
       </Heading>
       <Flex
         as="form"
@@ -87,6 +123,10 @@ export default function VerifyNewPasswordPage() {
           )}
         </FormControl>
         <Button type="submit">Change Password</Button>
+        <Center>
+          {error && <Text color="red.400">{error}</Text>}
+          {success && <Text color="green.400">{success}</Text>}
+        </Center>
       </Flex>
     </Flex>
   );

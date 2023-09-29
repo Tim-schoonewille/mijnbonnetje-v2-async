@@ -6,14 +6,45 @@ import {
   FormHelperText,
   FormLabel,
   Input,
+  Spinner,
+  Text,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
+import { AuthService } from "../../client";
 
 export default function RequestNewEmailVerificationPage() {
   const [email, setEmail] = useState<string>();
   const [emailError, setEmailError] = useState(false);
+  const [emailErrorMessage, setEmailErrorMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+
+  async function handleNewEmailTokenRequest(emailAddress: string) {
+    if (!emailAddress) return;
+    try {
+      setIsLoading(true);
+      const response = await AuthService.authRequestEmailVerificationCode({
+        email: emailAddress,
+      });
+      if (response.status === 200) {
+        setEmailErrorMessage('')
+        setEmailError(false)
+        setSuccessMessage("Token has been sent to your inbox");
+      } else {
+        setEmailError(true)
+        setSuccessMessage('')
+        setEmailErrorMessage("Something went horribly wrong");
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsLoading(false);
+    }
+  }
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!email) return
+    handleNewEmailTokenRequest(email)
   };
   return (
     <Flex
@@ -41,10 +72,12 @@ export default function RequestNewEmailVerificationPage() {
           {!emailError ? (
             <FormHelperText>Your email address</FormHelperText>
           ) : (
-            <FormErrorMessage>Email is required.</FormErrorMessage>
+            <FormErrorMessage>{emailErrorMessage}</FormErrorMessage>
           )}
         </FormControl>
         <Button type="submit">Request New Verification Link</Button>
+        {isLoading && <Spinner />}
+        {successMessage && <Text color="green.400">{successMessage}</Text>}
       </Flex>
     </Flex>
   );

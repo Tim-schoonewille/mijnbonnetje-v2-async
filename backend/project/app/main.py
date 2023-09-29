@@ -21,7 +21,8 @@ def create_application(testing: bool = False) -> FastAPI:
     origins = [
         "http://frontend.localhost:3000",
         "http://mijnbonnetje.lan:3000",
-        "http://frontend.mijnbonnetje.lan:3000"
+        "http://frontend.mijnbonnetje.lan:3000",
+        "http://frontend.mijnbonnetje.nl:3000",
     ]
     application = FastAPI(
         title="mijnbonnetje.nl",

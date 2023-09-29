@@ -40,7 +40,7 @@ async def create_product_entries(
             continue
         if 'totaal' in item['description'].lower():
             continue
-        if total_amount == item['amount'] and len(items) < 3:
+        if total_amount == item['amount'] and len(items) > 3:
             print('item:', item)
             continue
         product_item_schema = models.ProductItemCreate(

@@ -17,7 +17,7 @@ beat_schedule = {
     },
     "update-proxy-list-to-cache": {
         "task": "app.tasks.tasks.task_update_proxy_list_to_cache",
-        "schedule": crontab(minute="*/10"),
+        "schedule": crontab(),
     }
 }
 

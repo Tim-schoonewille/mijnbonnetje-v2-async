@@ -50,5 +50,5 @@ export default function RequiresValidToken({ children }: { children: any }) {
   if (!tokenIsVerified) {
     return <h1>Requires token!</h1>;
   }
-  return <>{children};</>;
+  return <>{children}</>;
 }

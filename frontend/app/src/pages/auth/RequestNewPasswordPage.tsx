@@ -6,14 +6,40 @@ import {
   FormHelperText,
   FormLabel,
   Input,
+  Text,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
+import { AuthService } from "../../client";
 
 export default function RequestNewPasswordPage() {
   const [email, setEmail] = useState<string>();
   const [emailError, setEmailError] = useState(false);
+  const [emailErrorMessage, setEmailErrorMessage] = useState('')
+  const [success, setSuccess] = useState('')
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!email) {
+      setEmailError(true)
+      setEmailErrorMessage('Requires a valid email address to proceed')
+      return
+    }
+
+    try {
+      setEmailErrorMessage('')
+      setEmailError(false)
+
+      const response = await AuthService.authRequestNewPasswordToken({email})
+
+      if (response.status === 200) {
+        setSuccess('Check inbox for link to generate new password')
+      } else {
+        setEmailError(true)
+        setSuccess('')
+        setEmailErrorMessage('Invalid email address, try again loser')
+      }
+    } catch (e) {
+      console.error(e)
+    }
   };
   return (
     <Flex
@@ -41,10 +67,11 @@ export default function RequestNewPasswordPage() {
           {!emailError ? (
             <FormHelperText>Your email address</FormHelperText>
           ) : (
-            <FormErrorMessage>Email is required.</FormErrorMessage>
+            <FormErrorMessage>{emailErrorMessage}</FormErrorMessage>
           )}
         </FormControl>
         <Button type="submit">Request New Password</Button>
+        { success && <Text color='green.400'>{success}</Text>}
       </Flex>
     </Flex>
   );

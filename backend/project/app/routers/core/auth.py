@@ -31,6 +31,7 @@ from app.utilities.core.dependencies import GetSettings
 from app.utilities.core.dependencies import SudoUser
 from app.utilities.core.dependencies import VerifiedUser
 from app.utilities.core.email import send_verification_code_email
+from app.utilities.core.email import send_request_new_password_email
 from app.utilities.core.log import log_traffic
 from app.utilities.core.redis import redis_login_attempts
 from app.utilities.core.redis import register_login_attempt
@@ -177,12 +178,13 @@ async def verify_sudo_token(user: SudoUser, request: Request) -> dict[str, bool]
     return {"sudo": True}
 
 
-@router.get("/email/verify/new")
+@router.post("/email/verify/new")
 @log_traffic()
 async def request_email_verification_code(
-    user: ActiveUser,
+    schema: models.RequestNewPassword,
     request: Request,
     bgtasks: BackgroundTasks,
+    db: GetDB
 ):
     """
     Request a new email verification code.
@@ -191,9 +193,10 @@ async def request_email_verification_code(
     Send an email to the user with the verification token.
 
     Raised:\n
-        400: {detail: 'ALREADY_VERIFIED}
+        404: {detail:"INVALID_EMAIL"}\n
+        400: {detail: 'ALREADY_VERIFIED}\n
     """
-    return await handle_new_verification_code(user, bgtasks)
+    return await handle_new_verification_code(schema.email, bgtasks, db)
 
 
 @router.get("/email/verify/")
@@ -217,6 +220,7 @@ async def verify_email(token: str, request: Request, db: GetDB):
 async def request_new_password_token(
     schema: models.RequestNewPassword,
     request: Request,
+    bg_tasks: BackgroundTasks,
     db: GetDB,
 ):
     """
@@ -228,7 +232,7 @@ async def request_new_password_token(
     Raises:\n
         404: {detail: 'INVALID_EMAIL'}
     """
-    return await handle_new_password_token(email=schema.email, db=db)
+    return await handle_new_password_token(email=schema.email, db=db, tasks=bg_tasks)
 
 
 @router.post("/password/reset/verify")
@@ -380,14 +384,28 @@ def handle_token() -> dict[str, bool]:
 
 
 async def handle_new_verification_code(
-    user: models.UserDB, bgtasks: BackgroundTasks
+    email: str, bgtasks: BackgroundTasks, db: AsyncSession,
 ) -> dict[str, str]:
+    user = await crud.user.get_by_email(db, email)
+    if user is None:
+        raise HTTPException(status_code=404, detail='INVALID_EMAIL')
     if user.verified:
         raise HTTPException(status_code=400, detail="ALREADY_VERIFIED")
 
     email_verification_code = create_email_verification_token(user.email)
     send_verification_code_email(user.email, email_verification_code, bgtasks)
     return dict(message="NEW_VERIFICATION_CODE_SENT")
+
+
+# async def handle_new_verification_code(
+#     user: models.UserDB, bgtasks: BackgroundTasks
+# ) -> dict[str, str]:
+#     if user.verified:
+#         raise HTTPException(status_code=400, detail="ALREADY_VERIFIED")
+
+#     email_verification_code = create_email_verification_token(user.email)
+#     send_verification_code_email(user.email, email_verification_code, bgtasks)
+#     return dict(message="NEW_VERIFICATION_CODE_SENT")
 
 
 async def handle_verify_email(token: str, db: AsyncSession) -> dict[str, str]:
@@ -404,13 +422,14 @@ async def handle_verify_email(token: str, db: AsyncSession) -> dict[str, str]:
     return dict(status="verified")
 
 
-async def handle_new_password_token(email: str, db: AsyncSession) -> dict[str, str]:
+async def handle_new_password_token(email: str, db: AsyncSession, tasks: BackgroundTasks) -> dict[str, str]:
     db_user: models.UserDB = await crud.user.get_by_email(db, email)
     if db_user is None:
         raise HTTPException(status_code=404, detail="INVALID_EMAIL")
 
     jti = str(uuid4())
     token = create_password_token(sub=str(db_user.id), jti=jti)
+    send_request_new_password_email(to=email, code=token, bg_tasks=tasks)
     return dict(token=token)
 
 

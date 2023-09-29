@@ -192,10 +192,17 @@ export class AuthService {
    * @returns any Successful Response
    * @throws ApiError
    */
-  public static authRequestEmailVerificationCode(): CancelablePromise<any> {
+  public static authRequestEmailVerificationCode(
+    requestBody: RequestNewPassword
+  ): CancelablePromise<ApiResponse<any>> {
     return __request(OpenAPI, {
-      method: "GET",
+      method: "POST",
       url: "/auth/email/verify/new",
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        422: `Validation Error`
+      }
     });
   }
 
@@ -215,7 +222,7 @@ export class AuthService {
    * @returns any Successful Response
    * @throws ApiError
    */
-  public static authVerifyEmail(token: string): CancelablePromise<any> {
+  public static authVerifyEmail(token: string): CancelablePromise<ApiResponse<any>> {
     return __request(OpenAPI, {
       method: "GET",
       url: "/auth/email/verify/",
@@ -276,7 +283,7 @@ export class AuthService {
   public static authVerifyNewPasswordRequest(
     token: string,
     requestBody: ValidateRequestNewPassword
-  ): CancelablePromise<any> {
+  ): CancelablePromise<ApiResponse<any>> {
     return __request(OpenAPI, {
       method: "POST",
       url: "/auth/password/reset/verify",
