@@ -6,16 +6,30 @@ import ProductItems from "../../components/receipt/ProductItems";
 import ReceiptSummary from "../../components/receipt/ReceiptSummary";
 import RequiresValidToken from "../../wrappers/RequiresValidToken";
 import { useAuthContext } from "../../context/AuthContext";
-import { Receipt, ReceiptService } from "../../client";
+import { Receipt, ReceiptService, Store, StoreService } from "../../client";
 
 export default function SingleReceiptPage() {
   const { id } = useParams();
   const [receipt, setReceipt] = useState<Receipt>();
+  const [stores, setStores] = useState<Store[]>();
   const receiptId = id || 0;
   const { isLoggedIn } = useAuthContext();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
+  async function readStores() {
+    try {
+      setIsLoading(true);
+      const response = await StoreService.storeReadUserStores();
+      if (response.status === 200) {
+        setStores(response.body);
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsLoading(false);
+    }
+  }
   async function readReceipt() {
     try {
       setIsLoading(true);
@@ -36,9 +50,10 @@ export default function SingleReceiptPage() {
   }
 
   useEffect(() => {
-    if (!isLoggedIn) return
-    readReceipt()
-  }, [isLoggedIn])
+    if (!isLoggedIn) return;
+    readReceipt();
+    readStores();
+  }, [isLoggedIn]);
 
   return (
     <RequiresValidToken>
@@ -51,7 +66,9 @@ export default function SingleReceiptPage() {
       >
         {!error ? (
           <ReceiptBody>
-            <ReceiptSummary receipt={receipt} />
+            {receipt && stores && (
+              <ReceiptSummary receipt={receipt} stores={stores} />
+            )}
             <ProductItems productItems={receipt?.productItems} />
           </ReceiptBody>
         ) : (

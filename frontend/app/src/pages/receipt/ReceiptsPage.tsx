@@ -11,6 +11,7 @@ export default function ReceiptsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [receipts, setReceipts] = useState<ReceiptEntry[] | null>(null);
   const [stores, setStores] = useState<Store[] | null>(null)
+  const [filter, setFilter] = useState('')
 
   async function readReceipts() {
     const response = await ReceiptEntryService.receiptEntryReadMultipleReceiptEntries()
@@ -38,7 +39,7 @@ export default function ReceiptsPage() {
   return (
     <RequiresValidToken>
       <Accordion allowToggle>
-        <ReceiptFilterMenu />
+        <ReceiptFilterMenu stores={stores}/>
         <ReceiptOrderByMenu />
       </Accordion>
 

@@ -22,7 +22,6 @@ export default function Receipts({ receipts, stores }: ReceiptsProps) {
       >
         {receipts.map((receipt) => {
           const store = stores?.find((store) => store.id === receipt.storeId)
-          console.log(store)
           return (
             <Box key={receipt.id}>
               <NavLink to={`/receipts/${receipt.id}`}>
