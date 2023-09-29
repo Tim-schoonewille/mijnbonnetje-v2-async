@@ -49,8 +49,11 @@ async def write_receipt_file_to_disk(
     file_name_without_spaces = file.filename.replace(" ", "")  # type: ignore
     file_name_on_disk = str(uuid4()) + file_name_without_spaces
     file_path = os.path.join(FOLDER_TO_SAVE_PATH, file_name_on_disk)
+    print('[...] opening file')
     async with aiofiles.open(file_path, "wb") as f:
+        print('[..] Writing to disk')
         await f.write(await file.read())
+    print('[..] Write succeeded')
     return file_path
 
 
@@ -74,6 +77,7 @@ async def handle_receipt_file(
     entry_id: int | UUID,
     folder: str,
 ) -> models.ReceiptFileDB:
+    print('[..] Writing to file')
     file_path_on_disk = await write_receipt_file_to_disk(receipt_file, entry_id, folder)
     input_schema = models.ReceiptFileCreate(
         receipt_entry_id=entry_id,

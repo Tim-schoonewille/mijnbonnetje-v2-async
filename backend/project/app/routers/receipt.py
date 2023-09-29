@@ -50,9 +50,11 @@ async def create_full_receipt(
         400: {detail: "FILE_TOO_LARGE_MAX_X_MB"}\n
         400: {detail: "INVALID_FILE_TYPE}\n
     """
+    print('[+] DEBUG_RECEIPT:: Creating enry...')
     receipt_entry = await crud.receipt_entry.create(
         db=db, schema_in=models.ReceiptEntryCreate(), user=user
     )
+    print('[+] DEBUG_RECEIPT :: CREATING RECEIPT FILE')
     receipt_file = await handle_receipt_file(
         db=db,
         user=user,
@@ -60,6 +62,7 @@ async def create_full_receipt(
         entry_id=receipt_entry.id,
         folder=settings.STATIC_FOLDER,
     )
+    print('[+] DEBUG_RECEIPT :: Scanning File')
     receipt_scan = await handle_receipt_scan(
         db=db,
         user=user,
@@ -67,6 +70,7 @@ async def create_full_receipt(
         receipt_file_id=receipt_file.id,
         receipt_file_path=receipt_file.file_path,
     )
+    print('[+] DEBUG_RECEIPT :: HANDLE EXTERNAL OCR')
     receipt = await handle_receipt_ocr(
         db=db,
         user=user,
