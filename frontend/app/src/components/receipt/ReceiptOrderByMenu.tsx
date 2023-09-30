@@ -1,4 +1,5 @@
 import { CalendarIcon } from "@chakra-ui/icons";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   AccordionButton,
   AccordionIcon,
@@ -20,6 +21,17 @@ export default function ReceiptOrderByMenu() {
   const [dateOrderByRadio, setDateOrderByradio] = useState("1");
   const [moneyOrderByRadio, setMoneyOrderByRadio] = useState("1");
   const accordionMargin = [0, 0, "200px", "500px"];
+
+  const location = useLocation();
+  const navigate = useNavigate();
+  const queryParams = new URLSearchParams(location.search);
+  const updateQueryParamsAndNavigate = (orderBy: string, sort: string) => {
+    queryParams.set("orderBy", orderBy);
+    queryParams.set("sort", sort);
+    const newSearch = queryParams.toString();
+
+    navigate(`/receipts?${newSearch}`);
+  };
   return (
     <AccordionItem ml={accordionMargin} mr={accordionMargin}>
       <h2>
@@ -42,9 +54,19 @@ export default function ReceiptOrderByMenu() {
             <Icon as={CalendarIcon} mr="12px" />
             <RadioGroup onChange={setDateOrderByradio} value={dateOrderByRadio}>
               <Stack direction="row">
-                <Radio value="asc">Ascending</Radio>
+                <Radio
+                  value="asc"
+                  onChange={() => updateQueryParamsAndNavigate("date", "asc")}
+                >
+                  Ascending
+                </Radio>
                 <Spacer />
-                <Radio value="desc">Descending</Radio>
+                <Radio
+                  value="desc"
+                  onChange={() => updateQueryParamsAndNavigate("date", "desc")}
+                >
+                  Descending
+                </Radio>
               </Stack>
             </RadioGroup>
           </Flex>
@@ -60,9 +82,19 @@ export default function ReceiptOrderByMenu() {
               value={moneyOrderByRadio}
             >
               <Stack direction="row">
-                <Radio value="asc">Ascending</Radio>
+                <Radio
+                  value="asc"
+                  onChange={() => updateQueryParamsAndNavigate("money", "asc")}
+                >
+                  Ascending
+                </Radio>
                 <Spacer />
-                <Radio value="desc">Descending</Radio>
+                <Radio
+                  value="desc"
+                  onChange={() => updateQueryParamsAndNavigate("money", "desc")}
+                >
+                  Descending
+                </Radio>
               </Stack>
             </RadioGroup>
           </Flex>

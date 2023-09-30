@@ -28,7 +28,7 @@ async def fill_db(db: AsyncSession) -> None:
         description="Pro tier with unlimited access",
         api_call_limit=100,
     )
-    store = models.StoreDB(name="Aldi", city="Brunssum", country="NL")
+    store = models.StoreDB(name="Aldi", city="Brunssum", country="NL", user_id=1)
     async with db as sess:
         sess.add(super_user)
         sess.add(tier_pro)

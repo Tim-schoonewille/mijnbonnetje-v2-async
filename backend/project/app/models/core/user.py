@@ -10,7 +10,7 @@ from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 
-from app.models.store import store_users_association_table
+
 from app.models.base import Base
 from app.models.base import CamelBase
 from app.models.base import IDFieldDBMixin
@@ -61,9 +61,7 @@ class UserDB(IDFieldDBMixin, TimeStampDBMixin, Base):
         back_populates="user"
     )
     receipt_files: Mapped[list["ReceiptFileDB"]] = relationship(back_populates="user")
-    stores: Mapped[list["StoreDB"]] = relationship(
-        secondary=store_users_association_table, back_populates="users"
-    )
+    stores: Mapped[list["StoreDB"]] = relationship(back_populates='user')
     product_items: Mapped[list["ProductItemDB"]] = relationship(back_populates="user")
 
     def __repr__(self):

@@ -16,6 +16,10 @@ async def parameters(
     start_date: str | None = None,
     end_date: str | None = None,
     date_filter: str = "created_at",
+    column_filter_string: str | None = None,
+    column_filter_string_value: str | UUID | None = None,
+    column_filter_int: str | None = None,
+    column_filter_int_value: int | None = None
 ) -> dict:
     return {
         "skip": skip,
@@ -24,6 +28,12 @@ async def parameters(
         "start_date": start_date,
         "end_date": end_date,
         "date_filter": date_filter,
+        'column_filter_string': column_filter_string,
+        'column_filter_string_value': column_filter_string_value,
+        'column_filter_int': column_filter_int,
+        'column_filter_int_value': column_filter_int_value,
+
+
     }
 
 
@@ -37,4 +47,3 @@ async def count_parameters(
         "end_date": end_date,
         "date_filter": date_filter,
     }
-

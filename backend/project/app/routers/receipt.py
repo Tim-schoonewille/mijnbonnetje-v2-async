@@ -30,7 +30,7 @@ router = APIRouter(prefix=settings.URL_PREFIX + "/receipt", tags=["receipt"])
 async def create_full_receipt(
     *,
     include_external_ocr: bool = False,
-    user: UserLimitedAPICalls,
+    user: VerifiedUser,
     file: UploadFile,
     settings: GetSettings,
     db: GetDB,

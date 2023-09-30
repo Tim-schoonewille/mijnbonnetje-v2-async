@@ -11,7 +11,8 @@ from fastapi import HTTPException
 from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy import func
-from sqlalchemy.exc import DBAPIError
+import sqlalchemy
+from sqlalchemy.exc import DBAPIError, ProgrammingError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import models
@@ -47,8 +48,10 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         start_date: str | None = None,
         end_date: str | None = None,
         date_filter: str = "created_at",
-        column_filter: str | None = None,
-        column_filter_value: str | int | UUID | None = None,
+        column_filter_string: str | None = None,
+        column_filter_string_value: str | UUID | None = None,
+        column_filter_int: str | None = None,
+        column_filter_int_value: int | None = None,
     ) -> Sequence[ModelType]:
         """
         Retrieve objects with filters and pagination.
@@ -68,9 +71,14 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             stmt = stmt.where(date_filter_column >= convert_to_datetime(start_date))
         if end_date and hasattr(self.model, date_filter):
             stmt = stmt.filter(date_filter_column <= convert_to_datetime(end_date))
-        if column_filter and hasattr(self.model, column_filter):
-            column_in_object = getattr(self.model, column_filter)
-            stmt = stmt.filter(column_in_object == column_filter_value)
+        if column_filter_string and hasattr(self.model, column_filter_string):
+            column_in_object = getattr(self.model, column_filter_string)
+            stmt = stmt.filter(column_in_object == column_filter_string_value)
+
+        if column_filter_int and hasattr(self.model, column_filter_int):
+            column_in_object = getattr(self.model, column_filter_int)
+            stmt = stmt.filter(column_in_object == column_filter_int_value)        
+
         if user.sudo and user_id:
             try:
                 user_id_column = getattr(self.model, "user_id")
@@ -81,7 +89,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             stmt = stmt.filter(user_id_column == user_id)
         if not user.sudo and hasattr(self.model, "user"):
             stmt = stmt.where(self.model.user == user)  # type: ignore
-        stmt = stmt.order_by(self.model.id)  # type: ignore
+        stmt = stmt.order_by(self.model.id.desc())  # type: ignore
         stmt = stmt.offset(skip).limit(limit)
         objects = await db.execute(stmt)
         return objects.scalars().all()

@@ -11,7 +11,7 @@ export type ReceiptsProps = {
 };
 
 export default function Receipts({ receipts, stores }: ReceiptsProps) {
-  if (!receipts) return <h1>No files...</h1>
+  if (!receipts) return <h1>No files...</h1>;
   return (
     <>
       <SimpleGrid
@@ -21,11 +21,11 @@ export default function Receipts({ receipts, stores }: ReceiptsProps) {
         spacingY="32px"
       >
         {receipts.map((receipt) => {
-          const store = stores?.find((store) => store.id === receipt.storeId)
+          const store = stores?.find((store) => store.id === receipt.storeId);
           return (
             <Box key={receipt.id}>
               <NavLink to={`/receipts/${receipt.id}`}>
-                <TruncatedReceipt receipt={receipt} store={store}/>
+                <TruncatedReceipt receipt={receipt} store={store} />
               </NavLink>
               <Divider visibility={["visible", "hidden"]} />
             </Box>

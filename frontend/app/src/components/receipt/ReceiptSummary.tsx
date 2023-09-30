@@ -16,28 +16,37 @@ import {
   Link,
   Select,
   SimpleGrid,
+  Spinner,
   Text,
 } from "@chakra-ui/react";
-import React, { useState } from "react";
+import React, { Dispatch, SetStateAction, useState } from "react";
 import { BiCategoryAlt } from "react-icons/bi";
 import { BsShop } from "react-icons/bs";
 import { RiMoneyDollarBoxLine } from "react-icons/ri";
-import { Categories, Receipt, Store } from "../../client";
+import { Categories, Receipt, ReceiptEntryService, Store } from "../../client";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { ReceiptEntryUpdate } from "../../../../.app2/src/client/models/ReceiptEntryUpdate";
+import { useParams } from "react-router-dom";
 
 type ReceiptSummaryProps = {
   receipt: Receipt;
   stores: Store[];
+  update: Dispatch<SetStateAction<boolean>>;
 };
 
 export default function ReceiptSummary({
   receipt,
   stores,
+  update,
 }: ReceiptSummaryProps) {
+  const { id } = useParams();
+  const receiptID = id || 0;
   const [shop, setShop] = useState(receipt.store?.name);
   const [editShop, setEditShop] = useState(false);
-  const [category, setCategory] = useState(receipt.category);
+  const [category, setCategory] = useState<string | Categories>(
+    receipt.category
+  );
   const [editCategory, setEditCategory] = useState(false);
   const [purchaseDate, setPurchaseDate] = useState(receipt.purchaseDate);
   const [editPurchaseDate, setEditPurchaseDate] = useState(false);
@@ -45,9 +54,57 @@ export default function ReceiptSummary({
     receipt?.totalAmount ? (receipt.totalAmount / 100).toString() : ""
   );
   const [editTotalAmount, setEditTotalAmount] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const categories = Object.values(Categories);
   if (receipt === null || receipt === undefined)
     return <Text>Error fetching file</Text>;
+
+  console.log(purchaseDate);
+
+  async function handlePatch(e: React.FormEvent, type: string) {
+    e.preventDefault();
+    let payload: ReceiptEntryUpdate = {};
+    switch (type) {
+      case "store":
+        const storeWithId = stores.find((store) => store.name === shop);
+        if (!storeWithId) break;
+        payload = { storeId: storeWithId.id };
+        break;
+      case "category":
+        payload = { category: category };
+        break;
+      case "purchaseDate":
+        payload = { purchaseDate: purchaseDate };
+        break;
+      case "totalAmount":
+        payload = { totalAmount: Number(totalAmount) * 100 };
+        break;
+      default:
+        console.error("not allowed");
+    }
+    console.log("updating.....");
+    try {
+      setIsLoading(true);
+      const response = await ReceiptEntryService.receiptEntryUpdateReceiptEntry(
+        receiptID,
+        payload
+      );
+      if (response.status === 200) {
+        console.log("updated!");
+        setEditShop(false);
+        setEditCategory(false);
+        setEditPurchaseDate(false);
+        setEditTotalAmount(false);
+        update(true);
+      } else {
+        alert("weeeh");
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   return (
     <>
@@ -57,13 +114,29 @@ export default function ReceiptSummary({
           Shop:
         </Text>
         {editShop ? (
-          <Flex>
-            <Select size="xs" placeholder={shop}>
+          <Flex as="form" onSubmit={(e) => handlePatch(e, "store")}>
+            <Select
+              value={shop}
+              size="xs"
+              placeholder={shop}
+              onChange={(e) => {
+                setShop(e.target.value);
+              }}
+            >
               {stores.map((store) => {
-                return <option key={store.id}>{store.name}</option>;
+                return (
+                  <option value={store.name} key={store.id}>
+                    {store.name}
+                  </option>
+                );
               })}
             </Select>
-            <IconButton size="xs" aria-label="edit shop" icon={<CheckIcon />} />
+            <IconButton
+              type="submit"
+              size="xs"
+              aria-label="edit shop"
+              icon={<CheckIcon />}
+            />
             <IconButton
               size="xs"
               aria-label="cancel"
@@ -79,13 +152,23 @@ export default function ReceiptSummary({
           Category:
         </Text>
         {editCategory ? (
-          <Flex>
-            <Select size="xs" placeholder={category}>
+          <Flex as="form" onSubmit={(e) => handlePatch(e, "category")}>
+            <Select
+              value={category}
+              size="xs"
+              placeholder={category}
+              onChange={(e) => setCategory(e.target.value)}
+            >
               {categories.map((category, i) => {
-                return <option key={i}>{category}</option>;
+                return (
+                  <option value={category} key={i}>
+                    {category}
+                  </option>
+                );
               })}
             </Select>
             <IconButton
+              type="submit"
               size="xs"
               aria-label="edit category"
               icon={<CheckIcon />}
@@ -105,9 +188,19 @@ export default function ReceiptSummary({
           Purchase date:
         </Text>
         {editPurchaseDate ? (
-          <Flex>
-            <Input size="xs" type="date" value={purchaseDate} />
-            <IconButton size="xs" aria-label="edit date" icon={<CheckIcon />} />
+          <Flex as="form" onSubmit={(e) => handlePatch(e, "purchaseDate")}>
+            <Input
+              size="xs"
+              type="date"
+              value={purchaseDate}
+              onChange={(e) => setPurchaseDate(e.target.value)}
+            />
+            <IconButton
+              type="submit"
+              size="xs"
+              aria-label="edit date"
+              icon={<CheckIcon />}
+            />
             <IconButton
               size="xs"
               aria-label="cancel"
@@ -125,13 +218,14 @@ export default function ReceiptSummary({
           Total amount:
         </Text>
         {editTotalAmount ? (
-          <Flex>
+          <Flex as="form" onSubmit={(e) => handlePatch(e, "totalAmount")}>
             <Input
               size="xs"
               value={totalAmount}
               onChange={(e) => setTotalAmount(e.target.value)}
             />
             <IconButton
+              type="submit"
               size="xs"
               aria-label="edit store"
               icon={<CheckIcon />}
@@ -157,6 +251,7 @@ export default function ReceiptSummary({
           </Link>
         </Text>
       </SimpleGrid>
+      {isLoading && <Spinner />}
     </>
   );
 }

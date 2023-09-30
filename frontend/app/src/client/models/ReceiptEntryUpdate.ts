@@ -10,6 +10,6 @@ export type ReceiptEntryUpdate = {
     purchaseDate?: (string | null);
     totalAmount?: (number | null);
     warranty?: (number | null);
-    category?: (Categories | null);
+    category?: (string | null);
 };
 

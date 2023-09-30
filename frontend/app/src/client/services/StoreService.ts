@@ -22,7 +22,7 @@ export class StoreService {
      */
     public static storeCreateStore(
         requestBody: StoreCreate,
-    ): CancelablePromise<Store> {
+    ): CancelablePromise<ApiResponse<any>> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/store/',
@@ -43,6 +43,10 @@ export class StoreService {
      * @param startDate
      * @param endDate
      * @param dateFilter
+     * @param columnFilterString
+     * @param columnFilterStringValue
+     * @param columnFilterInt
+     * @param columnFilterIntValue
      * @returns Store Successful Response
      * @throws ApiError
      */
@@ -53,7 +57,11 @@ export class StoreService {
         startDate?: (string | null),
         endDate?: (string | null),
         dateFilter: string = 'created_at',
-    ): CancelablePromise<Array<Store>> {
+        columnFilterString?: (string | null),
+        columnFilterStringValue?: (string | null),
+        columnFilterInt?: (string | null),
+        columnFilterIntValue?: (number | null),
+    ): CancelablePromise<ApiResponse<any>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/store/',
@@ -64,6 +72,10 @@ export class StoreService {
                 'start_date': startDate,
                 'end_date': endDate,
                 'date_filter': dateFilter,
+                'column_filter_string': columnFilterString,
+                'column_filter_string_value': columnFilterStringValue,
+                'column_filter_int': columnFilterInt,
+                'column_filter_int_value': columnFilterIntValue,
             },
             errors: {
                 422: `Validation Error`,
@@ -80,7 +92,7 @@ export class StoreService {
      */
     public static storeSearchStore(
         q: string,
-    ): CancelablePromise<Array<Store>> {
+    ): CancelablePromise<ApiResponse<any>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/store/search',

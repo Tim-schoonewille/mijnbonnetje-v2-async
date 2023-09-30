@@ -4,6 +4,6 @@
 /* eslint-disable */
 
 export type Body_receipt_create_full_receipt = {
-    file: File
+    file: Blob;
 };
 

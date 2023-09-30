@@ -27,6 +27,10 @@ export class SudoService {
      * @param startDate
      * @param endDate
      * @param dateFilter
+     * @param columnFilterString
+     * @param columnFilterStringValue
+     * @param columnFilterInt
+     * @param columnFilterIntValue
      * @returns LoginHistory Successful Response
      * @throws ApiError
      */
@@ -37,6 +41,10 @@ export class SudoService {
         startDate?: (string | null),
         endDate?: (string | null),
         dateFilter: string = 'created_at',
+        columnFilterString?: (string | null),
+        columnFilterStringValue?: (string | null),
+        columnFilterInt?: (string | null),
+        columnFilterIntValue?: (number | null),
     ): CancelablePromise<Array<LoginHistory>> {
         return __request(OpenAPI, {
             method: 'GET',
@@ -48,6 +56,10 @@ export class SudoService {
                 'start_date': startDate,
                 'end_date': endDate,
                 'date_filter': dateFilter,
+                'column_filter_string': columnFilterString,
+                'column_filter_string_value': columnFilterStringValue,
+                'column_filter_int': columnFilterInt,
+                'column_filter_int_value': columnFilterIntValue,
             },
             errors: {
                 422: `Validation Error`,
@@ -65,6 +77,10 @@ export class SudoService {
      * @param startDate
      * @param endDate
      * @param dateFilter
+     * @param columnFilterString
+     * @param columnFilterStringValue
+     * @param columnFilterInt
+     * @param columnFilterIntValue
      * @returns RefreshToken Successful Response
      * @throws ApiError
      */
@@ -75,6 +91,10 @@ export class SudoService {
         startDate?: (string | null),
         endDate?: (string | null),
         dateFilter: string = 'created_at',
+        columnFilterString?: (string | null),
+        columnFilterStringValue?: (string | null),
+        columnFilterInt?: (string | null),
+        columnFilterIntValue?: (number | null),
     ): CancelablePromise<Array<RefreshToken>> {
         return __request(OpenAPI, {
             method: 'GET',
@@ -86,6 +106,10 @@ export class SudoService {
                 'start_date': startDate,
                 'end_date': endDate,
                 'date_filter': dateFilter,
+                'column_filter_string': columnFilterString,
+                'column_filter_string_value': columnFilterStringValue,
+                'column_filter_int': columnFilterInt,
+                'column_filter_int_value': columnFilterIntValue,
             },
             errors: {
                 422: `Validation Error`,
@@ -197,6 +221,10 @@ export class SudoService {
      * @param startDate
      * @param endDate
      * @param dateFilter
+     * @param columnFilterString
+     * @param columnFilterStringValue
+     * @param columnFilterInt
+     * @param columnFilterIntValue
      * @returns User Successful Response
      * @throws ApiError
      */
@@ -207,6 +235,10 @@ export class SudoService {
         startDate?: (string | null),
         endDate?: (string | null),
         dateFilter: string = 'created_at',
+        columnFilterString?: (string | null),
+        columnFilterStringValue?: (string | null),
+        columnFilterInt?: (string | null),
+        columnFilterIntValue?: (number | null),
     ): CancelablePromise<Array<User>> {
         return __request(OpenAPI, {
             method: 'GET',
@@ -218,6 +250,10 @@ export class SudoService {
                 'start_date': startDate,
                 'end_date': endDate,
                 'date_filter': dateFilter,
+                'column_filter_string': columnFilterString,
+                'column_filter_string_value': columnFilterStringValue,
+                'column_filter_int': columnFilterInt,
+                'column_filter_int_value': columnFilterIntValue,
             },
             errors: {
                 422: `Validation Error`,

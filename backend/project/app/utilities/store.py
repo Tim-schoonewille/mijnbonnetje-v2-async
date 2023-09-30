@@ -19,13 +19,13 @@ async def create_or_get_store_id(
     return store.id
 
 
-async def get_store_with_users(
+async def get_store(
     db: AsyncSession, store_id: int | UUID
 ) -> models.StoreDB:
     store = await crud.store.get(db, store_id)
     if store is None:
         raise HTTPException(status_code=404, detail="STORE_NOT_FOUND")
-    await store.awaitable_attrs.users
+    # await store.awaitable_attrs.users
     return store
 
 
@@ -34,25 +34,30 @@ async def add_user_to_store(
     user: models.UserDB,
     store_id: int | UUID,
 ) -> None:
-    store = await get_store_with_users(db, store_id)
-    if user not in store.users:
-        store.users.append(user)
+    store = await get_store(db, store_id)
+    await user.awaitable_attrs.stores
+    if store not in user.stores:
+        print('appending store to user')
+        user.stores.append(store)
 
 
 async def remove_user_from_store(
     db: AsyncSession, user: models.UserDB, store_id: int | UUID
 ) -> None:
-    store = await get_store_with_users(db, store_id)
-    if user in store.users:
-        store.users.remove(user)
+    store = await get_store(db, store_id)
+
+    await user.awaitable_attrs.stores
+    if store in user.stores:
+        await crud.store.remove(db, store)
 
 
 async def entries_related_to_store(
-    db: AsyncSession, user: models.UserDB, store_id: int | UUID
+    db: AsyncSession, user: models.UserDB, store_id: int
 ) -> bool:
     entries_with_store = await crud.receipt_entry.get_multi(
-        db=db, user=user, column_filter="store_id", column_filter_value=store_id
+        db=db, user=user, column_filter_int="store_id", column_filter_int_value=store_id
     )
+    print(entries_with_store)
     if len(entries_with_store) == 1:
         return False
     return True

@@ -5,7 +5,7 @@
 
 export type StoreCreate = {
     name: string;
-    city: string;
+    city?: (string | null);
     country?: (string | null);
 };
 

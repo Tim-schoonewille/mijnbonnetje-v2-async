@@ -16,6 +16,7 @@ export default function SingleReceiptPage() {
   const { isLoggedIn } = useAuthContext();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [isUpdated, setIsUpdated] = useState(false);
 
   async function readStores() {
     try {
@@ -30,12 +31,13 @@ export default function SingleReceiptPage() {
       setIsLoading(false);
     }
   }
-  async function readReceipt() {
+  async function readReceipt(specificStoreId: number) {
+    console.log("Fetching receipt...");
     try {
       setIsLoading(true);
       setError("");
       const response = await ReceiptService.receiptReadSpecificFullReceipt(
-        receiptId
+        specificStoreId
       );
       if (response.status === 200) {
         setReceipt(response.body);
@@ -51,10 +53,11 @@ export default function SingleReceiptPage() {
 
   useEffect(() => {
     if (!isLoggedIn) return;
-    readReceipt();
+    readReceipt(Number(receiptId));
     readStores();
-  }, [isLoggedIn]);
+  }, [isLoggedIn, isUpdated, receiptId]);
 
+  console.log(receipt);
   return (
     <RequiresValidToken>
       <Flex
@@ -67,7 +70,11 @@ export default function SingleReceiptPage() {
         {!error ? (
           <ReceiptBody>
             {receipt && stores && (
-              <ReceiptSummary receipt={receipt} stores={stores} />
+              <ReceiptSummary
+                receipt={receipt}
+                stores={stores}
+                update={setIsUpdated}
+              />
             )}
             <ProductItems productItems={receipt?.productItems} />
           </ReceiptBody>

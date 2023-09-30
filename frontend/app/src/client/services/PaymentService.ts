@@ -21,6 +21,10 @@ export class PaymentService {
      * @param startDate
      * @param endDate
      * @param dateFilter
+     * @param columnFilterString
+     * @param columnFilterStringValue
+     * @param columnFilterInt
+     * @param columnFilterIntValue
      * @returns Payment Successful Response
      * @throws ApiError
      */
@@ -31,6 +35,10 @@ export class PaymentService {
         startDate?: (string | null),
         endDate?: (string | null),
         dateFilter: string = 'created_at',
+        columnFilterString?: (string | null),
+        columnFilterStringValue?: (string | null),
+        columnFilterInt?: (string | null),
+        columnFilterIntValue?: (number | null),
     ): CancelablePromise<Array<Payment>> {
         return __request(OpenAPI, {
             method: 'GET',
@@ -42,6 +50,10 @@ export class PaymentService {
                 'start_date': startDate,
                 'end_date': endDate,
                 'date_filter': dateFilter,
+                'column_filter_string': columnFilterString,
+                'column_filter_string_value': columnFilterStringValue,
+                'column_filter_int': columnFilterInt,
+                'column_filter_int_value': columnFilterIntValue,
             },
             errors: {
                 422: `Validation Error`,

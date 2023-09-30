@@ -12,7 +12,7 @@ from app.utilities.core.redis import get_cached_item
 from app.utilities.store import add_user_to_store
 from app.utilities.store import remove_user_from_store
 from app.utilities.store import entries_related_to_store
-from app.utilities.core.dependencies import CountParameterDepends, GetCache
+from app.utilities.core.dependencies import CountParameterDepends, GetAsyncCache, GetCache
 from app.utilities.core.dependencies import GetDB
 from app.utilities.core.dependencies import ParametersDepends
 from app.utilities.core.dependencies import VerifiedUser
@@ -97,6 +97,7 @@ async def update_receipt_entry(
     receipt_entry_id: int | UUID,
     update_schema: models.ReceiptEntryUpdate,
     user: VerifiedUser,
+    cache: GetAsyncCache,
     db: GetDB,
 ):
     """
@@ -115,12 +116,17 @@ async def update_receipt_entry(
 
     if update_schema.store_id and update_schema.store_id != 0:
         await add_user_to_store(db, user, update_schema.store_id)
+        entries_related = await entries_related_to_store(db, user, receipt_entry_in_db.store_id)
+        if not entries_related:
+            print('has no entries related')
+            await remove_user_from_store(db, user, receipt_entry_in_db.store_id)
     if not update_schema.store_id and receipt_entry_in_db.store_id is not None:
-        await remove_user_from_store(db, user, receipt_entry_in_db.store_id)
+        print('wassup')
 
     updated_receipt_entry = await crud.receipt_entry.update(
         db, update_schema, receipt_entry_in_db
     )
+    await cache.delete(f'{CachedItemPrefix.RECEIPT}{receipt_entry_id}')
     return updated_receipt_entry
 
 
@@ -143,6 +149,7 @@ async def delete_receipt_entry(
     if receipt_entry_in_db.user_id != user.id:
         raise HTTPException(status_code=403, detail="NOT_YOUR_RECEIPT_ENTRY")
     if receipt_entry_in_db.store_id:
+        print('has store id')
         has_entries_related_to_store = await entries_related_to_store(
             db, user, receipt_entry_in_db.store_id
         )
