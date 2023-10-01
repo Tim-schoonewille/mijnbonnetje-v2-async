@@ -24,8 +24,7 @@ import { BiCategoryAlt } from "react-icons/bi";
 import { BsShop } from "react-icons/bs";
 import { RiMoneyDollarBoxLine } from "react-icons/ri";
 import { Categories, Receipt, ReceiptEntryService, Store } from "../../client";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+
 import { ReceiptEntryUpdate } from "../../../../.app2/src/client/models/ReceiptEntryUpdate";
 import { useParams } from "react-router-dom";
 
@@ -117,7 +116,7 @@ export default function ReceiptSummary({
           <Flex as="form" onSubmit={(e) => handlePatch(e, "store")}>
             <Select
               value={shop}
-              size="xs"
+              size="sm"
               placeholder={shop}
               onChange={(e) => {
                 setShop(e.target.value);
@@ -133,12 +132,12 @@ export default function ReceiptSummary({
             </Select>
             <IconButton
               type="submit"
-              size="xs"
+              size="sm"
               aria-label="edit shop"
               icon={<CheckIcon />}
             />
             <IconButton
-              size="xs"
+              size="sm"
               aria-label="cancel"
               icon={<CloseIcon />}
               onClick={() => setEditShop(false)}
@@ -155,7 +154,7 @@ export default function ReceiptSummary({
           <Flex as="form" onSubmit={(e) => handlePatch(e, "category")}>
             <Select
               value={category}
-              size="xs"
+              size="sm"
               placeholder={category}
               onChange={(e) => setCategory(e.target.value)}
             >
@@ -169,12 +168,12 @@ export default function ReceiptSummary({
             </Select>
             <IconButton
               type="submit"
-              size="xs"
+              size="sm"
               aria-label="edit category"
               icon={<CheckIcon />}
             />
             <IconButton
-              size="xs"
+              size="sm"
               aria-label="cancel"
               icon={<CloseIcon />}
               onClick={() => setEditCategory(false)}
@@ -190,19 +189,19 @@ export default function ReceiptSummary({
         {editPurchaseDate ? (
           <Flex as="form" onSubmit={(e) => handlePatch(e, "purchaseDate")}>
             <Input
-              size="xs"
+              size="sm"
               type="date"
               value={purchaseDate}
               onChange={(e) => setPurchaseDate(e.target.value)}
             />
             <IconButton
               type="submit"
-              size="xs"
+              size="sm"
               aria-label="edit date"
               icon={<CheckIcon />}
             />
             <IconButton
-              size="xs"
+              size="sm"
               aria-label="cancel"
               icon={<CloseIcon />}
               onClick={() => setEditPurchaseDate(false)}
@@ -220,31 +219,31 @@ export default function ReceiptSummary({
         {editTotalAmount ? (
           <Flex as="form" onSubmit={(e) => handlePatch(e, "totalAmount")}>
             <Input
-              size="xs"
+              size="sm"
               value={totalAmount}
               onChange={(e) => setTotalAmount(e.target.value)}
             />
             <IconButton
               type="submit"
-              size="xs"
+              size="sm"
               aria-label="edit store"
               icon={<CheckIcon />}
             />
             <IconButton
-              size="xs"
+              size="sm"
               aria-label="cancel"
               icon={<CloseIcon />}
               onClick={() => setEditTotalAmount(false)}
             />
           </Flex>
         ) : (
-          <Text onClick={() => setEditTotalAmount(true)}>{totalAmount}</Text>
+          <Text onClick={() => setEditTotalAmount(true)}>€ {totalAmount}</Text>
         )}
         {/* <Text>€ {receipt.totalAmount ? receipt.totalAmount / 100 : ""}</Text> */}
         <Text as="b">
           <DownloadIcon mr="10px" />
           <Link
-            href={`http://backend.mijnbonnetje.lan:8000/${receipt.receiptFiles[0].filePath}`}
+            href={`http://frontend.mijnbonnetje.nl:8000/${receipt.receiptFiles[0].filePath}`}
             isExternal
           >
             Download

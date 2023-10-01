@@ -7,6 +7,7 @@ import {
   Box,
   Flex,
   Icon,
+  Input,
   Select,
 } from "@chakra-ui/react";
 import React from "react";
@@ -21,7 +22,6 @@ type ReceiptFilterMenuProps = {
 export default function ReceiptFilterMenu({ stores }: ReceiptFilterMenuProps) {
   const accordionMargin = [0, 0, "200px", "500px"];
   const categories = Object.values(Categories);
-  console.log(stores);
   return (
     <AccordionItem ml={accordionMargin} mr={accordionMargin}>
       <h2>
@@ -37,9 +37,8 @@ export default function ReceiptFilterMenu({ stores }: ReceiptFilterMenuProps) {
         <Flex direction={"column"} as="ul" listStyleType={"none"} gap={3}>
           <Flex as="li" gap="4px" justifyContent="center" alignItems="center">
             <Icon as={CalendarIcon} mr="12px" />
-            <Select placeholder="select date">
-              <option>Some dates</option>
-            </Select>
+            <Input type="date" />
+            <Input type="date" />
           </Flex>
           <Flex as="li" gap="4px" justifyContent="center" alignItems="center">
             <Icon as={BsShop} mr="12px" />

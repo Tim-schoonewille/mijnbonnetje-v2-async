@@ -22,11 +22,17 @@ export default function ReceiptsPage() {
 
   const orderBy = queryParams.get("orderBy") || undefined;
   const sort = queryParams.get("sort") || undefined;
+  const categoryParam = queryParams.get("category") || undefined;
 
   async function readReceipts() {
-    const response =
-      await ReceiptEntryService.receiptEntryReadMultipleReceiptEntries();
-    setReceipts(response.body);
+    try {
+      const response =
+        await ReceiptEntryService.receiptEntryReadMultipleReceiptEntries();
+
+      setReceipts(response.body);
+    } catch (e) {
+      console.error(e);
+    }
   }
   async function readStores() {
     try {
