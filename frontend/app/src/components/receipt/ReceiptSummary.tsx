@@ -5,11 +5,13 @@ import {
   DownloadIcon,
 } from "@chakra-ui/icons";
 import {
+  Box,
   Button,
   Editable,
   EditableInput,
   EditablePreview,
   Flex,
+  HStack,
   Icon,
   IconButton,
   Input,
@@ -23,11 +25,19 @@ import React, { Dispatch, SetStateAction, useState } from "react";
 import { BiCategoryAlt } from "react-icons/bi";
 import { BsShop } from "react-icons/bs";
 import { RiMoneyDollarBoxLine } from "react-icons/ri";
-import { Categories, Receipt, ReceiptEntryService, Store } from "../../client";
+import {
+  Categories,
+  Receipt,
+  ReceiptEntryService,
+  Store,
+  StoreService,
+} from "../../client";
 
 import { ReceiptEntryUpdate } from "../../../../.app2/src/client/models/ReceiptEntryUpdate";
 import { useParams } from "react-router-dom";
-
+import { AiOutlineEdit } from "react-icons/ai";
+import { LiaHandMiddleFingerSolid } from "react-icons/lia";
+import { CreatableSelect } from "chakra-react-select";
 type ReceiptSummaryProps = {
   receipt: Receipt;
   stores: Store[];
@@ -60,8 +70,8 @@ export default function ReceiptSummary({
 
   console.log(purchaseDate);
 
-  async function handlePatch(e: React.FormEvent, type: string) {
-    e.preventDefault();
+  async function handlePatch(type: string, e?: React.FormEvent) {
+    if(e) e.preventDefault();
     let payload: ReceiptEntryUpdate = {};
     switch (type) {
       case "store":
@@ -105,6 +115,16 @@ export default function ReceiptSummary({
     }
   }
 
+  async function createNewStore(name: string) {
+    try {
+      const response = await StoreService.storeCreateStore({ name: name });
+      console.log(response)
+      update(true);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+  console.log(stores)
   return (
     <>
       <SimpleGrid columns={2} spacing={10}>
@@ -113,8 +133,28 @@ export default function ReceiptSummary({
           Shop:
         </Text>
         {editShop ? (
-          <Flex as="form" onSubmit={(e) => handlePatch(e, "store")}>
-            <Select
+          <Flex as="form" onSubmit={(e) => handlePatch("store", e)}>
+            <Box w={80}>
+              <CreatableSelect
+                onCreateOption={(e) => {
+                  createNewStore(e);
+                  handlePatch("store")
+                }}
+                size={"sm"}
+                name="colors"
+                options={stores.map((store) => {
+                  return { label: store.name, value: store.name };
+                })}
+                placeholder="select store"
+                closeMenuOnSelect={false}
+                onChange={(item) => {
+                  if (!item) return;
+                  setShop(item.value);
+                }}
+                value={{ label: shop, value: shop }}
+              />
+            </Box>
+            {/* <Select
               value={shop}
               size="sm"
               placeholder={shop}
@@ -129,7 +169,7 @@ export default function ReceiptSummary({
                   </option>
                 );
               })}
-            </Select>
+            </Select> */}
             <IconButton
               type="submit"
               size="sm"
@@ -144,14 +184,21 @@ export default function ReceiptSummary({
             />
           </Flex>
         ) : (
-          <Text onClick={() => setEditShop(true)}>{shop}</Text>
+          <HStack
+            justifyContent={"space-between"}
+            onClick={() => setEditShop(true)}
+            _hover={{ cursor: "pointer" }}
+          >
+            <Text>{shop}</Text>
+            <Icon as={AiOutlineEdit} />
+          </HStack>
         )}
         <Text as="b">
           <Icon as={BiCategoryAlt} mr="12px" />
           Category:
         </Text>
         {editCategory ? (
-          <Flex as="form" onSubmit={(e) => handlePatch(e, "category")}>
+          <Flex as="form" onSubmit={(e) => handlePatch("category", e)}>
             <Select
               value={category}
               size="sm"
@@ -180,14 +227,21 @@ export default function ReceiptSummary({
             />
           </Flex>
         ) : (
-          <Text onClick={() => setEditCategory(true)}>{category}</Text>
+          <HStack
+            justifyContent={"space-between"}
+            onClick={() => setEditCategory(true)}
+            _hover={{ cursor: "pointer" }}
+          >
+            <Text>{category}</Text>
+            <Icon as={AiOutlineEdit} />
+          </HStack>
         )}
         <Text as="b">
           <Icon as={CalendarIcon} mr="12px" />
           Purchase date:
         </Text>
         {editPurchaseDate ? (
-          <Flex as="form" onSubmit={(e) => handlePatch(e, "purchaseDate")}>
+          <Flex as="form" onSubmit={(e) => handlePatch("purchaseDate", e)}>
             <Input
               size="sm"
               type="date"
@@ -208,16 +262,21 @@ export default function ReceiptSummary({
             />
           </Flex>
         ) : (
-          <Text onClick={() => setEditPurchaseDate(true)}>
-            {receipt.purchaseDate}
-          </Text>
+          <HStack
+            justifyContent={"space-between"}
+            onClick={() => setEditPurchaseDate(true)}
+            _hover={{ cursor: "pointer" }}
+          >
+            <Text>{receipt.purchaseDate}</Text>
+            <Icon as={AiOutlineEdit} />
+          </HStack>
         )}
         <Text as="b">
           <Icon as={RiMoneyDollarBoxLine} mr="12px" />
           Total amount:
         </Text>
         {editTotalAmount ? (
-          <Flex as="form" onSubmit={(e) => handlePatch(e, "totalAmount")}>
+          <Flex as="form" onSubmit={(e) => handlePatch("totalAmount", e)}>
             <Input
               size="sm"
               value={totalAmount}
@@ -237,13 +296,20 @@ export default function ReceiptSummary({
             />
           </Flex>
         ) : (
-          <Text onClick={() => setEditTotalAmount(true)}>€ {totalAmount}</Text>
+          <HStack
+            justifyContent={"space-between"}
+            onClick={() => setEditTotalAmount(true)}
+            _hover={{ cursor: "pointer" }}
+          >
+            <Text>€ {totalAmount}</Text>
+            <Icon as={LiaHandMiddleFingerSolid} />
+          </HStack>
         )}
         {/* <Text>€ {receipt.totalAmount ? receipt.totalAmount / 100 : ""}</Text> */}
         <Text as="b">
           <DownloadIcon mr="10px" />
           <Link
-            href={`http://frontend.mijnbonnetje.nl:8000/${receipt.receiptFiles[0].filePath}`}
+            href={`http://frontend.mijnbonnetje.lan:8000/${receipt.receiptFiles[0].filePath}`}
             isExternal
           >
             Download

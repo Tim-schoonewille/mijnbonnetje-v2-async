@@ -113,7 +113,7 @@ async def update_receipt_entry(
         raise HTTPException(status_code=404, detail="RECEIPT_ENTRY_NOT_FOUND")
     if receipt_entry_in_db.user_id != user.id:
         raise HTTPException(status_code=403, detail="NOT_YOUR_RECEIPT_ENTRY")
-
+    print('store id: ', update_schema.store_id)
     if update_schema.store_id and update_schema.store_id != 0:
         await add_user_to_store(db, user, update_schema.store_id)
         entries_related = await entries_related_to_store(db, user, receipt_entry_in_db.store_id)

@@ -25,9 +25,18 @@ export default function ReceiptsPage() {
   const categoryParam = queryParams.get("category") || undefined;
 
   async function readReceipts() {
+    let payload = {};
+    if (categoryParam) {
+      payload = {
+        columnFilterStringValue: categoryParam,
+        columnFilterString: "category",
+      }
+
+      };
     try {
+      console.log(payload)
       const response =
-        await ReceiptEntryService.receiptEntryReadMultipleReceiptEntries();
+        await ReceiptEntryService.receiptEntryReadMultipleReceiptEntries(payload);
 
       setReceipts(response.body);
     } catch (e) {
@@ -50,7 +59,7 @@ export default function ReceiptsPage() {
   useEffect(() => {
     readReceipts();
     readStores();
-  }, []);
+  }, [categoryParam]);
 
   if (orderBy && receipts && sort) {
     switch (orderBy) {

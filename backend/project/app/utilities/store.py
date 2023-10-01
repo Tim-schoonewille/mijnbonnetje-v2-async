@@ -22,6 +22,7 @@ async def create_or_get_store_id(
 async def get_store(
     db: AsyncSession, store_id: int | UUID
 ) -> models.StoreDB:
+    print('store id is: ', store_id)
     store = await crud.store.get(db, store_id)
     if store is None:
         raise HTTPException(status_code=404, detail="STORE_NOT_FOUND")
@@ -44,8 +45,8 @@ async def add_user_to_store(
 async def remove_user_from_store(
     db: AsyncSession, user: models.UserDB, store_id: int | UUID
 ) -> None:
+    print('removing from store..')
     store = await get_store(db, store_id)
-
     await user.awaitable_attrs.stores
     if store in user.stores:
         await crud.store.remove(db, store)
