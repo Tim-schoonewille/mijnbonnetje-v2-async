@@ -22,15 +22,14 @@ async def create_or_get_store_id(
 async def get_store(
     db: AsyncSession, store_id: int | UUID
 ) -> models.StoreDB:
-    print('store id is: ', store_id)
+    print('in function, get_store: store id is: ', store_id)
     store = await crud.store.get(db, store_id)
     if store is None:
         raise HTTPException(status_code=404, detail="STORE_NOT_FOUND")
-    # await store.awaitable_attrs.users
     return store
 
 
-async def add_user_to_store(
+async def add_store_to_user(
     db: AsyncSession,
     user: models.UserDB,
     store_id: int | UUID,
@@ -60,5 +59,6 @@ async def entries_related_to_store(
     )
     print(entries_with_store)
     if len(entries_with_store) == 1:
+        print('in function: no entries related')
         return False
     return True

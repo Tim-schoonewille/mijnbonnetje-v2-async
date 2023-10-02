@@ -17,7 +17,7 @@ from app import crud
 from app import models
 from app.config import settings
 from app.utilities.get_proxy import get_working_proxy
-from app.utilities.store import add_user_to_store
+from app.utilities.store import add_store_to_user
 from app.utilities.store import create_or_get_store_id
 from app.utilities.product_item import create_product_entries
 

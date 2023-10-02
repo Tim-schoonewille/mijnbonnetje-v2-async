@@ -9,7 +9,7 @@ from app import models
 from app.config import settings
 from app.config import CachedItemPrefix
 from app.utilities.core.redis import get_cached_item
-from app.utilities.store import add_user_to_store
+from app.utilities.store import add_store_to_user
 from app.utilities.store import remove_user_from_store
 from app.utilities.store import entries_related_to_store
 from app.utilities.core.dependencies import CountParameterDepends, GetAsyncCache, GetCache
@@ -104,6 +104,7 @@ async def update_receipt_entry(
     update a specific receipt entry (requires verifieduser token)
 
     Raises:\n
+        400: {detail='ENTRY_NEEDS_STORE_ID'}
         404: {detail="RECEIPT_ENTRY_NOT_FOUND"}
         403: {detail="NOT_YOUR_RECEIPT_ENTRY"}
         404: {detail="STORE_NOT_FOUND"}
@@ -113,15 +114,17 @@ async def update_receipt_entry(
         raise HTTPException(status_code=404, detail="RECEIPT_ENTRY_NOT_FOUND")
     if receipt_entry_in_db.user_id != user.id:
         raise HTTPException(status_code=403, detail="NOT_YOUR_RECEIPT_ENTRY")
+
     print('store id: ', update_schema.store_id)
     if update_schema.store_id and update_schema.store_id != 0:
-        await add_user_to_store(db, user, update_schema.store_id)
+        await add_store_to_user(db, user, update_schema.store_id)
         entries_related = await entries_related_to_store(db, user, receipt_entry_in_db.store_id)
         if not entries_related:
             print('has no entries related')
             await remove_user_from_store(db, user, receipt_entry_in_db.store_id)
     if not update_schema.store_id and receipt_entry_in_db.store_id is not None:
-        print('wassup')
+        print('This action remvoved the store_id from entry...')
+        raise HTTPException(status_code=400, detail='ENTRY_NEEDS_STORE_ID')
 
     updated_receipt_entry = await crud.receipt_entry.update(
         db, update_schema, receipt_entry_in_db
