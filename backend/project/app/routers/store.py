@@ -57,7 +57,7 @@ async def read_multiple_stores(
 
 @router.patch("/{store_id}", response_model=models.Store)
 async def update_store(
-    store_id: int | UUID, update_schema: models.StoreUpdate, sudo: SudoUser, db: GetDB
+    store_id: int | UUID, update_schema: models.StoreUpdate, sudo: VerifiedUser, db: GetDB
 ):
     """Update specific store (requires sudo login)
     c

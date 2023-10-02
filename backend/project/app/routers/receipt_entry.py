@@ -117,14 +117,15 @@ async def update_receipt_entry(
 
     print('store id: ', update_schema.store_id)
     if update_schema.store_id and update_schema.store_id != 0:
-        await add_store_to_user(db, user, update_schema.store_id)
-        entries_related = await entries_related_to_store(db, user, receipt_entry_in_db.store_id)
-        if not entries_related:
-            print('has no entries related')
-            await remove_user_from_store(db, user, receipt_entry_in_db.store_id)
-    if not update_schema.store_id and receipt_entry_in_db.store_id is not None:
-        print('This action remvoved the store_id from entry...')
-        raise HTTPException(status_code=400, detail='ENTRY_NEEDS_STORE_ID')
+        if receipt_entry_in_db.store_id:
+            await add_store_to_user(db, user, update_schema.store_id)
+            entries_related = await entries_related_to_store(db, user, receipt_entry_in_db.store_id)
+            if not entries_related:
+                print('has no entries related')
+                await remove_user_from_store(db, user, receipt_entry_in_db.store_id)
+    # if not update_schema.store_id and receipt_entry_in_db.store_id is not None:
+    #     print('This action remvoved the store_id from entry...')
+    #     raise HTTPException(status_code=400, detail='ENTRY_NEEDS_STORE_ID')
 
     updated_receipt_entry = await crud.receipt_entry.update(
         db, update_schema, receipt_entry_in_db

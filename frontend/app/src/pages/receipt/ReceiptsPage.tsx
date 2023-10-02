@@ -23,20 +23,32 @@ export default function ReceiptsPage() {
   const orderBy = queryParams.get("orderBy") || undefined;
   const sort = queryParams.get("sort") || undefined;
   const categoryParam = queryParams.get("category") || undefined;
+  const storeParam = queryParams.get("shop") || undefined;
 
   async function readReceipts() {
     let payload = {};
     if (categoryParam) {
       payload = {
+        ...payload,
         columnFilterStringValue: categoryParam,
         columnFilterString: "category",
-      }
-
       };
+    }
+    if (storeParam) {
+      console.log("has store param");
+      const StoreFromParam = stores?.find((store) => store.name === storeParam);
+      payload = {
+        ...payload,
+        columnFilterIntValue: StoreFromParam?.id,
+        columnFilterInt: "store_id",
+      };
+    }
     try {
-      console.log(payload)
+      console.log(payload);
       const response =
-        await ReceiptEntryService.receiptEntryReadMultipleReceiptEntries(payload);
+        await ReceiptEntryService.receiptEntryReadMultipleReceiptEntries(
+          payload
+        );
 
       setReceipts(response.body);
     } catch (e) {
@@ -59,7 +71,7 @@ export default function ReceiptsPage() {
   useEffect(() => {
     readReceipts();
     readStores();
-  }, [categoryParam]);
+  }, [categoryParam, storeParam]);
 
   if (orderBy && receipts && sort) {
     switch (orderBy) {

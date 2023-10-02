@@ -50,9 +50,15 @@ export default function ReceiptSummary({
   update,
 }: ReceiptSummaryProps) {
   const { id } = useParams();
+  console.log(receipt);
   const receiptID = id || 0;
   const [shop, setShop] = useState(receipt.store?.name);
   const [editShop, setEditShop] = useState(false);
+
+  const [editShopValue, setEditShopValue] = useState(shop);
+  const [addShop, setAddShop] = useState(false);
+  const [addShopValue, setAddShopValue] = useState("");
+  const [editCurrentShop, setEditCurrentShop] = useState(false);
   const [category, setCategory] = useState<string | Categories>(
     receipt.category
   );
@@ -68,10 +74,8 @@ export default function ReceiptSummary({
   if (receipt === null || receipt === undefined)
     return <Text>Error fetching file</Text>;
 
-  console.log(purchaseDate);
-
   async function handlePatch(type: string, e?: React.FormEvent) {
-    if(e) e.preventDefault();
+    if (e) e.preventDefault();
     let payload: ReceiptEntryUpdate = {};
     switch (type) {
       case "store":
@@ -91,7 +95,6 @@ export default function ReceiptSummary({
       default:
         console.error("not allowed");
     }
-    console.log("updating.....");
     try {
       setIsLoading(true);
       const response = await ReceiptEntryService.receiptEntryUpdateReceiptEntry(
@@ -99,7 +102,6 @@ export default function ReceiptSummary({
         payload
       );
       if (response.status === 200) {
-        console.log("updated!");
         setEditShop(false);
         setEditCategory(false);
         setEditPurchaseDate(false);
@@ -115,16 +117,55 @@ export default function ReceiptSummary({
     }
   }
 
-  async function createNewStore(name: string) {
+  async function updateShopInDB() {
+    console.log(shop);
+    if (!shop) return;
+    const storeObjectWithID = stores.find((store) => store.name === shop);
+    if (!storeObjectWithID) return;
+    console.log(storeObjectWithID?.id);
     try {
-      const response = await StoreService.storeCreateStore({ name: name });
-      console.log(response)
-      update(true);
+      const response = await StoreService.storeUpdateStore(
+        storeObjectWithID.id,
+        { name: editShopValue }
+      );
+      setShop(editShopValue);
+      console.log(response);
+      update((prev) => !prev);
+      setEditShop(false);
     } catch (e) {
       console.error(e);
     }
   }
-  console.log(stores)
+
+  async function handleAddStoreToDB() {
+    if (!addShopValue) return;
+
+    try {
+      const response = await StoreService.storeCreateStore({
+        name: addShopValue,
+      });
+      if (response.status === 201) {
+        await handleUpdateStoreID(response.body["id"]);
+        update((prev) => !prev);
+        setShop(addShopValue);
+        setEditShop(false);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async function handleUpdateStoreID(newStoreID: number) {
+    try {
+      const response = await ReceiptEntryService.receiptEntryUpdateReceiptEntry(
+        receiptID,
+        { storeId: newStoreID }
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  console.log(stores);
   return (
     <>
       <SimpleGrid columns={2} spacing={10}>
@@ -133,8 +174,9 @@ export default function ReceiptSummary({
           Shop:
         </Text>
         {editShop ? (
-          <Flex as="form" onSubmit={(e) => handlePatch("store", e)}>
-            <Box w={80}>
+          <>
+            <Flex as="form" onSubmit={(e) => handlePatch("store", e)}>
+              {/* <Box w={80}>
               <CreatableSelect
                 onCreateOption={(e) => {
                   createNewStore(e);
@@ -153,36 +195,65 @@ export default function ReceiptSummary({
                 }}
                 value={{ label: shop, value: shop }}
               />
-            </Box>
-            {/* <Select
-              value={shop}
-              size="sm"
-              placeholder={shop}
-              onChange={(e) => {
-                setShop(e.target.value);
-              }}
-            >
-              {stores.map((store) => {
-                return (
-                  <option value={store.name} key={store.id}>
-                    {store.name}
-                  </option>
-                );
-              })}
-            </Select> */}
-            <IconButton
-              type="submit"
-              size="sm"
-              aria-label="edit shop"
-              icon={<CheckIcon />}
-            />
-            <IconButton
-              size="sm"
-              aria-label="cancel"
-              icon={<CloseIcon />}
-              onClick={() => setEditShop(false)}
-            />
-          </Flex>
+            </Box> */}
+              <Select
+                value={shop}
+                size="sm"
+                placeholder={"............"}
+                onChange={(e) => {
+                  setShop(e.target.value);
+                }}
+              >
+                {stores.map((store) => {
+                  return (
+                    <option value={store.name} key={store.id}>
+                      {store.name}
+                    </option>
+                  );
+                })}
+              </Select>
+              <IconButton
+                type="submit"
+                size="sm"
+                aria-label="edit shop"
+                icon={<CheckIcon />}
+              />
+              <IconButton
+                size="sm"
+                aria-label="cancel"
+                icon={<CloseIcon />}
+                onClick={() => setEditShop(false)}
+              />
+            </Flex>
+            <Button onClick={() => setAddShop((prev) => !prev)}>
+              Add shop
+            </Button>
+            <Button onClick={() => setEditCurrentShop((prev) => !prev)}>
+              Edit Shop
+            </Button>
+            {editCurrentShop && (
+              <>
+                <Input
+                  value={editShopValue}
+                  onChange={(e) => setEditShopValue(e.target.value)}
+                ></Input>
+                <Button type="submit" onClick={updateShopInDB}>
+                  Edit
+                </Button>{" "}
+              </>
+            )}
+            {addShop && (
+              <>
+                <Input
+                  value={addShopValue}
+                  onChange={(e) => setAddShopValue(e.target.value)}
+                ></Input>
+                <Button type="submit" onClick={handleAddStoreToDB}>
+                  Add
+                </Button>{" "}
+              </>
+            )}
+          </>
         ) : (
           <HStack
             justifyContent={"space-between"}
@@ -241,7 +312,13 @@ export default function ReceiptSummary({
           Purchase date:
         </Text>
         {editPurchaseDate ? (
-          <Flex as="form" onSubmit={(e) => handlePatch("purchaseDate", e)}>
+          <Flex
+            as="form"
+            onSubmit={(e) => {
+              handlePatch("purchaseDate", e);
+              console.log("e is :   ", e);
+            }}
+          >
             <Input
               size="sm"
               type="date"
@@ -267,7 +344,7 @@ export default function ReceiptSummary({
             onClick={() => setEditPurchaseDate(true)}
             _hover={{ cursor: "pointer" }}
           >
-            <Text>{receipt.purchaseDate}</Text>
+            <Text>{purchaseDate}</Text>
             <Icon as={AiOutlineEdit} />
           </HStack>
         )}

@@ -5,12 +5,13 @@ import {
   AccordionItem,
   AccordionPanel,
   Box,
+  Button,
   Flex,
   Icon,
   Input,
   Select,
 } from "@chakra-ui/react";
-import React from "react";
+import React, { useState } from "react";
 import { BsShop } from "react-icons/bs";
 import { BiCategoryAlt } from "react-icons/bi";
 import { HiOutlineFilter } from "react-icons/hi";
@@ -23,14 +24,22 @@ type ReceiptFilterMenuProps = {
 export default function ReceiptFilterMenu({ stores }: ReceiptFilterMenuProps) {
   const accordionMargin = [0, 0, "200px", "500px"];
   const categories = Object.values(Categories);
+  const [filtersAreSet, setFiltersAreSet] = useState(false);
 
-  const location = useLocation()
-  const navigate = useNavigate()
-  const queryParams = new URLSearchParams(location.search)
+  const location = useLocation();
+  const navigate = useNavigate();
+  const queryParams = new URLSearchParams(location.search);
   const updateQueryParamsAndNavigate = (category: string) => {
+    setFiltersAreSet(true);
     queryParams.set("category", category);
     const newSearch = queryParams.toString();
 
+    navigate(`/receipts?${newSearch}`);
+  };
+  const updateShopParams = (shop: string) => {
+    setFiltersAreSet(true);
+    queryParams.set("shop", shop);
+    const newSearch = queryParams.toString();
     navigate(`/receipts?${newSearch}`);
   };
   return (
@@ -55,7 +64,7 @@ export default function ReceiptFilterMenu({ stores }: ReceiptFilterMenuProps) {
             <Icon as={BsShop} mr="12px" />
             <Select
               placeholder="select shop"
-              onChange={() => console.log("sfssdf")}
+              onChange={(e) => updateShopParams(e.target.value)}
             >
               {stores?.map((store) => {
                 return <option key={store.id}>{store.name}</option>;
@@ -74,6 +83,16 @@ export default function ReceiptFilterMenu({ stores }: ReceiptFilterMenuProps) {
               })}
             </Select>
           </Flex>
+          {filtersAreSet && (
+            <Button
+              onClick={() => {
+                setFiltersAreSet(false);
+                navigate('/receipts')
+              }}
+            >
+              Remove filters
+            </Button>
+          )}
         </Flex>
       </AccordionPanel>
     </AccordionItem>

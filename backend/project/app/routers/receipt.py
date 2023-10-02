@@ -111,9 +111,9 @@ async def read_specific_full_receipt(
         404: {detail:"RECEIPT_NOT_FOUND"}
         403: {detail: "ACCESS_DENIED"}
     """
-    cached_item = await get_cached_item(cache, CachedItemPrefix.RECEIPT, receipt_id, user.id)
-    if cached_item:
-        return cached_item
+    # cached_item = await get_cached_item(cache, CachedItemPrefix.RECEIPT, receipt_id, user.id)
+    # if cached_item:
+    #     return cached_item
 
     receipt = await crud.receipt_entry.get(db, receipt_id)
     if receipt is None:
