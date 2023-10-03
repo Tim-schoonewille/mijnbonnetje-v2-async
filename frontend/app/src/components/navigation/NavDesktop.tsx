@@ -33,16 +33,18 @@ export default function NavDesktop({ links }: NavDesktopProps) {
         {isLoggedIn ? (
           <>
             <NavLink to="/auth/logout">
-              <Button>Logout</Button>
+              <Button colorScheme="teal">Logout</Button>
             </NavLink>
           </>
         ) : (
           <>
             <NavLink to="/auth/login">
-              <Button>Login</Button>
+              <Button variant="outline" colorScheme="teal">
+                Login
+              </Button>
             </NavLink>
             <NavLink to="/auth/register">
-              <Button variant="outline">Register</Button>
+              <Button colorScheme="teal">Register</Button>
             </NavLink>
           </>
         )}

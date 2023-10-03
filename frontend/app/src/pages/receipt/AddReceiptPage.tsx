@@ -10,7 +10,7 @@ export default function AddReceiptPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   // Function to handle file selection
   const handleFileSelect = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -24,27 +24,25 @@ export default function AddReceiptPage() {
       fileInput.click();
     }
   };
-  function foo() {
-    console.log('bar')
-  }
   async function handleNewReceipt() {
-    console.log('adding file')
+    console.log("adding file");
     if (!selectedFile) return;
     const formData: Body_receipt_create_full_receipt = { file: selectedFile };
-    const includeExternalOcr = true
+    const includeExternalOcr = true;
 
     try {
       setIsLoading(true);
-      const response = await ReceiptService.receiptCreateFullReceipt(formData, includeExternalOcr)
+      const response = await ReceiptService.receiptCreateFullReceipt(
+        formData,
+        includeExternalOcr
+      );
       if (response.status === 201) {
-        setSuccessMessage('File uploaded!')
-        setErrorMessage('')
-        navigate(`/receipts/${response.body['id']}`)
-
-
+        setSuccessMessage("File uploaded!");
+        setErrorMessage("");
+        navigate(`/receipts/${response.body["id"]}`);
       } else {
-        setErrorMessage('Something went wrong. Contact admin')
-        setSuccessMessage('')
+        setErrorMessage("Something went wrong. Contact admin");
+        setSuccessMessage("");
       }
     } catch (e) {
       console.error(e);
@@ -55,7 +53,6 @@ export default function AddReceiptPage() {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (!selectedFile) return;
-    console.log("File selected!");
     handleNewReceipt();
   }
   return (
@@ -80,7 +77,12 @@ export default function AddReceiptPage() {
         />
 
         <label htmlFor="fileInput">
-          <Button as="span" variant="outline" cursor="pointer">
+          <Button
+            colorScheme="teal"
+            as="span"
+            variant="outline"
+            cursor="pointer"
+          >
             Select File
           </Button>
         </label>
@@ -89,7 +91,9 @@ export default function AddReceiptPage() {
             <strong>Selected File:</strong> {selectedFile.name}
           </>
         )}
-        <Button type="submit">Add Receipt</Button>
+        <Button type="submit" colorScheme="teal">
+          Add Receipt
+        </Button>
         {isLoading && <Spinner />}
         {successMessage && <Text color={"green.400"}> {successMessage}</Text>}
         {errorMessage && <Text color={"red.400"}>{errorMessage}</Text>}

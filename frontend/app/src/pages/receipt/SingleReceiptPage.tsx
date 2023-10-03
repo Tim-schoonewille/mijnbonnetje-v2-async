@@ -57,7 +57,6 @@ export default function SingleReceiptPage() {
     readStores();
   }, [isLoggedIn, isUpdated, receiptId]);
 
-  console.log(receipt);
   return (
     <RequiresValidToken>
       <Flex
@@ -76,7 +75,7 @@ export default function SingleReceiptPage() {
                 update={setIsUpdated}
               />
             )}
-            <ProductItems productItems={receipt?.productItems} />
+            <ProductItems productItems={receipt?.productItems} update={setIsUpdated} />
           </ReceiptBody>
         ) : (
           <Text color={"red.400"}>{error}</Text>

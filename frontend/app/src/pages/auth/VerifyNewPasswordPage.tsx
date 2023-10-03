@@ -68,9 +68,7 @@ export default function VerifyNewPasswordPage() {
       flexDirection="column"
       gap={15}
     >
-      <Heading size="xl">
-        Verify new password:
-      </Heading>
+      <Heading size="xl">Verify new password:</Heading>
       <Flex
         as="form"
         minW={["100%", "100%", "600px", "600px"]}
@@ -89,7 +87,12 @@ export default function VerifyNewPasswordPage() {
               onChange={(e) => setPassword(e.target.value)}
             />
             <InputRightElement width="4.5rem">
-              <Button h="1.75rem" size="sm" onClick={() => setShow(!show)}>
+              <Button
+                colorScheme="teal"
+                h="1.75rem"
+                size="sm"
+                onClick={() => setShow(!show)}
+              >
                 {show ? "Hide" : "Show"}
               </Button>
             </InputRightElement>
@@ -111,7 +114,12 @@ export default function VerifyNewPasswordPage() {
               onChange={(e) => setPassword2(e.target.value)}
             />
             <InputRightElement width="4.5rem">
-              <Button h="1.75rem" size="sm" onClick={() => setShow(!show)}>
+              <Button
+                colorScheme="teal"
+                h="1.75rem"
+                size="sm"
+                onClick={() => setShow(!show)}
+              >
                 {show ? "Hide" : "Show"}
               </Button>
             </InputRightElement>
@@ -122,7 +130,9 @@ export default function VerifyNewPasswordPage() {
             <FormErrorMessage>Email is required.</FormErrorMessage>
           )}
         </FormControl>
-        <Button type="submit">Change Password</Button>
+        <Button colorScheme="teal" type="submit">
+          Change Password
+        </Button>
         <Center>
           {error && <Text color="red.400">{error}</Text>}
           {success && <Text color="green.400">{success}</Text>}

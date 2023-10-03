@@ -42,7 +42,7 @@ class ReceiptEntryDB(
     Base,
 ):
     __tablename__ = "receipt_entries"
-    purchase_date: Mapped[Optional[str]] = mapped_column(index=True)
+    purchase_date: Mapped[Optional[date]] = mapped_column(index=True)
     total_amount: Mapped[int] = mapped_column(default=0)
     warranty: Mapped[int] = mapped_column(default=0)
     category: Mapped[Categories] = mapped_column(default=Categories.OTHER)
@@ -66,7 +66,7 @@ class ReceiptEntry(
     TimeStampSchemaMixin,
 ):
     store_id: int | UUID | None = None
-    purchase_date: str
+    purchase_date: date
     total_amount: int | None = None
     warranty: int
     category: Categories
@@ -75,7 +75,8 @@ class ReceiptEntry(
 
 class ReceiptEntryCreate(CamelBase):
     store_id: int | UUID | None = Field(default=None, gt=0)
-    purchase_date: str = Field(default_factory=lambda: str(date.today()))
+    # purchase_date: str = Field(default_factory=lambda: str(date.today()))
+    purchase_date: date = Field(default_factory=lambda: date.today())
     total_amount: int = Field(default=0)
     warranty: int = Field(default=0)
     category: Categories = Field(default=Categories.OTHER)
@@ -83,7 +84,7 @@ class ReceiptEntryCreate(CamelBase):
 
 class ReceiptEntryUpdate(CamelBase):
     store_id: int | UUID | None = Field(default=0, gt=0)
-    purchase_date: str | None = None
+    purchase_date: date | None = None
     total_amount: int | None = None
     warranty: int | None = None
     category: Categories | None = None

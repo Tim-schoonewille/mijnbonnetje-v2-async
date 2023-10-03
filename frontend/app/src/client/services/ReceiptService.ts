@@ -150,7 +150,7 @@ export class ReceiptService {
    */
   public static receiptDeleteSpecificFullReceipt(
     receiptId: number | string
-  ): CancelablePromise<any> {
+  ): CancelablePromise<ApiResponse<any>> {
     return __request(OpenAPI, {
       method: "DELETE",
       url: "/receipt/{receipt_id}",

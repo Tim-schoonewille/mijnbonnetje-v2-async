@@ -59,14 +59,13 @@ export default function RegisterForm() {
         );
       }
       if (response.status === 400) {
-        setEmailError(true)
+        setEmailError(true);
         setEmailErrorMessage("E-mail already registerd!");
       }
     } catch (e) {
-      console.error(e)
-
+      console.error(e);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
   return (
@@ -102,7 +101,12 @@ export default function RegisterForm() {
             onChange={(e) => setPassword(e.target.value)}
           />
           <InputRightElement width="4.5rem">
-            <Button h="1.75rem" size="sm" onClick={() => setShow(!show)}>
+            <Button
+              colorScheme="teal"
+              h="1.75rem"
+              size="sm"
+              onClick={() => setShow(!show)}
+            >
               {show ? "Hide" : "Show"}
             </Button>
           </InputRightElement>
@@ -124,7 +128,12 @@ export default function RegisterForm() {
             onChange={(e) => setPassword2(e.target.value)}
           />
           <InputRightElement width="4.5rem">
-            <Button h="1.75rem" size="sm" onClick={() => setShow(!show)}>
+            <Button
+              colorScheme="teal"
+              h="1.75rem"
+              size="sm"
+              onClick={() => setShow(!show)}
+            >
               {show ? "Hide" : "Show"}
             </Button>
           </InputRightElement>
@@ -135,7 +144,9 @@ export default function RegisterForm() {
           <FormErrorMessage>{passwordErrorMessage}</FormErrorMessage>
         )}
       </FormControl>
-      <Button type="submit">Register</Button>
+      <Button colorScheme="teal" type="submit">
+        Register
+      </Button>
       <Center>
         {isLoading && <Spinner />}
 

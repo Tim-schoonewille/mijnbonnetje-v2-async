@@ -27,12 +27,12 @@ export default function RequestNewEmailVerificationPage() {
         email: emailAddress,
       });
       if (response.status === 200) {
-        setEmailErrorMessage('')
-        setEmailError(false)
+        setEmailErrorMessage("");
+        setEmailError(false);
         setSuccessMessage("Token has been sent to your inbox");
       } else {
-        setEmailError(true)
-        setSuccessMessage('')
+        setEmailError(true);
+        setSuccessMessage("");
         setEmailErrorMessage("Something went horribly wrong");
       }
     } catch (e) {
@@ -43,8 +43,8 @@ export default function RequestNewEmailVerificationPage() {
   }
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) return
-    handleNewEmailTokenRequest(email)
+    if (!email) return;
+    handleNewEmailTokenRequest(email);
   };
   return (
     <Flex
@@ -75,7 +75,9 @@ export default function RequestNewEmailVerificationPage() {
             <FormErrorMessage>{emailErrorMessage}</FormErrorMessage>
           )}
         </FormControl>
-        <Button type="submit">Request New Verification Link</Button>
+        <Button colorScheme="teal" type="submit">
+          Request New Verification Link
+        </Button>
         {isLoading && <Spinner />}
         {successMessage && <Text color="green.400">{successMessage}</Text>}
       </Flex>

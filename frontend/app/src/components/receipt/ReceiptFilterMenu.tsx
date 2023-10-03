@@ -25,6 +25,8 @@ export default function ReceiptFilterMenu({ stores }: ReceiptFilterMenuProps) {
   const accordionMargin = [0, 0, "200px", "500px"];
   const categories = Object.values(Categories);
   const [filtersAreSet, setFiltersAreSet] = useState(false);
+  const [startDate, setStartDate] = useState("2023-01-01");
+  const [endDate, setEndDate] = useState("2023-10-01");
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -39,6 +41,12 @@ export default function ReceiptFilterMenu({ stores }: ReceiptFilterMenuProps) {
   const updateShopParams = (shop: string) => {
     setFiltersAreSet(true);
     queryParams.set("shop", shop);
+    const newSearch = queryParams.toString();
+    navigate(`/receipts?${newSearch}`);
+  };
+  const updateStartDateParams = (typeOfDate: string, date: string) => {
+    setFiltersAreSet(true);
+    queryParams.set(typeOfDate, date);
     const newSearch = queryParams.toString();
     navigate(`/receipts?${newSearch}`);
   };
@@ -57,8 +65,16 @@ export default function ReceiptFilterMenu({ stores }: ReceiptFilterMenuProps) {
         <Flex direction={"column"} as="ul" listStyleType={"none"} gap={3}>
           <Flex as="li" gap="4px" justifyContent="center" alignItems="center">
             <Icon as={CalendarIcon} mr="12px" />
-            <Input type="date" />
-            <Input type="date" />
+            <Input
+              type="date"
+              onChange={(e) =>
+                updateStartDateParams("startDate", e.target.value)
+              }
+            />
+            <Input
+              type="date"
+              onChange={(e) => updateStartDateParams("endDate", e.target.value)}
+            />
           </Flex>
           <Flex as="li" gap="4px" justifyContent="center" alignItems="center">
             <Icon as={BsShop} mr="12px" />
@@ -87,7 +103,7 @@ export default function ReceiptFilterMenu({ stores }: ReceiptFilterMenuProps) {
             <Button
               onClick={() => {
                 setFiltersAreSet(false);
-                navigate('/receipts')
+                navigate("/receipts");
               }}
             >
               Remove filters

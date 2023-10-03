@@ -31,7 +31,7 @@ export default function NavMobile({ links }: NavMobileProps) {
       pr={5}
     >
       <ColorModeSwitcher justifySelf="flex-end" />
-      <Button onClick={onOpen}>
+      <Button colorScheme="teal" onClick={onOpen}>
         <HamburgerIcon />
       </Button>
 
@@ -64,19 +64,24 @@ export default function NavMobile({ links }: NavMobileProps) {
             <Flex gap={5}>
               {isLoggedIn ? (
                 <NavLink to="/auth/logout">
-                  <Button w="auto" onClick={onClose}>
+                  <Button colorScheme="teal" w="auto" onClick={onClose}>
                     Logout
                   </Button>
                 </NavLink>
               ) : (
                 <>
                   <NavLink to="/auth/login">
-                    <Button w="auto" onClick={onClose}>
+                    <Button colorScheme="teal" w="auto" onClick={onClose}>
                       Login
                     </Button>
                   </NavLink>
                   <NavLink to="/auth/register">
-                    <Button variant="outline" w="auto" onClick={onClose}>
+                    <Button
+                      colorScheme="teal"
+                      variant="outline"
+                      w="auto"
+                      onClick={onClose}
+                    >
                       register
                     </Button>
                   </NavLink>

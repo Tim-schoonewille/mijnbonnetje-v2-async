@@ -1,4 +1,5 @@
 import {
+  AddIcon,
   CalendarIcon,
   CheckIcon,
   CloseIcon,
@@ -7,6 +8,7 @@ import {
 import {
   Box,
   Button,
+  Center,
   Editable,
   EditableInput,
   EditablePreview,
@@ -16,10 +18,18 @@ import {
   IconButton,
   Input,
   Link,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
   Select,
   SimpleGrid,
   Spinner,
   Text,
+  useDisclosure,
 } from "@chakra-ui/react";
 import React, { Dispatch, SetStateAction, useState } from "react";
 import { BiCategoryAlt } from "react-icons/bi";
@@ -29,12 +39,13 @@ import {
   Categories,
   Receipt,
   ReceiptEntryService,
+  ReceiptService,
   Store,
   StoreService,
 } from "../../client";
 
 import { ReceiptEntryUpdate } from "../../../../.app2/src/client/models/ReceiptEntryUpdate";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { AiOutlineEdit } from "react-icons/ai";
 import { LiaHandMiddleFingerSolid } from "react-icons/lia";
 import { CreatableSelect } from "chakra-react-select";
@@ -49,8 +60,10 @@ export default function ReceiptSummary({
   stores,
   update,
 }: ReceiptSummaryProps) {
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const { id } = useParams();
   console.log(receipt);
+  const navigate = useNavigate();
   const receiptID = id || 0;
   const [shop, setShop] = useState(receipt.store?.name);
   const [editShop, setEditShop] = useState(false);
@@ -118,18 +131,15 @@ export default function ReceiptSummary({
   }
 
   async function updateShopInDB() {
-    console.log(shop);
     if (!shop) return;
     const storeObjectWithID = stores.find((store) => store.name === shop);
     if (!storeObjectWithID) return;
-    console.log(storeObjectWithID?.id);
     try {
       const response = await StoreService.storeUpdateStore(
         storeObjectWithID.id,
         { name: editShopValue }
       );
       setShop(editShopValue);
-      console.log(response);
       update((prev) => !prev);
       setEditShop(false);
     } catch (e) {
@@ -165,9 +175,40 @@ export default function ReceiptSummary({
       console.error(error);
     }
   }
+  async function handleDelete() {
+    if (!receiptID) return;
+    try {
+      const response = await ReceiptService.receiptDeleteSpecificFullReceipt(
+        receiptID
+      );
+      navigate("/receipts");
+    } catch (e) {
+      console.error(e);
+    }
+  }
   console.log(stores);
   return (
     <>
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Delete Receipt</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            Are you sure you want to delete this receipt? Data will be
+            permanently lost!
+          </ModalBody>
+
+          <ModalFooter>
+            <Button colorScheme="red" mr={3} onClick={handleDelete}>
+              Delete
+            </Button>
+            <Button variant="ghost" onClick={onClose}>
+              Close
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
       <SimpleGrid columns={2} spacing={10}>
         <Text as="b">
           <Icon as={BsShop} mr="12px" />
@@ -213,22 +254,37 @@ export default function ReceiptSummary({
                 })}
               </Select>
               <IconButton
+                variant="ghost"
                 type="submit"
                 size="sm"
                 aria-label="edit shop"
                 icon={<CheckIcon />}
+                mr={1}
               />
               <IconButton
+                variant="ghost"
                 size="sm"
                 aria-label="cancel"
                 icon={<CloseIcon />}
                 onClick={() => setEditShop(false)}
               />
             </Flex>
-            <Button onClick={() => setAddShop((prev) => !prev)}>
+            <Button
+              variant={addShop ? "outline" : "ghost"}
+              onClick={() => {
+                setAddShop((prev) => !prev);
+                setEditCurrentShop(false);
+              }}
+            >
               Add shop
             </Button>
-            <Button onClick={() => setEditCurrentShop((prev) => !prev)}>
+            <Button
+              variant={editCurrentShop ? "outline" : "ghost"}
+              onClick={() => {
+                setEditCurrentShop((prev) => !prev);
+                setAddShop(false);
+              }}
+            >
               Edit Shop
             </Button>
             {editCurrentShop && (
@@ -237,7 +293,12 @@ export default function ReceiptSummary({
                   value={editShopValue}
                   onChange={(e) => setEditShopValue(e.target.value)}
                 ></Input>
-                <Button type="submit" onClick={updateShopInDB}>
+                <Button
+                  leftIcon={<AiOutlineEdit />}
+                  type="submit"
+                  outline="ghost"
+                  onClick={updateShopInDB}
+                >
                   Edit
                 </Button>{" "}
               </>
@@ -248,7 +309,11 @@ export default function ReceiptSummary({
                   value={addShopValue}
                   onChange={(e) => setAddShopValue(e.target.value)}
                 ></Input>
-                <Button type="submit" onClick={handleAddStoreToDB}>
+                <Button
+                  leftIcon={<AddIcon />}
+                  type="submit"
+                  onClick={handleAddStoreToDB}
+                >
                   Add
                 </Button>{" "}
               </>
@@ -287,11 +352,17 @@ export default function ReceiptSummary({
             <IconButton
               type="submit"
               size="sm"
+              colorScheme="teal"
+              variant="ghost"
               aria-label="edit category"
               icon={<CheckIcon />}
+              mr={1}
+              ml={1}
             />
             <IconButton
               size="sm"
+              variant="ghost"
+              colorScheme="teal"
               aria-label="cancel"
               icon={<CloseIcon />}
               onClick={() => setEditCategory(false)}
@@ -326,12 +397,16 @@ export default function ReceiptSummary({
               onChange={(e) => setPurchaseDate(e.target.value)}
             />
             <IconButton
+              mr={1}
+              ml={1}
+              variant="ghost"
               type="submit"
               size="sm"
               aria-label="edit date"
               icon={<CheckIcon />}
             />
             <IconButton
+              variant="ghost"
               size="sm"
               aria-label="cancel"
               icon={<CloseIcon />}
@@ -360,12 +435,16 @@ export default function ReceiptSummary({
               onChange={(e) => setTotalAmount(e.target.value)}
             />
             <IconButton
+              variant="ghost"
               type="submit"
               size="sm"
               aria-label="edit store"
               icon={<CheckIcon />}
+              mr={1}
+              ml={1}
             />
             <IconButton
+              variant="ghost"
               size="sm"
               aria-label="cancel"
               icon={<CloseIcon />}
@@ -392,6 +471,16 @@ export default function ReceiptSummary({
             Download
           </Link>
         </Text>
+        {/* <Center> */}
+        <Button
+          size={"sm"}
+          leftIcon={<CloseIcon />}
+          colorScheme="red"
+          onClick={onOpen}
+        >
+          delete
+        </Button>
+        {/* </Center> */}
       </SimpleGrid>
       {isLoading && <Spinner />}
     </>

@@ -28,7 +28,7 @@ export default function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
 
   const { setIsLoggedIn } = useAuthContext();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -49,7 +49,7 @@ export default function LoginForm() {
         setIsLoggedIn(true);
         setSuccessMessage("Succesfull login!");
         setErrorMessage("");
-        navigate('/receipts')
+        navigate("/receipts");
       } else {
         setSuccessMessage("");
         setErrorMessage("Invalid credentials");
@@ -93,7 +93,12 @@ export default function LoginForm() {
             onChange={(e) => setPassword(e.target.value)}
           />
           <InputRightElement width="4.5rem">
-            <Button h="1.75rem" size="sm" onClick={() => setShow(!show)}>
+            <Button
+              colorScheme="teal"
+              h="1.75rem"
+              size="sm"
+              onClick={() => setShow(!show)}
+            >
               {show ? "Hide" : "Show"}
             </Button>
           </InputRightElement>
@@ -106,7 +111,9 @@ export default function LoginForm() {
           <FormErrorMessage>Email is required.</FormErrorMessage>
         )}
       </FormControl>
-      <Button type="submit">Login</Button>
+      <Button colorScheme="teal" type="submit">
+        Login
+      </Button>
       <Center>
         {isLoading && <Spinner />}
         {successMessage && <Text color={"green.400"}>{successMessage}</Text>}

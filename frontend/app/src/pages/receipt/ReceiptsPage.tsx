@@ -24,13 +24,29 @@ export default function ReceiptsPage() {
   const sort = queryParams.get("sort") || undefined;
   const categoryParam = queryParams.get("category") || undefined;
   const storeParam = queryParams.get("shop") || undefined;
+  const startDateParam = queryParams.get("startDate") || undefined;
+  const endDateParam = queryParams.get("endDate") || undefined;
 
   async function readReceipts() {
     let payload = {};
+    if (startDateParam) {
+      payload = {
+        ...payload,
+        startDate: startDateParam,
+        dateFilter: "purchase_date",
+      };
+    }
+    if (endDateParam) {
+      payload = {
+        ...payload,
+        endDate: endDateParam,
+        dateFilter: "purchase_date",
+      };
+    }
     if (categoryParam) {
       payload = {
         ...payload,
-        columnFilterStringValue: categoryParam,
+        columnFilterStringValue: categoryParam.toString(),
         columnFilterString: "category",
       };
     }
@@ -44,7 +60,6 @@ export default function ReceiptsPage() {
       };
     }
     try {
-      console.log(payload);
       const response =
         await ReceiptEntryService.receiptEntryReadMultipleReceiptEntries(
           payload
@@ -71,7 +86,7 @@ export default function ReceiptsPage() {
   useEffect(() => {
     readReceipts();
     readStores();
-  }, [categoryParam, storeParam]);
+  }, [categoryParam, storeParam, startDateParam, endDateParam]);
 
   if (orderBy && receipts && sort) {
     switch (orderBy) {
@@ -116,7 +131,6 @@ export default function ReceiptsPage() {
     }
   }
 
-  console.log(receipts);
   return (
     <RequiresValidToken>
       <Accordion allowToggle>

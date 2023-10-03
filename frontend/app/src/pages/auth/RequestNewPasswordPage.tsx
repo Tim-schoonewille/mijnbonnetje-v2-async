@@ -14,31 +14,31 @@ import { AuthService } from "../../client";
 export default function RequestNewPasswordPage() {
   const [email, setEmail] = useState<string>();
   const [emailError, setEmailError] = useState(false);
-  const [emailErrorMessage, setEmailErrorMessage] = useState('')
-  const [success, setSuccess] = useState('')
+  const [emailErrorMessage, setEmailErrorMessage] = useState("");
+  const [success, setSuccess] = useState("");
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) {
-      setEmailError(true)
-      setEmailErrorMessage('Requires a valid email address to proceed')
-      return
+      setEmailError(true);
+      setEmailErrorMessage("Requires a valid email address to proceed");
+      return;
     }
 
     try {
-      setEmailErrorMessage('')
-      setEmailError(false)
+      setEmailErrorMessage("");
+      setEmailError(false);
 
-      const response = await AuthService.authRequestNewPasswordToken({email})
+      const response = await AuthService.authRequestNewPasswordToken({ email });
 
       if (response.status === 200) {
-        setSuccess('Check inbox for link to generate new password')
+        setSuccess("Check inbox for link to generate new password");
       } else {
-        setEmailError(true)
-        setSuccess('')
-        setEmailErrorMessage('Invalid email address, try again loser')
+        setEmailError(true);
+        setSuccess("");
+        setEmailErrorMessage("Invalid email address, try again loser");
       }
     } catch (e) {
-      console.error(e)
+      console.error(e);
     }
   };
   return (
@@ -70,8 +70,10 @@ export default function RequestNewPasswordPage() {
             <FormErrorMessage>{emailErrorMessage}</FormErrorMessage>
           )}
         </FormControl>
-        <Button type="submit">Request New Password</Button>
-        { success && <Text color='green.400'>{success}</Text>}
+        <Button colorScheme="teal" type="submit">
+          Request New Password
+        </Button>
+        {success && <Text color="green.400">{success}</Text>}
       </Flex>
     </Flex>
   );

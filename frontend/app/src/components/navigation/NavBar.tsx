@@ -1,4 +1,4 @@
-import { Button, Flex, Heading, Link } from "@chakra-ui/react";
+import { Button, Flex, HStack, Heading, Link, Text } from "@chakra-ui/react";
 import React from "react";
 import { Link as NavLink } from "react-router-dom";
 import { ColorModeSwitcher } from "../../ColorModeSwitcher";
@@ -40,8 +40,10 @@ export default function NavBar() {
     >
       <Heading size="lg">
         <NavLink to="/">
-        <CopyIcon /> &nbsp;
-          Mijnbonnetje.nl</NavLink>
+          <HStack>
+            <CopyIcon mr={1} /> <Text>Mijnbonnetje.nl</Text>
+          </HStack>
+        </NavLink>
       </Heading>
       <NavDesktop links={navLinkMappings} />
       <NavMobile links={navLinkMappings} />
