@@ -13,6 +13,7 @@ import ReceiptsPage from "./pages/receipt/ReceiptsPage";
 import AddReceiptPage from "./pages/receipt/AddReceiptPage";
 import SingleReceiptPage from "./pages/receipt/SingleReceiptPage";
 import AuthProvider from "./context/AuthContext";
+import DashboardPage from "./pages/DashboardPage";
 
 export const App = () => {
   return (
@@ -20,7 +21,8 @@ export const App = () => {
       <Router>
         <NavBar />
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          <Route path="/" element={<DashboardPage />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
 
           <Route path="/auth/login" element={<LoginPage />} />
           <Route path="/auth/register" element={<RegisterPage />} />

@@ -11,7 +11,7 @@ import {
   Input,
   Select,
 } from "@chakra-ui/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { BsShop } from "react-icons/bs";
 import { BiCategoryAlt } from "react-icons/bi";
 import { HiOutlineFilter } from "react-icons/hi";
@@ -31,6 +31,8 @@ export default function ReceiptFilterMenu({ stores }: ReceiptFilterMenuProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const queryParams = new URLSearchParams(location.search);
+  const startDateQueryParam = queryParams.get("startDate");
+
   const updateQueryParamsAndNavigate = (category: string) => {
     setFiltersAreSet(true);
     queryParams.set("category", category);
@@ -50,6 +52,12 @@ export default function ReceiptFilterMenu({ stores }: ReceiptFilterMenuProps) {
     const newSearch = queryParams.toString();
     navigate(`/receipts?${newSearch}`);
   };
+
+  useEffect(() => {
+    if (startDateQueryParam) {
+      setFiltersAreSet(true);
+    }
+  }, []);
   return (
     <AccordionItem ml={accordionMargin} mr={accordionMargin}>
       <h2>
