@@ -49,7 +49,7 @@ export default function LoginForm() {
         setIsLoggedIn(true);
         setSuccessMessage("Succesfull login!");
         setErrorMessage("");
-        navigate("/receipts");
+        navigate("/dashboard");
       } else {
         setSuccessMessage("");
         setErrorMessage("Invalid credentials");

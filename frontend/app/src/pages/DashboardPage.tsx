@@ -9,6 +9,7 @@ import {
   Heading,
   Icon,
   Progress,
+  Spinner,
   Tab,
   TabList,
   TabPanel,
@@ -26,6 +27,7 @@ import { Link } from "react-router-dom";
 export default function DashboardPage() {
   const [receipts, setReceipts] = useState<ReceiptEntry[] | null>();
   const [isLoading, setIsLoading] = useState(false);
+  const [showTotalAmount, setShowTotalAmount] = useState(false);
 
   const categories = Object.values(Categories);
 
@@ -125,6 +127,22 @@ export default function DashboardPage() {
     );
     return filteredEntries.length;
   }
+
+  function getTotalByCategory(
+    entries: ReceiptEntry[] | null | undefined,
+    categoryToCount: string
+  ): number {
+    if (!entries) return 0;
+    const filteredEntries = entries.filter(
+      (entry) => entry.category === categoryToCount
+    );
+    const totalAmount = filteredEntries.reduce((total, entry) => {
+      // Assuming each entry has a 'totalAmount' property
+      return total + (entry.totalAmount || 0);
+    }, 0);
+    return totalAmount;
+  }
+
   return (
     <RequiresValidToken>
       {/* <HStack p={5}>
@@ -135,144 +153,187 @@ export default function DashboardPage() {
       <Heading size="sm" p={3} pl={5}>
         stats:
       </Heading> */}
-      <Flex
-        justifyContent="center"
-        alignItems="center"
-        flexDirection="column"
-        gap={15}
-      >
-        {dataLastSevenDays && dataLastMonth && dataLastYear && dataAll && (
-          <Tabs w="100%" isFitted variant="enclosed">
-            <TabList>
-              <Tab>7-days</Tab>
-              <Tab>month</Tab>
-              <Tab>year</Tab>
-              <Tab>all</Tab>
-            </TabList>
+      {isLoading ? (
+        <Spinner />
+      ) : (
+        <>
+          <Flex
+            justifyContent="center"
+            alignItems="center"
+            flexDirection="column"
+            gap={15}
+          >
+            {dataLastSevenDays && dataLastMonth && dataLastYear && dataAll && (
+              <Tabs w="100%" isFitted variant="enclosed" colorScheme="teal" mb={0}>
+                <TabList>
+                  <Tab>7-days</Tab>
+                  <Tab>month</Tab>
+                  <Tab>year</Tab>
+                  <Tab>all</Tab>
+                </TabList>
 
-            <TabPanels pl={5} pt={3}>
-              <TabPanel>
-                <Box>
-                  <HStack>
-                    <CopyIcon />
-                    <Text fontWeight="bold">Total Receipts:</Text>
-                    <Text>{dataLastSevenDays.totalReceipts}</Text>
-                  </HStack>
-                  <HStack>
-                    <Icon as={RiMoneyDollarBoxLine} />
-                    <Text fontWeight="bold">Total Amount:</Text>
-                    <Text>€ {dataLastSevenDays.totalAmount / 100}</Text>
-                  </HStack>
-                  <Link
-                    to={`/receipts?startDate=${formatDate(
-                      currentMonthStartDate
-                    )}`}
-                  >
-                    <Button mt={5} variant="ghost">
-                      Show receipts
-                    </Button>
-                  </Link>
-                </Box>
-              </TabPanel>
-              <TabPanel>
-                <Box>
-                  <HStack>
-                    <CopyIcon />
-                    <Text fontWeight="bold">Total Receipts:</Text>
-                    <Text>{dataLastMonth.totalReceipts}</Text>
-                  </HStack>
-                  <HStack>
-                    <Icon as={RiMoneyDollarBoxLine} />
-                    <Text fontWeight="bold">Total Amount:</Text>
-                    <Text>€ {dataLastMonth.totalAmount / 100}</Text>
-                  </HStack>
-                  <Link
-                    to={`/receipts?startDate=${formatDate(
-                      currentYearStartDate
-                    )}`}
-                  >
-                    <Button mt={5} variant="ghost">
-                      Show receipts
-                    </Button>
-                  </Link>
-                </Box>
-              </TabPanel>
-              <TabPanel>
-                <Box>
-                  <HStack>
-                    <CopyIcon />
-                    <Text fontWeight="bold">Total Receipts:</Text>
-                    <Text>{dataLastYear.totalReceipts}</Text>
-                  </HStack>
-                  <HStack>
-                    <Icon as={RiMoneyDollarBoxLine} />
-                    <Text fontWeight="bold">Total Amount:</Text>
-                    <Text>€ {dataLastYear.totalAmount / 100}</Text>
-                  </HStack>
-                  <Link
-                    to={`/receipts?startDate=${formatDate(
-                      currentYearStartDate
-                    )}`}
-                  >
-                    <Button mt={5} variant="ghost">
-                      Show receipts
-                    </Button>
-                  </Link>
-                </Box>
-              </TabPanel>
-              <TabPanel>
-                <Box>
-                  <HStack>
-                    <CopyIcon />
-                    <Text fontWeight="bold">Total Receipts:</Text>
-                    <Text>{dataAll.totalReceipts}</Text>
-                  </HStack>
-                  <HStack>
-                    <Icon as={RiMoneyDollarBoxLine} />
-                    <Text fontWeight="bold">Total Amount:</Text>
-                    <Text>€ {dataAll.totalAmount / 100}</Text>
-                  </HStack>
-                  <Link to="/receipts">
-                    <Button mt={5} variant="ghost">
-                      Show receipts
-                    </Button>
-                  </Link>
-                </Box>
-              </TabPanel>
-            </TabPanels>
-          </Tabs>
-        )}
-      </Flex>
-      <Divider mt={3} mb={3} />
-      <Box m={5}>
-        <Heading size="sm" mb={3}>
-          Total per category:
-        </Heading>
-        {categories.map((category) => {
-          const totalEntriesInCategory = countEntriesByCategory(
-            receipts,
-            category
-          );
-          const totalEntries = receipts ? receipts.length : 100;
-          const percentageofEntries =
-            (totalEntriesInCategory / totalEntries) * 100;
-          if (totalEntriesInCategory === 0) return;
-          return (
-            <Link to={`/receipts/?category=${category}`}>
-              <Flex flexDirection={"column"} mb={2}>
-                <Text mb={1}>
-                  {category} ({totalEntriesInCategory})
-                </Text>
-                <Progress
-                  size="sm"
-                  colorScheme="teal"
-                  value={percentageofEntries}
-                />
-              </Flex>
-            </Link>
-          );
-        })}
-      </Box>
+                <TabPanels pl={5} pt={3}>
+                  <TabPanel>
+                    <Box>
+                      <HStack>
+                        <CopyIcon />
+                        <Text fontWeight="bold">Total Receipts:</Text>
+                        <Text>{dataLastSevenDays.totalReceipts}</Text>
+                      </HStack>
+                      <HStack>
+                        <Icon as={RiMoneyDollarBoxLine} />
+                        <Text fontWeight="bold">Total Amount:</Text>
+                        <Text>€ {dataLastSevenDays.totalAmount / 100}</Text>
+                      </HStack>
+                      <Link
+                        to={`/receipts?startDate=${formatDate(
+                          currentMonthStartDate
+                        )}`}
+                      >
+                        <Button mt={5} variant="outline" w="100%">
+                          Show selection
+                        </Button>
+                      </Link>
+                    </Box>
+                  </TabPanel>
+                  <TabPanel>
+                    <Box>
+                      <HStack>
+                        <CopyIcon />
+                        <Text fontWeight="bold">Total Receipts:</Text>
+                        <Text>{dataLastMonth.totalReceipts}</Text>
+                      </HStack>
+                      <HStack>
+                        <Icon as={RiMoneyDollarBoxLine} />
+                        <Text fontWeight="bold">Total Amount:</Text>
+                        <Text as='i'>€ {dataLastMonth.totalAmount / 100}</Text>
+                      </HStack>
+                      <Link
+                        to={`/receipts?startDate=${formatDate(
+                          currentYearStartDate
+                        )}`}
+                      >
+                        <Button mt={5} variant="outline" w="100%">
+                          Show selection 
+                        </Button>
+                      </Link>
+                    </Box>
+                  </TabPanel>
+                  <TabPanel>
+                    <Box>
+                      <HStack>
+                        <CopyIcon />
+                        <Text fontWeight="bold">Total Receipts:</Text>
+                        <Text>{dataLastYear.totalReceipts}</Text>
+                      </HStack>
+                      <HStack>
+                        <Icon as={RiMoneyDollarBoxLine} />
+                        <Text fontWeight="bold">Total Amount:</Text>
+                        <Text>€ {dataLastYear.totalAmount / 100}</Text>
+                      </HStack>
+                      <Link
+                        to={`/receipts?startDate=${formatDate(
+                          currentYearStartDate
+                        )}`}
+                      >
+                        <Button mt={5} variant="outline" w="100%">
+                          Show selection
+                        </Button>
+                      </Link>
+                    </Box>
+                  </TabPanel>
+                  <TabPanel>
+                    <Box>
+                      <HStack>
+                        <CopyIcon />
+                        <Text fontWeight="bold">Total Receipts:</Text>
+                        <Text>{dataAll.totalReceipts}</Text>
+                      </HStack>
+                      <HStack>
+                        <Icon as={RiMoneyDollarBoxLine} />
+                        <Text fontWeight="bold">Total Amount:</Text>
+                        <Text>€ {dataAll.totalAmount / 100}</Text>
+                      </HStack>
+                      <Link to="/receipts">
+                        <Button mt={5} variant="outline" w="100%">
+                          Show selection
+                        </Button>
+                      </Link>
+                    </Box>
+                  </TabPanel>
+                </TabPanels>
+              </Tabs>
+            )}
+          </Flex>
+          <Divider mt={3} mb={10} />
+          <Box m={5}>
+            <Heading size="sm" mt={3} mb={3}>
+              Total per category:
+            </Heading>
+
+            {/* <Button variant={showTotalAmount ? "solid" : "outline"}>
+                Entries
+              </Button> */}
+
+            {categories.map((category) => {
+              const totalEntriesInCategory = countEntriesByCategory(
+                receipts,
+                category
+              );
+              const totalAmountInCategory = getTotalByCategory(
+                receipts,
+                category
+              );
+
+              const totalEntries = receipts ? receipts.length : 100;
+              const percentageofEntries =
+                (totalEntriesInCategory / totalEntries) * 100;
+              const totalAmountOfAllEntries = dataAll?.totalAmount
+                ? dataAll.totalAmount
+                : 9999;
+              const percentageOfTotalAmount =
+                (totalAmountInCategory / totalAmountOfAllEntries) * 100;
+              console.log(totalAmountOfAllEntries);
+              if (totalEntriesInCategory === 0) return;
+              return (
+                <Link to={`/receipts/?category=${category}`}>
+                  <Flex flexDirection={"column"} mb={2}>
+                    <Text mb={1}>
+                      {category} (
+                      {showTotalAmount
+                        ? totalAmountInCategory / 100
+                        : totalEntriesInCategory}
+                      )
+                    </Text>
+                    <Progress
+                      size="sm"
+                      colorScheme="teal"
+                      value={
+                        showTotalAmount
+                          ? percentageOfTotalAmount
+                          : percentageofEntries
+                      }
+                    />
+                  </Flex>
+                </Link>
+              );
+            })}
+            <Tabs
+              size="sm"
+              isFitted
+              variant="soft-rounded"
+              mt={5}
+              align="end"
+              colorScheme="teal"
+            >
+              <TabList>
+                <Tab onClick={() => setShowTotalAmount(false)}>Total</Tab>
+                <Tab onClick={() => setShowTotalAmount(true)}>money</Tab>
+              </TabList>
+            </Tabs>
+          </Box>
+        </>
+      )}
     </RequiresValidToken>
   );
 }
