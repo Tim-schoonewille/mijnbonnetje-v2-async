@@ -3,6 +3,7 @@ import RequiresValidToken from "../wrappers/RequiresValidToken";
 import {
   Box,
   Button,
+  Container,
   Divider,
   Flex,
   HStack,
@@ -19,7 +20,13 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { LuLayoutDashboard } from "react-icons/lu";
-import { Categories, ReceiptEntry, ReceiptEntryService } from "../client";
+import {
+  Categories,
+  ReceiptEntry,
+  ReceiptEntryService,
+  Store,
+  StoreService,
+} from "../client";
 import { CopyIcon } from "@chakra-ui/icons";
 import { RiMoneyDollarBoxLine } from "react-icons/ri";
 import { Link } from "react-router-dom";
@@ -28,6 +35,9 @@ export default function DashboardPage() {
   const [receipts, setReceipts] = useState<ReceiptEntry[] | null>();
   const [isLoading, setIsLoading] = useState(false);
   const [showTotalAmount, setShowTotalAmount] = useState(false);
+  const [showTotalAmountForStores, setShowTotalAmountForStores] = useState();
+  const [stores, setStores] = useState<Store[] | null>();
+  const [maxIStores, setMaxIStores] = useState(5);
 
   const categories = Object.values(Categories);
 
@@ -38,7 +48,20 @@ export default function DashboardPage() {
         await ReceiptEntryService.receiptEntryReadMultipleReceiptEntries();
       if (response.status === 200) {
         setReceipts(response.body);
-        console.log(response.body);
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  async function readStores() {
+    try {
+      setIsLoading(true);
+      const response = await StoreService.storeReadUserStores();
+      if (response.status === 200) {
+        setStores(response.body);
       }
     } catch (e) {
       console.error(e);
@@ -49,12 +72,17 @@ export default function DashboardPage() {
 
   useEffect(() => {
     getReceipts();
+    readStores();
   }, []);
 
+  if (!receipts || !stores) return <></>;
   const dataLastSevenDays = processData("last7days");
   const dataLastMonth = processData("month");
   const dataLastYear = processData("year");
   const dataAll = processData("all");
+  const totalAmountOfAllEntries = dataAll?.totalAmount
+    ? dataAll.totalAmount
+    : 9999;
 
   // Function to process data based on the selected filter
   function processData(selectedFilter: string) {
@@ -94,12 +122,6 @@ export default function DashboardPage() {
       totalAmount,
     };
   }
-
-  // Now you have four objects representing the outcome of each filter
-  console.log("last seven days:", dataLastSevenDays);
-  console.log("last month", dataLastMonth);
-  console.log("last year", dataLastYear);
-  console.log("all", dataAll);
 
   const lastSevenDaysStartDate = new Date();
   lastSevenDaysStartDate.setDate(lastSevenDaysStartDate.getDate() - 7);
@@ -143,6 +165,56 @@ export default function DashboardPage() {
     return totalAmount;
   }
 
+  function countEntriesByStore(
+    entries: ReceiptEntry[],
+    storeToCount: number | string
+  ): number {
+    if (!entries) return 0;
+    const filteredEntries = entries.filter(
+      (entry) => entry.storeId === storeToCount
+    );
+    return filteredEntries.length;
+  }
+
+  const storeTotalAmounts: { [key: string]: number } = {};
+  const storeTotalQuantity: { [key: string]: number } = {};
+
+  receipts.forEach((entry) => {
+    const storeId = entry.storeId as string;
+    const totalAmount = entry.totalAmount || 0; // Use 0 as default if totalAmount is missing
+
+    if (storeId) {
+      storeTotalAmounts[storeId] =
+        (storeTotalAmounts[storeId] || 0) + totalAmount;
+    }
+  });
+
+  receipts.forEach((entry) => {
+    const storeId = entry.storeId as string;
+    if (storeId) {
+      storeTotalQuantity[storeId] = (storeTotalQuantity[storeId] || 0) + 1;
+    }
+  });
+
+  const storesSortedByMoney = [...stores];
+  const storesSortedByQuantity = [...stores];
+
+  storesSortedByMoney.sort((storeA, storeB) => {
+    const totalAmountA = storeTotalAmounts[storeA.id] || 0;
+    const totalAmountB = storeTotalAmounts[storeB.id] || 0;
+
+    return totalAmountB - totalAmountA;
+  });
+
+  storesSortedByQuantity.sort((storeA, storeB) => {
+    const totalQuantityA = storeTotalQuantity[storeA.id] || 0;
+    const totalQuantityB = storeTotalQuantity[storeB.id] || 0;
+
+    return totalQuantityB - totalQuantityA;
+  });
+
+  console.log(storeTotalQuantity);
+  console.log(storesSortedByQuantity);
   return (
     <RequiresValidToken>
       {/* <HStack p={5}>
@@ -178,7 +250,7 @@ export default function DashboardPage() {
                   <Tab>all</Tab>
                 </TabList>
 
-                <TabPanels pl={5} pt={3}>
+                <TabPanels>
                   <TabPanel>
                     <Box>
                       <HStack>
@@ -294,12 +366,10 @@ export default function DashboardPage() {
               const totalEntries = receipts ? receipts.length : 100;
               const percentageofEntries =
                 (totalEntriesInCategory / totalEntries) * 100;
-              const totalAmountOfAllEntries = dataAll?.totalAmount
-                ? dataAll.totalAmount
-                : 9999;
+
               const percentageOfTotalAmount =
                 (totalAmountInCategory / totalAmountOfAllEntries) * 100;
-              console.log(totalAmountOfAllEntries);
+
               if (totalEntriesInCategory === 0) return;
               return (
                 <Link to={`/receipts/?category=${category}`}>
@@ -338,6 +408,72 @@ export default function DashboardPage() {
               </TabList>
             </Tabs>
           </Box>
+          <Divider mt={3} mb={10} />
+          {stores && (
+            <Box m={5}>
+              <Heading size="sm" mt={3} mb={3}>
+                Top 5 stores:
+              </Heading>
+
+              <Tabs
+                size="sm"
+                isFitted
+                variant="soft-rounded"
+                p={0}
+                m={0}
+                mt={5}
+                colorScheme="teal"
+              >
+                <TabPanels>
+                  <TabPanel>
+                    {storesSortedByQuantity.map((store, i) => {
+                      if (maxIStores && i >= maxIStores) return;
+                      const total = receipts.length;
+                      const percentage =
+                        (storeTotalQuantity[store.id] / total) * 100;
+                      return (
+                        <>
+                          <Text>{store.name.toLowerCase()}</Text>
+                          <Progress
+                            value={percentage}
+                            size="sm"
+                            colorScheme="teal"
+                          />
+                        </>
+                      );
+                    })}
+                  </TabPanel>
+                  <TabPanel>
+                    {storesSortedByMoney.map((store, i) => {
+                      if (maxIStores && i >= maxIStores) return;
+                      const percentage =
+                        (storeTotalAmounts[store.id] /
+                          totalAmountOfAllEntries) *
+                        100;
+                      return (
+                        // <Link to={`/receipts?shop=${store.name}`}>
+                        //   <Flex flexDirection={"column"} mb={2}>
+                        <>
+                          <Text mb={1}>{store.name.toLowerCase()}</Text>
+                          <Progress
+                            value={percentage}
+                            size="sm"
+                            colorScheme="teal"
+                          />
+                        </>
+                        //   </Flex>
+                        // </Link>
+                      );
+                    })}
+                  </TabPanel>
+                </TabPanels>
+                <TabList>
+                  <Tab>Total</Tab>
+                  <Tab>MONEY</Tab>
+                </TabList>
+              </Tabs>
+            </Box>
+          )}
         </>
       )}
     </RequiresValidToken>
