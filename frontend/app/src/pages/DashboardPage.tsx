@@ -164,7 +164,13 @@ export default function DashboardPage() {
             gap={15}
           >
             {dataLastSevenDays && dataLastMonth && dataLastYear && dataAll && (
-              <Tabs w="100%" isFitted variant="enclosed" colorScheme="teal" mb={0}>
+              <Tabs
+                w="100%"
+                isFitted
+                variant="enclosed"
+                colorScheme="teal"
+                mb={0}
+              >
                 <TabList>
                   <Tab>7-days</Tab>
                   <Tab>month</Tab>
@@ -187,7 +193,7 @@ export default function DashboardPage() {
                       </HStack>
                       <Link
                         to={`/receipts?startDate=${formatDate(
-                          currentMonthStartDate
+                          lastSevenDaysStartDate
                         )}`}
                       >
                         <Button mt={5} variant="outline" w="100%">
@@ -206,15 +212,15 @@ export default function DashboardPage() {
                       <HStack>
                         <Icon as={RiMoneyDollarBoxLine} />
                         <Text fontWeight="bold">Total Amount:</Text>
-                        <Text as='i'>€ {dataLastMonth.totalAmount / 100}</Text>
+                        <Text as="i">€ {dataLastMonth.totalAmount / 100}</Text>
                       </HStack>
                       <Link
                         to={`/receipts?startDate=${formatDate(
-                          currentYearStartDate
+                          currentMonthStartDate
                         )}`}
                       >
                         <Button mt={5} variant="outline" w="100%">
-                          Show selection 
+                          Show selection
                         </Button>
                       </Link>
                     </Box>

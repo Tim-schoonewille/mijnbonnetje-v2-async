@@ -183,7 +183,9 @@ async def handle_receipt_ocr(
 
     await crud.receipt_scan.update(db, models.ReceiptScanUpdate(scan_json=data), scan)
     ocr_receipt = data["receipts"][0]
-    purchase_date = ocr_receipt["date"]
+    purchase_date = ocr_receipt.get('date', '2023-10-01')
+    if purchase_date is None:
+        purchase_date = '2023-10-01'
     store_name = ocr_receipt["merchant_name"]
     total_amount = ocr_receipt["total"]
     product_items = ocr_receipt["items"]
