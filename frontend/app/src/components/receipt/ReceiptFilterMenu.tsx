@@ -88,10 +88,13 @@ export default function ReceiptFilterMenu({ stores }: ReceiptFilterMenuProps) {
             <Icon as={BsShop} mr="12px" />
             <Select
               placeholder="select shop"
-              onChange={(e) => updateShopParams(e.target.value)}
+              onChange={(e) => {
+                console.log(e)
+                updateShopParams(e.target.value) 
+              }}
             >
               {stores?.map((store) => {
-                return <option key={store.id}>{store.name}</option>;
+                return <option key={store.id} value={store.id}>{store.name}</option>;
               })}
             </Select>
           </Flex>

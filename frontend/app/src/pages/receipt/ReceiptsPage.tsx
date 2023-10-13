@@ -53,9 +53,11 @@ export default function ReceiptsPage() {
     if (storeParam) {
       console.log("has store param");
       const StoreFromParam = stores?.find((store) => store.name === storeParam);
+      // console.log(stores)
+      // console.log(StoreFromParam)
       payload = {
         ...payload,
-        columnFilterIntValue: StoreFromParam?.id,
+        columnFilterIntValue: storeParam,
         columnFilterInt: "store_id",
       };
     }
@@ -84,9 +86,14 @@ export default function ReceiptsPage() {
     }
   }
   useEffect(() => {
-    readReceipts();
     readStores();
   }, [categoryParam, storeParam, startDateParam, endDateParam]);
+
+  useEffect(()=> {
+    readReceipts()
+  }, [categoryParam, storeParam, startDateParam, endDateParam])
+
+  console.log(stores)
 
   if (orderBy && receipts && sort) {
     switch (orderBy) {
