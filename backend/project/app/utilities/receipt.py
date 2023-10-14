@@ -232,7 +232,7 @@ async def get_external_ocr_data(file_path: str, cache: AsyncRedis) -> dict:
                 "ref_no": "ocr_pyton_123",
             },
             files=files,
-            timeout=20
+            timeout=40
         )
         data = response.json()
         print(data)

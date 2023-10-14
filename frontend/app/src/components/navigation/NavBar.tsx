@@ -39,7 +39,7 @@ export default function NavBar() {
       boxShadow="base"
     >
       <Heading size="lg">
-        <NavLink to="/">
+        <NavLink to="/dashboard">
           <HStack>
             <CopyIcon mr={1} /> <Text>Mijnbonnetje.nl</Text>
           </HStack>

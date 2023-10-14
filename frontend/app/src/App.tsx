@@ -21,7 +21,7 @@ export const App = () => {
       <Router>
         <NavBar />
         <Routes>
-          <Route path="/" element={<DashboardPage />} />
+          <Route path="/" element={<HomePage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
 
           <Route path="/auth/login" element={<LoginPage />} />

@@ -92,6 +92,7 @@ def store_token(res: Response, key: str, value: str) -> None:
 
 def retreive_token(req: Request, key: str):
     token = req.cookies.get(key)
+
     if token is None:
         raise HTTPException(status_code=410, detail=f"NO_{key}_TOKEN")
     return models.Token(jwt=token)

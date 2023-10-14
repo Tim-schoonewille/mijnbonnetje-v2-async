@@ -113,7 +113,7 @@ export class StoreService {
     public static storeReadUserStores(): CancelablePromise<ApiResponse<any>> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/store/user',
+            url: `/store/user?timestamp=${new Date().getTime()}`,
         });
     }
 

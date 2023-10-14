@@ -87,49 +87,49 @@ export class ReceiptEntryService {
   //     },
   //   });
   // }
-public static receiptEntryReadMultipleReceiptEntries({
-  skip = 0,
-  limit = 1000,
-  userId,
-  startDate,
-  endDate,
-  dateFilter = "created_at",
-  columnFilterString,
-  columnFilterStringValue,
-  columnFilterInt,
-  columnFilterIntValue,
-}: {
-  skip?: number;
-  limit?: number;
-  userId?: number | string | null;
-  startDate?: string | null;
-  endDate?: string | null;
-  dateFilter?: string;
-  columnFilterString?: string | null;
-  columnFilterStringValue?: string | null;
-  columnFilterInt?: string | null;
-  columnFilterIntValue?: number | null;
-} = {}): CancelablePromise<ApiResponse<any>> {
-  return __request(OpenAPI, {
-    method: "GET",
-    url: "/receipt-entry/",
-    query: {
-      skip,
-      limit,
-      user_id: userId,
-      start_date: startDate,
-      end_date: endDate,
-      date_filter: dateFilter,
-      column_filter_string: columnFilterString,
-      column_filter_string_value: columnFilterStringValue,
-      column_filter_int: columnFilterInt,
-      column_filter_int_value: columnFilterIntValue,
-    },
-    errors: {
-      422: `Validation Error`,
-    },
-  });
-}
+  public static receiptEntryReadMultipleReceiptEntries({
+    skip = 0,
+    limit = 1000,
+    userId,
+    startDate,
+    endDate,
+    dateFilter = "created_at",
+    columnFilterString,
+    columnFilterStringValue,
+    columnFilterInt,
+    columnFilterIntValue,
+  }: {
+    skip?: number;
+    limit?: number;
+    userId?: number | string | null;
+    startDate?: string | null;
+    endDate?: string | null;
+    dateFilter?: string;
+    columnFilterString?: string | null;
+    columnFilterStringValue?: string | null;
+    columnFilterInt?: string | null;
+    columnFilterIntValue?: number | null;
+  } = {}): CancelablePromise<ApiResponse<any>> {
+    return __request(OpenAPI, {
+      method: "GET",
+      url: `/receipt-entry/?timestamp=${new Date().getTime()}`,
+      query: {
+        skip,
+        limit,
+        user_id: userId,
+        start_date: startDate,
+        end_date: endDate,
+        date_filter: dateFilter,
+        column_filter_string: columnFilterString,
+        column_filter_string_value: columnFilterStringValue,
+        column_filter_int: columnFilterInt,
+        column_filter_int_value: columnFilterIntValue,
+      },
+      errors: {
+        422: `Validation Error`,
+      },
+    });
+  }
 
   /**
    * Count Receipt Entries

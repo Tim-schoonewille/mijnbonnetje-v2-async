@@ -66,8 +66,9 @@ export default function ReceiptsPage() {
         await ReceiptEntryService.receiptEntryReadMultipleReceiptEntries(
           payload
         );
-
-      setReceipts(response.body);
+      if (response.status === 200) {
+        setReceipts(response.body);
+      }
     } catch (e) {
       console.error(e);
     }
@@ -85,15 +86,15 @@ export default function ReceiptsPage() {
       setIsLoading(false);
     }
   }
+  // useEffect(() => {
+  // }, []);
+  
   useEffect(() => {
     readStores();
+    readReceipts();
   }, [categoryParam, storeParam, startDateParam, endDateParam]);
 
-  useEffect(()=> {
-    readReceipts()
-  }, [categoryParam, storeParam, startDateParam, endDateParam])
-
-  console.log(stores)
+  console.log(stores);
 
   if (orderBy && receipts && sort) {
     switch (orderBy) {

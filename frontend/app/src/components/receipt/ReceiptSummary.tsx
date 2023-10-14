@@ -464,7 +464,7 @@ export default function ReceiptSummary({
         <Text as="b">
           <DownloadIcon mr="10px" />
           <Link
-            href={`http://frontend.mijnbonnetje.lan:8000/${receipt.receiptFiles[0].filePath}`}
+            href={`http://frontend.mijnbonnetje.nl:8000/${receipt.receiptFiles[0].filePath}`}
             isExternal
           >
             Download

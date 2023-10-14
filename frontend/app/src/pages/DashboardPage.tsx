@@ -47,9 +47,13 @@ export default function DashboardPage() {
     try {
       setIsLoading(true);
       const response =
-        await ReceiptEntryService.receiptEntryReadMultipleReceiptEntries();
+        await ReceiptEntryService.receiptEntryReadMultipleReceiptEntries({
+          skip: 0,
+        });
       if (response.status === 200) {
         setReceipts(response.body);
+      } else {
+        alert(response.body["detail"]);
       }
     } catch (e) {
       console.error(e);
