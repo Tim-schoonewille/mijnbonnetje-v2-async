@@ -2,9 +2,11 @@ from uuid import UUID
 
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
+from redis.asyncio import Redis as AsyncRedis
 
 from app import crud
 from app import models
+from app.config import CachedItemPrefix
 
 
 async def create_or_get_store_id(
@@ -31,6 +33,7 @@ async def get_store(
 
 async def add_store_to_user(
     db: AsyncSession,
+    cache: AsyncRedis,
     user: models.UserDB,
     store_id: int | UUID,
 ) -> None:
@@ -42,12 +45,13 @@ async def add_store_to_user(
 
 
 async def remove_user_from_store(
-    db: AsyncSession, user: models.UserDB, store_id: int | UUID
+    db: AsyncSession, cache: AsyncRedis, user: models.UserDB, store_id: int | UUID
 ) -> None:
     print('removing from store..')
     store = await get_store(db, store_id)
     await user.awaitable_attrs.stores
     if store in user.stores:
+        await cache.delete(f'{CachedItemPrefix.STORES}{user.id}')
         await crud.store.remove(db, store)
 
 

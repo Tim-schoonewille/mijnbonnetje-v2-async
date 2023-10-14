@@ -97,6 +97,7 @@ export default function DashboardStore({
                             value={percentage}
                             size="sm"
                             colorScheme="teal"
+                            rounded={6}
                             mb={2}
                           />
                         </Link>
@@ -121,6 +122,7 @@ export default function DashboardStore({
                       <Link key={store.id} to={`/receipts?shop=${store.id}`}>
                         <Text mb={2}>{store.name.toLowerCase()}</Text>
                         <Progress
+                          rounded={6}
                           mb={2}
                           value={percentage}
                           size="sm"

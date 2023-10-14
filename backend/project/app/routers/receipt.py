@@ -21,6 +21,7 @@ from app.utilities.core.dependencies import ParametersDepends
 from app.utilities.core.dependencies import VerifiedUser
 from app.utilities.core.dependencies import UserLimitedAPICalls
 from app.utilities.core.redis import get_cached_item
+from app.utilities.store import entries_related_to_store, remove_user_from_store
 
 
 router = APIRouter(prefix=settings.URL_PREFIX + "/receipt", tags=["receipt"])
@@ -111,9 +112,12 @@ async def read_specific_full_receipt(
         404: {detail:"RECEIPT_NOT_FOUND"}
         403: {detail: "ACCESS_DENIED"}
     """
-    # cached_item = await get_cached_item(cache, CachedItemPrefix.RECEIPT, receipt_id, user.id)
-    # if cached_item:
-    #     return cached_item
+    cached_item = await get_cached_item(
+        cache, CachedItemPrefix.RECEIPT, receipt_id, user.id
+    )
+    if cached_item:
+        print('Getting from cache')
+        return cached_item
 
     receipt = await crud.receipt_entry.get(db, receipt_id)
     if receipt is None:
@@ -134,7 +138,7 @@ async def read_specific_full_receipt(
 async def delete_specific_full_receipt(
     receipt_id: int | UUID,
     user: VerifiedUser,
-    cache: GetCache,
+    cache: GetAsyncCache,
     db: GetDB,
 ):
     """Delete a full receipt from database with:
@@ -150,6 +154,13 @@ async def delete_specific_full_receipt(
         raise HTTPException(status_code=403, detail="ACCESS_DENIED")
     await refresh_receipt_entry(db, receipt)
 
+    entries_related = await entries_related_to_store(db, user, receipt.store_id)
+    print('ENTRIES RELATED::: ', entries_related)
+    if not entries_related:
+        print('::: HAS NO ENTRIES RELATED')
+        await remove_user_from_store(db, cache, user, receipt.store_id)
+
+    await cache.delete(f'{CachedItemPrefix.RECEIPT}{receipt_id}')
+    await cache.delete(f'{CachedItemPrefix.STORES}{user.id}')
     await crud.receipt_entry.remove(db, receipt)
-    cache.delete(f'{CachedItemPrefix.RECEIPT}{receipt_id}')
     return dict(message="RECEIPT_DELETED")

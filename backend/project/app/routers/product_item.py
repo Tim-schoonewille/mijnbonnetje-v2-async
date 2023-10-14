@@ -6,8 +6,8 @@ from fastapi import HTTPException
 
 from app import crud
 from app import models
-from app.config import settings
-from app.utilities.core.dependencies import VerifiedUser
+from app.config import CachedItemPrefix, settings
+from app.utilities.core.dependencies import GetAsyncCache, VerifiedUser
 from app.utilities.core.dependencies import GetDB
 from app.utilities.core.dependencies import ParametersDepends
 
@@ -63,6 +63,7 @@ async def update_specific_product_item(
     product_item_id: int | UUID,
     schema: models.ProductItemUpdate,
     user: VerifiedUser,
+    cache: GetAsyncCache,
     db: GetDB,
 ):
     """Update specific product item in database.
@@ -76,6 +77,7 @@ async def update_specific_product_item(
         raise HTTPException(status_code=404, detail="PRODUCT_ITEM_NOT_FOUND")
     if product_item_in_db.user_id != user.id:
         raise HTTPException(status_code=403, detail="ACCESS_DENIED")
+    await cache.delete(f'{CachedItemPrefix.RECEIPT}{product_item_in_db.receipt_entry_id}')
     return await crud.product_item.update(db, schema, product_item_in_db)
 
 
@@ -83,6 +85,7 @@ async def update_specific_product_item(
 async def delete_specific_product_item(
     product_item_id: int | UUID,
     user: VerifiedUser,
+    cache: GetAsyncCache,
     db: GetDB,
 ):
     """Delete specific product item in database.
@@ -96,5 +99,8 @@ async def delete_specific_product_item(
         raise HTTPException(status_code=404, detail="PRODUCT_ITEM_NOT_FOUND")
     if product_item_in_db.user_id != user.id:
         raise HTTPException(status_code=403, detail="ACCESS_DENIED")
+
+    await cache.delete(f'{CachedItemPrefix.RECEIPT}{product_item_in_db.receipt_entry_id}')
     await crud.product_item.remove(db, product_item_in_db)
+
     return dict(message="PRODUCT_ITEM_DELETED")

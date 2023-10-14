@@ -122,8 +122,9 @@ export default function DashboardCategory({
                     (categoryTotalQuantity[category] / total) * 100;
                   console.log(category, percentage);
                   return (
-                    <>
+                    <Box>
                       <Link
+
                         key={category}
                         to={`/receipts?category=${category}`}
                       >
@@ -134,10 +135,11 @@ export default function DashboardCategory({
                           }
                           size="sm"
                           colorScheme="teal"
-                          mb={2}
+                          rounded={6}
+                          mb={4}
                         />
                       </Link>
-                    </>
+                    </Box>
                   );
                 })}
                 {Object.keys(categoryTotalAmounts).length > maxIterations && (
@@ -174,6 +176,7 @@ export default function DashboardCategory({
                           }
                           size="sm"
                           colorScheme="teal"
+                          rounded={6}
                           mb={2}
                         />
                       </Link>

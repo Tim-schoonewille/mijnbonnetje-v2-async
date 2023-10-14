@@ -1,16 +1,19 @@
+import pickle
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException
 
 
 from app import crud, models
-from app.config import settings
+from app.config import CachedItemPrefix, settings
 from app.utilities.core.dependencies import (
+    GetAsyncCache,
     VerifiedUser,
     GetDB,
     ParametersDepends,
     SudoUser,
 )
+from app.utilities.core.redis import get_cached_item
 
 router = APIRouter(prefix=settings.URL_PREFIX + "/store", tags=["store"])
 
@@ -28,9 +31,18 @@ async def search_store(q: str, user: VerifiedUser, db: GetDB):
 
 
 @router.get("/user", response_model=list[models.Store])
-async def read_user_stores(user_: VerifiedUser, db: GetDB):
-    print("USER:::::", user_)
+async def read_user_stores(user_: VerifiedUser, cache: GetAsyncCache, db: GetDB):
+    cached_items = await cache.get(f'{CachedItemPrefix.STORES}{user_.id}')
+    if cached_items:
+        print("::: GETTING STORES FROM CACHE FOR USER ")
+        cached_items = pickle.loads(cached_items)
+        return cached_items
     await user_.awaitable_attrs.stores
+    await cache.set(
+        name=f'{CachedItemPrefix.STORES}{user_.id}',
+        value=pickle.dumps(user_.stores),
+        ex=settings.CACHE_EXPIRATION_TIME,
+    )
     return user_.stores
 
 
@@ -57,7 +69,11 @@ async def read_multiple_stores(
 
 @router.patch("/{store_id}", response_model=models.Store)
 async def update_store(
-    store_id: int | UUID, update_schema: models.StoreUpdate, sudo: VerifiedUser, db: GetDB
+    store_id: int | UUID,
+    update_schema: models.StoreUpdate,
+    user: VerifiedUser,
+    cache: GetAsyncCache,
+    db: GetDB
 ):
     """Update specific store (requires sudo login)
     c
@@ -67,11 +83,12 @@ async def update_store(
     store_in_db = await crud.store.get(db, store_id)
     if store_in_db is None:
         raise HTTPException(status_code=404, detail="STORE_NOT_FOUND")
+    await cache.delete(f'{CachedItemPrefix.STORES}{user.id}')
     return await crud.store.update(db, update_schema, store_in_db)
 
 
 @router.delete("/{store_id}")
-async def delete_store(store_id: int | UUID, sudo: SudoUser, db: GetDB):
+async def delete_store(store_id: int | UUID, user: VerifiedUser, cache: GetAsyncCache, db: GetDB):
     """delete specific store (requires sudo login)
     c
         Raises:\n
@@ -80,5 +97,6 @@ async def delete_store(store_id: int | UUID, sudo: SudoUser, db: GetDB):
     store_in_db = await crud.store.get(db, store_id)
     if store_in_db is None:
         raise HTTPException(status_code=404, detail="STORE_NOT_FOUND")
+    await cache.delete(f'{CachedItemPrefix.STORES}{user.id}')
     await crud.store.remove(db, store_in_db)
     return dict(message="STORE_DELETED")

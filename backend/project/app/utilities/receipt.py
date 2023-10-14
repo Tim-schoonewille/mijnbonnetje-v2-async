@@ -192,7 +192,7 @@ async def handle_receipt_ocr(
 
     store_id = await create_or_get_store_id(db, user, store_name)
     if not testing:
-        await add_store_to_user(db, user, store_id)
+        await add_store_to_user(db, cache, user, store_id)
     entry_update_schema = models.ReceiptEntryUpdate(
         store_id=store_id,
         total_amount=int(total_amount * 100),

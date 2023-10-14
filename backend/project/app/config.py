@@ -97,6 +97,7 @@ class CachedItemPrefix(str, Enum):
     USER = f"{CACHED_ITEM_PREFIX}user_"
     TIER = f"{CACHED_ITEM_PREFIX}tier_"
     RECEIPT = f'{CACHED_ITEM_PREFIX}receipt_'
+    STORES = f'{CACHED_ITEM_PREFIX}stores_'
     RECEIPT_ENTRY = f'{CACHED_ITEM_PREFIX}receipt_entry_'
     PROXY_IP = f'{CACHED_ITEM_PREFIX}proxy_ip_'
 

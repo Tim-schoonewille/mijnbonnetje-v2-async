@@ -34,7 +34,7 @@ async def create_receipt_entry(
         404: {detail:"STORE_NOT_FOUND" }
     """
     if schema.store_id:
-        await add_user_to_store(db, user, schema.store_id)
+        await add_store_to_user(db, user, schema.store_id)
     new_receipt_entry = await crud.receipt_entry.create(db, schema, user)
     return new_receipt_entry
 
@@ -74,7 +74,7 @@ async def count_receipt_entries(
 async def read_specific_receipt_entry(
     receipt_entry_id: int | UUID,
     user: VerifiedUser,
-    cache: GetCache,
+    cache: GetAsyncCache,
     db: GetDB,
 ):
     """
@@ -84,6 +84,11 @@ async def read_specific_receipt_entry(
         404: {detail="RECEIPT_ENTRY_NOT_FOUND"}
         403: {detail="NOT_YOUR_RECEIPT_ENTRY"}
     """
+    cached_item = await get_cached_item(
+        cache, CachedItemPrefix.RECEIPT, receipt_entry_id, user.id
+    )
+    if cached_item:
+        return cached_item
     receipt_entry_in_db = await crud.receipt_entry.get(db, receipt_entry_id)
     if receipt_entry_in_db is None:
         raise HTTPException(status_code=404, detail="RECEIPT_ENTRY_NOT_FOUND")
@@ -118,11 +123,11 @@ async def update_receipt_entry(
     print('store id: ', update_schema.store_id)
     if update_schema.store_id and update_schema.store_id != 0:
         if receipt_entry_in_db.store_id:
-            await add_store_to_user(db, user, update_schema.store_id)
+            await add_store_to_user(db, cache, user, update_schema.store_id)
             entries_related = await entries_related_to_store(db, user, receipt_entry_in_db.store_id)
             if not entries_related:
                 print('has no entries related')
-                await remove_user_from_store(db, user, receipt_entry_in_db.store_id)
+                await remove_user_from_store(db, cache, user, receipt_entry_in_db.store_id)
     # if not update_schema.store_id and receipt_entry_in_db.store_id is not None:
     #     print('This action remvoved the store_id from entry...')
     #     raise HTTPException(status_code=400, detail='ENTRY_NEEDS_STORE_ID')
@@ -138,6 +143,7 @@ async def update_receipt_entry(
 async def delete_receipt_entry(
     receipt_entry_id: int | UUID,
     user: VerifiedUser,
+    cache: GetAsyncCache,
     db: GetDB,
 ):
     """
@@ -158,6 +164,7 @@ async def delete_receipt_entry(
             db, user, receipt_entry_in_db.store_id
         )
         if not has_entries_related_to_store:
-            await remove_user_from_store(db, user, receipt_entry_in_db.store_id)
+            await remove_user_from_store(db, cache, user, receipt_entry_in_db.store_id)
+    await cache.delete(f'{CachedItemPrefix.RECEIPT}{receipt_entry_id}')
     await crud.receipt_entry.remove(db, receipt_entry_in_db)
     return dict(message="RECEIPT_ENTRY_DELETED")

@@ -1,6 +1,6 @@
 import React, { Dispatch, SetStateAction } from "react";
 import SingleProductItem from "./SingleProductItem";
-import { Flex, Icon, Text } from "@chakra-ui/react";
+import { Flex, Icon, Spinner, Text } from "@chakra-ui/react";
 
 import { MdProductionQuantityLimits } from "react-icons/md";
 import { ProductItem } from "../../client";
@@ -14,7 +14,8 @@ export default function ProductItems({
   update,
 }: ProductItemsProps) {
   if (productItems === null || productItems === undefined)
-    return <Text>Error loading products</Text>;
+    //return <Text>Error loading products</Text>;
+    return <Spinner />;
   return (
     <>
       <Flex flexDirection="column" gap={3}>
