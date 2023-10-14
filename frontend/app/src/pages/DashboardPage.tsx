@@ -31,6 +31,7 @@ import { CopyIcon } from "@chakra-ui/icons";
 import { RiMoneyDollarBoxLine } from "react-icons/ri";
 import { Link } from "react-router-dom";
 import DashboardStore from "../components/dashboard/DashboardStore";
+import DashboardCategory from "../components/dashboard/DashboardCategory";
 
 export default function DashboardPage() {
   const [receipts, setReceipts] = useState<ReceiptEntry[] | null>();
@@ -166,12 +167,6 @@ export default function DashboardPage() {
     return totalAmount;
   }
 
-
-
-
-  
-
-
   return (
     <RequiresValidToken>
       {/* <HStack p={5}>
@@ -301,72 +296,21 @@ export default function DashboardPage() {
             )}
           </Flex>
           <Divider mt={3} mb={10} />
-          <Box m={5}>
-            <Heading size="sm" mt={3} mb={3}>
-              Total per category:
-            </Heading>
-
-            {/* <Button variant={showTotalAmount ? "solid" : "outline"}>
-                Entries
-              </Button> */}
-
-            {categories.map((category) => {
-              const totalEntriesInCategory = countEntriesByCategory(
-                receipts,
-                category
-              );
-              const totalAmountInCategory = getTotalByCategory(
-                receipts,
-                category
-              );
-
-              const totalEntries = receipts ? receipts.length : 100;
-              const percentageofEntries =
-                (totalEntriesInCategory / totalEntries) * 100;
-
-              const percentageOfTotalAmount =
-                (totalAmountInCategory / totalAmountOfAllEntries) * 100;
-
-              if (totalEntriesInCategory === 0) return;
-              return (
-                <Link key={category} to={`/receipts/?category=${category}`}>
-                  <Flex flexDirection={"column"} mb={2}>
-                    <Text mb={1}>
-                      {category} (
-                      {showTotalAmount
-                        ? totalAmountInCategory / 100
-                        : totalEntriesInCategory}
-                      )
-                    </Text>
-                    <Progress
-                      size="sm"
-                      colorScheme="teal"
-                      value={
-                        showTotalAmount
-                          ? percentageOfTotalAmount
-                          : percentageofEntries
-                      }
-                    />
-                  </Flex>
-                </Link>
-              );
-            })}
-            <Tabs
-              size="sm"
-              isFitted
-              variant="soft-rounded"
-              mt={5}
-              align="end"
-              colorScheme="teal"
-            >
-              <TabList>
-                <Tab onClick={() => setShowTotalAmount(false)}>Total</Tab>
-                <Tab onClick={() => setShowTotalAmount(true)}>money</Tab>
-              </TabList>
-            </Tabs>
-          </Box>
+          {dataAll && (
+            <DashboardCategory
+              categories={categories}
+              receipts={receipts}
+              totalAmountMoney={dataAll.totalAmount}
+            />
+          )}
           <Divider mt={3} mb={10} />
-          {stores && dataAll && <DashboardStore stores={stores} receipts={receipts} totalAmountMoney={dataAll.totalAmount}/>}
+          {stores && dataAll && (
+            <DashboardStore
+              stores={stores}
+              receipts={receipts}
+              totalAmountMoney={dataAll.totalAmount}
+            />
+          )}
         </>
       )}
     </RequiresValidToken>

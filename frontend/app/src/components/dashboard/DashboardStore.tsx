@@ -69,7 +69,7 @@ export default function DashboardStore({
       {stores && (
         <Box m={5}>
           <Heading size="sm" mt={3} mb={3}>
-            Top 5 stores:
+            Stores:
           </Heading>
 
           <Tabs
@@ -140,7 +140,7 @@ export default function DashboardStore({
                 </TabPanel>
               </TabPanels>
             </Box>
-            <TabList>
+            <TabList mt={3}>
               <Tab>Total</Tab>
               <Tab>MONEY</Tab>
             </TabList>

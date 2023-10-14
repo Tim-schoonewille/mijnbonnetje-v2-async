@@ -31,7 +31,7 @@ export default function NavMobile({ links }: NavMobileProps) {
       pr={5}
     >
       <ColorModeSwitcher justifySelf="flex-end" />
-      <Button colorScheme="teal" variant='outline' onClick={onOpen}>
+      <Button variant='outline' onClick={onOpen}>
         <HamburgerIcon />
       </Button>
 
