@@ -70,7 +70,7 @@ async def register_new_user(
     return await handle_signup(schema_in, bg_tasks, db)
 
 
-@router.post("/login", response_model=dict[str, str])
+@router.post("/login", response_model=dict[str, bool | dict[str, str]])
 @log_traffic()
 async def login_user(
     schema_in: models.UserLogin,
@@ -184,7 +184,7 @@ async def request_email_verification_code(
     schema: models.RequestNewPassword,
     request: Request,
     bgtasks: BackgroundTasks,
-    db: GetDB
+    db: GetDB,
 ):
     """
     Request a new email verification code.
@@ -258,7 +258,7 @@ async def verify_new_password_request(
     )
 
 
-@router.get("/twofactor/", response_model=models.Tokens)
+@router.get("/twofactor/", response_model=dict[str, dict[str, str]])
 async def handle_two_factor_otp(
     otp_session_id: UUID,
     otp: str,
@@ -286,7 +286,8 @@ async def handle_two_factor_otp(
     if user is None:
         raise HTTPException(status_code=404, detail="USER_NOT_FOUND")
     await register_new_login(user, db, request, fresh=True)
-    return await create_login_tokens(user, response, db)
+    tokens = await create_login_tokens(user, response, db)
+    return dict(payload=tokens)
 
 
 @router.patch("/twofactor/enable/{action}")
@@ -329,7 +330,7 @@ async def twofactor_renew(
 
 async def handle_signup(
     schema: models.UserCreate, bg_tasks: BackgroundTasks, db: AsyncSession
-) -> dict[str, str]:
+) -> models.UserDB:
     user = await crud.user.get_by_email(db, schema.email)
     if user:
         raise HTTPException(status_code=400, detail="DUPLICATE_EMAIL")
@@ -349,8 +350,8 @@ async def handle_login(
     settings: Settings,
     cache: AsyncRedis,
     db: AsyncSession,
-) -> dict[str, str]:
-    user: models.UserDB = await crud.user.get_by_email(db, email)
+) -> dict[str, bool | dict[str, str]]:
+    user = await crud.user.get_by_email(db, email)
     if user is None:
         raise invalid_credentials()
     login_attempts = await redis_login_attempts(user.id, cache)
@@ -365,9 +366,10 @@ async def handle_login(
     if user.two_factor:
         new_otp = await register_new_otp(cache=cache, user_id=user.id)
         send_otp(email, new_otp, bg_tasks)
-        return dict(TwoFactor="sent")
+        return {"twoFactor": True}
     await register_new_login(user, db, request, fresh=True)
-    return await create_login_tokens(user, response, db)
+    tokens = await create_login_tokens(user, response, db)
+    return {"twoFactor": False, "tokens": tokens}
 
 
 async def handle_logout(
@@ -384,11 +386,13 @@ def handle_token() -> dict[str, bool]:
 
 
 async def handle_new_verification_code(
-    email: str, bgtasks: BackgroundTasks, db: AsyncSession,
+    email: str,
+    bgtasks: BackgroundTasks,
+    db: AsyncSession,
 ) -> dict[str, str]:
     user = await crud.user.get_by_email(db, email)
     if user is None:
-        raise HTTPException(status_code=404, detail='INVALID_EMAIL')
+        raise HTTPException(status_code=404, detail="INVALID_EMAIL")
     if user.verified:
         raise HTTPException(status_code=400, detail="ALREADY_VERIFIED")
 
@@ -422,7 +426,9 @@ async def handle_verify_email(token: str, db: AsyncSession) -> dict[str, str]:
     return dict(status="verified")
 
 
-async def handle_new_password_token(email: str, db: AsyncSession, tasks: BackgroundTasks) -> dict[str, str]:
+async def handle_new_password_token(
+    email: str, db: AsyncSession, tasks: BackgroundTasks
+) -> dict[str, str]:
     db_user: models.UserDB = await crud.user.get_by_email(db, email)
     if db_user is None:
         raise HTTPException(status_code=404, detail="INVALID_EMAIL")

@@ -1,8 +1,11 @@
 import asyncio
+import json
 import pickle
 import os
-from datetime import datetime, date, time
+import time
+from datetime import datetime, date
 from pathlib import Path
+from app import models
 
 from app.config import settings
 from app.tasks.celery import celery_app
@@ -59,20 +62,41 @@ def task_log_traffic() -> None:
         f.write(str(api_traffic))
 
 
+# @celery_app.task
+# def task_update_proxy_list_to_cache() -> None:
+#     async def update_proxy_list_to_cache() -> None:
+#         from app.tasks.utils.proxy_scanner import ProxyScanner
+#         from redis import asyncio as aioredis
+
+#         # endpoint = "https://ipv4.icanhazip.com"
+#         endpoint = "https://api.ipify.org?format=json"
+#         proxy_scanner = ProxyScanner('./utils/proxies.txt', endpoint)
+#         await proxy_scanner.test_all_proxies()
+#         redis = aioredis.from_url(f'redis://:{settings.REDIS_PASSWORD}@localhost:6379')
+#         async with redis.client() as client:
+#             await client.set('proxies', pickle.dumps(proxy_scanner.working_proxies))
+
+#     asyncio.run(update_proxy_list_to_cache())
+#     print(os.getcwd())
+#     return
+
+
 @celery_app.task
-def task_update_proxy_list_to_cache() -> None:
-    async def update_proxy_list_to_cache() -> None:
-        from app.tasks.utils.proxy_scanner import ProxyScanner
-        from redis import asyncio as aioredis
+def export_receipts_to_json(
+    receipts: list[models.ReceiptEntryDB], user_id: int
+) -> None:
+    with open(
+        f"./public/exports/export_{user_id}_{datetime.utcnow()}.txt",
+        "w",
+        encoding="utf-8",
+    ) as file:
+        json.dump(receipts, file)
 
-        # endpoint = "https://ipv4.icanhazip.com"
-        endpoint = "https://api.ipify.org?format=json"
-        proxy_scanner = ProxyScanner('./utils/proxies.txt', endpoint)
-        await proxy_scanner.test_all_proxies()
-        redis = aioredis.from_url(f'redis://:{settings.REDIS_PASSWORD}@localhost:6379')
-        async with redis.client() as client:
-            await client.set('proxies', pickle.dumps(proxy_scanner.working_proxies))
+    return None
 
-    asyncio.run(update_proxy_list_to_cache())
-    print(os.getcwd())
-    return
+
+@celery_app.task
+def run_in_bg_test() -> None:
+    time.sleep(10)
+    print("Running in background or nay?")
+    return None

@@ -66,7 +66,7 @@ async def create_login_tokens(
     user: models.UserDB,
     res: Response,
     db: AsyncSession,
-) -> dict:
+) -> dict[str, str]:
     access_token = create_access_token(sub=user.email)
     jti_refresh_token = str(uuid4())
     refresh_token = create_access_token(

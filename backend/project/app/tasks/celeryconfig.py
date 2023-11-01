@@ -1,8 +1,8 @@
 from celery.schedules import crontab  # type: ignore
 
 
-broker_url = "pyamqp://admin:admin@localhost"
-result_backend = "rpc://"
+# broker_url = "pyamqp://admin:admin@localhost"
+# result_backend = "redis://:REDIS_PASSWORD@localhost:6379"
 result_expires = 3600
 include = ["app.tasks.tasks"]
 timezone = "Europe/Berlin"
@@ -15,10 +15,10 @@ beat_schedule = {
         "task": "app.tasks.tasks.task_update_subscription_active_status",
         "schedule": crontab(minute="*/5"),
     },
-    "update-proxy-list-to-cache": {
-        "task": "app.tasks.tasks.task_update_proxy_list_to_cache",
-        "schedule": crontab(),
-    }
+    # "update-proxy-list-to-cache": {
+    #     "task": "app.tasks.tasks.task_update_proxy_list_to_cache",
+    #     "schedule": crontab(),
+    # }
 }
 
 
