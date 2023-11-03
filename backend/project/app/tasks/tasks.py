@@ -5,11 +5,14 @@ import os
 import time
 from datetime import datetime, date
 from pathlib import Path
-from app import models
+from typing import Any
+from app import models, crud
 
 from app.config import settings
 from app.tasks.celery import celery_app
 from app.utilities.core.subscription import update_subscription_active_status
+from app.db import AsyncSessionLocal
+from app.utilities.export.utilities import get_and_export_receipts
 
 
 @celery_app.task
@@ -62,37 +65,32 @@ def task_log_traffic() -> None:
         f.write(str(api_traffic))
 
 
-# @celery_app.task
-# def task_update_proxy_list_to_cache() -> None:
-#     async def update_proxy_list_to_cache() -> None:
-#         from app.tasks.utils.proxy_scanner import ProxyScanner
-#         from redis import asyncio as aioredis
+@celery_app.task
+def task_update_proxy_list_to_cache() -> None:
+    async def update_proxy_list_to_cache() -> None:
+        from app.tasks.utils.proxy_scanner import ProxyScanner
+        from redis import asyncio as aioredis
 
-#         # endpoint = "https://ipv4.icanhazip.com"
-#         endpoint = "https://api.ipify.org?format=json"
-#         proxy_scanner = ProxyScanner('./utils/proxies.txt', endpoint)
-#         await proxy_scanner.test_all_proxies()
-#         redis = aioredis.from_url(f'redis://:{settings.REDIS_PASSWORD}@localhost:6379')
-#         async with redis.client() as client:
-#             await client.set('proxies', pickle.dumps(proxy_scanner.working_proxies))
+        # endpoint = "https://ipv4.icanhazip.com"
+        endpoint = "https://api.ipify.org?format=json"
+        proxy_scanner = ProxyScanner("./utils/proxies.txt", endpoint)
+        await proxy_scanner.test_all_proxies()
+        redis = aioredis.from_url(f"redis://:{settings.REDIS_PASSWORD}@localhost:6379")
+        async with redis.client() as client:
+            await client.set("proxies", pickle.dumps(proxy_scanner.working_proxies))
 
-#     asyncio.run(update_proxy_list_to_cache())
-#     print(os.getcwd())
-#     return
+    # asyncio.run(update_proxy_list_to_cache())
+    print(os.getcwd())
+    return
 
 
 @celery_app.task
-def export_receipts_to_json(
-    receipts: list[models.ReceiptEntryDB], user_id: int
-) -> None:
-    with open(
-        f"./public/exports/export_{user_id}_{datetime.utcnow()}.txt",
-        "w",
-        encoding="utf-8",
-    ) as file:
-        json.dump(receipts, file)
+def export_receipts(
+    params: dict[str, Any], user_id: int, export_types: list[str], folder_name: str
+):
+    asyncio.run(get_and_export_receipts(params, user_id, export_types, folder_name))
 
-    return None
+    return folder_name + ".zip"
 
 
 @celery_app.task

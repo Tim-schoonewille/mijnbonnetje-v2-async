@@ -95,3 +95,8 @@ class Receipt(ReceiptEntry):
     receipt_scans: list["ReceiptScan"]
     store: Union["Store", None] = None
     product_items: list["ProductItem"] | None = None
+
+
+class ReceiptForExport(ReceiptEntry):
+    receipt_files: list['ReceiptFile']
+    store: Union['Store', None] = None

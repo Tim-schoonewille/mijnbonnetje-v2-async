@@ -59,6 +59,7 @@ from .receipt_entry import (
     ReceiptEntryCreate,
     ReceiptEntryUpdate,
     Receipt,
+    ReceiptForExport,
 )
 
 from .store import StoreDB, Store, StoreCreate, StoreUpdate, StoreWithReceiptEntries
@@ -88,3 +89,4 @@ ItemWithUser.model_rebuild()
 UserWithItems.model_rebuild()
 StoreWithReceiptEntries.model_rebuild()
 Receipt.model_rebuild()
+ReceiptForExport.model_rebuild()
